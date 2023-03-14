@@ -2,6 +2,7 @@
 title: "Available textual datasets that are relevant for the analysis of Russia's invasion of Ukraine and conflicts in the region"
 description: "What datasets are publicly available?"
 author: Giorgio Comai
+date: 2022-11-21
 last-modified: 2022-11-21
 categories: [review of literature, content analysis, data sources]
 image: "giocomai_many_words_and_cyrillic_text_coming_out_of_a_tv_set_wi_10a1e1e3-b449-4132-8e24-fd07c53dc4d8.webp"

@@ -1,0 +1,38 @@
+---
+title: "What is a corpus? And what shape should it take?"
+description: "Definitions, and standards and formats for storing and sharing textual data"
+author: Giorgio Comai
+date: 2022-11-22
+last-modified: 2022-11-22
+categories: [review of literature, content analysis, tools]
+image: "giocomai_Text_as_data_being_inserted_into_boxes_of_different_sh_a66b94d8-0041-4bdc-96b7-1bd8413ac565.webp"
+bibliography: references.bib
+---
+
+{{< include ./../_early_disclaimer.qmd >}}
+
+## ![](giocomai_Text_as_data_being_inserted_into_boxes_of_different_sh_a66b94d8-0041-4bdc-96b7-1bd8413ac565.webp){fig-align="left" style="float:left; margin-right: 10px; margin-top: 10px; margin-bottom: 0px;" width="320"}Definition: what is a corpus?
+
+At the most basic, "any collection of more than one text" can be considered a corpus [@mcenery2011, p. 29]. It is usually "collected for a specific purpose" [@kopotev2021, p. 299], even if this may not always be the case. Within the scope of this project, I would define a corpus as a collection of texts that:
+
+-   exists in machine-readable format (historically, this was obviously not the case, but talking about a corpus in the present tense implies that it be machine-readable)
+
+-   is of finite size (it may be only partially available, but it must have clearly discernible boundaries)
+
+-   has a coherent and consistent structure (for example, tweets and long-form articles should be in separate corpora)
+
+In linguistics, it is often important that a corpus is representative and includes language variety, features that can partly be measured and may depend on sampling [e.g. @mcenery2011, p. 29]. For scholars working on IR, peace and conflict studies, area studies, etc., such issues may or may not be relevant, or rather, they may be considered at a different stage of the process.
+
+For example, when analyising one or more nationalist outlets in Russia, I would define a corpus as all articles published on a given newspaper within a given timeframe. Unless I am specifically interested in that newspaper for a specific reason, the assumption would generally be that such a corpus would be "representative" of at least a certain strand of nationalist discourse in Russia. So while the corpus may be conceptually and practically finite in size and fully available in machine-readable format, questions of representativeness are left to the analytical phase.
+
+A different approach may consist in creating a corpus based on a sample of social media posts; in this context, issues of sampling and representativeness emerge more evidently. Even in such cases, however, there may be advantages in defining more tightly the case under analysis and make sure the corpus has finite and distinct boundaries.
+
+Either way, "we must understand what we are doing when we are looking in a corpus and building one" (@mcenery2011, p. 19). Both aspects are important. In order to analyse data, it is important that we fully understand how the data have been produced, collected, and processed. And it is just as important that we have a reasonable grasp of what we are doing when we analyse a corpus; at a time when even conceptually ludicrously complex analyses can be achieved simply by copy/pasting chunks of code, the temptation may be difficult to resist. Indeed, it is harder to abide by both of these principles than it may appear.
+
+## The tools
+
+The importance of tools. See @rieder2022
+
+## tif: Text Interchange Formats
+
+**Website:** <https://docs.ropensci.org/tif/>
