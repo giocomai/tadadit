@@ -2,4 +2,4 @@
 
 This repository hosts the `tadadit.xyz` website. 
 
-Selected datasets are available for downloaded from the releases section.
+Selected datasets are available for downloade from the releases section.
