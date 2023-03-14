@@ -1,0 +1,78 @@
+---
+title: "Tools for text mining and text analysis"
+description: "Software packages or other solutions that can be used to facilitate retrieving, analysing, and processing textual data."
+author: Giorgio Comai
+last-modified: 2022-11-22
+categories: [review of literature, content analysis, tools]
+image: "giocomai_a_wrench_used_to_process_text_as_data_1e95dc29-beed-4e2f-be9f-595aeaed9da7.webp"
+---
+
+## ![](giocomai_a_wrench_used_to_process_text_as_data_1e95dc29-beed-4e2f-be9f-595aeaed9da7.webp) Context {#top-left-img}
+
+Some of the most common software packages used by scholars who work on content analysis are proprietary (e.g. *NVivo* or *MAXQDA*). This project is however based on the assumption that the researcher has no access to proprietary software or proprietary datasets, which is often the case for anyone working outside of established academic institutions or businesses. Most advanced analyses are anyway already conducted using open source tools, which offer more solid foundations for long-term research commitments. Hence, for both practical and philosophical reasons, this section will focus on free and open source solutions available to anyone willing to learn how to use them, and, quite possibly, improve them.
+
+[![](/img/castarter_logo.webp){style="float: right;" width="200"}](https://castarter.tadadit.xyz/)With this in mind, I have been developing a package for the R programming language that makes it easier to create textual datasets from on-line resources and conduct basic analyses. This is based on the idea that many of the [features needed in a content analysis starter toolkit](./../posts/2022-10-content-analysis-toolkit-for-starters) are not readily available. The package, [`castarter`](https://github.com/giocomai/castarter) is currently available on-line, with extensive documentation to be published on this website soon.
+
+There is, however, a great number of solutions for processing and analysing textual datasets. In this section, I will list some of the most established. I will also include references to some tools that facilitate the retrieval of textual data from various on-line sources.
+
+## R packages for processing textual data
+
+In the R ecosystem, there are many packages dedicated to processing textual data and working on text as data. In the last decade, there have been various iterations of approaches, but by 2023 there are some clear points of reference for anyone interested in working with textual data in R.
+
+The most obvious starting point is the book [Text Mining with R](https://www.tidytextmining.com/), written by the authors of the [`tidytext`](https://juliasilge.github.io/tidytext/) R package.
+
+Taking it from there, here are some of the most established packages (or collection of packages) to further advance your textual analysis journey from within R.
+
+### tidytext
+
+**Self-described as**: "Text mining using tidy tools"
+
+**Website**: <https://juliasilge.github.io/tidytext/>
+
+### quanteda
+
+**Self-described as**: "Quantitative Analysis of Textual Data"
+
+**Website**: <https://quanteda.io/>
+
+### text
+
+**Self-described as**: An R-package for analysing natural language with transformers from HuggingFace using Natural Language Processing and Machine Learning.
+
+**Website**: <https://r-text.org/>
+
+## R packages for retrieving textual data
+
+### paperboy
+
+**Self-described as**: "A comprehensive (eventually) collection of web scraping scripts for news media sites"
+
+**Website**: <https://github.com/JBGruber/paperboy>
+
+### vosonSML - Social Media Lab
+
+**Self-described as:**
+
+> The `vosonSML` R package is a suite of easy to use functions for collecting and generating different types of networks from social media data. The package supports the collection of data from `twitter`, `youtube` and `reddit`, as well as `hyperlinks` from web sites. Networks in the form of node and edge lists can be generated from collected data, supplemented with additional metadata, and used to create graphs for Social Network Analysis.
+
+**Website:** [https://vosonlab.github.io/vosonSML/](https://vosonlab.github.io/vosonSML/https://vosonlab.github.io/vosonSML/)
+
+### Newspapers
+
+**Self-described as**: "R package to import articles from newspaper databases"
+
+**Website**: <https://github.com/koheiw/newspapers>
+
+## Python libraries to retrieve textual data
+
+### news-please
+
+**Self-described as: "**news-please - an integrated web crawler and information extractor for news that just works"
+
+**Website**: <https://github.com/fhamborg/news-please>
+
+### Telethon
+
+**Self-described as: "**Full-featured Telegram client library for Python 3"
+
+**Website**: <https://github.com/LonamiWebs/Telethon>
