@@ -1,0 +1,10 @@
+.Rproj.user
+.Rhistory
+.RData
+.Ruserdata
+/.quarto/
+renv
+upload_after_render.sh
+_freeze
+_publish.yml
+_site

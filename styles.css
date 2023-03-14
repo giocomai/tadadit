@@ -1,0 +1,49 @@
+/* BEGIN Regular */
+@font-face {
+  font-family: 'Roboto Condensed';
+  src: url('fonts/Roboto_Condensed/Roboto-Condensed-Regular.eot');
+  src: url('fonts/Roboto_Condensed/Roboto-Condensed-Regular.eot?#iefix') format('embedded-opentype'),
+       url('fonts/Roboto_Condensed/Roboto-Condensed-Regular.woff') format('woff'),
+       url('fonts/Roboto_Condensed/Roboto-Condensed-Regular.ttf') format('truetype'),
+       url('fonts/Roboto_Condensed/Roboto-Condensed-Regular.svg#OpenSansRegular') format('svg');
+  font-weight: normal;
+  font-style: normal;
+}
+/* END Regular */
+
+/* css styles */
+strong {
+   color: black;
+   font-weight: bold; 
+   text-shadow: 1px 1px 2px gray;
+  }
+
+.navbar-container {
+    margin: auto;
+  }
+  
+.navbar-nav li {
+    text-align: center;
+  }
+  
+.nav-footer {
+  min-height: 5.5em;
+  }
+
+#listing-litreview .metadata {
+  display: none;
+}
+
+#top-left-img img {
+  float:left;
+  margin-right: 10px;
+  margin-top: 10px;
+  margin-bottom: 0px;
+  width: 320px;
+  max-width: 320px;
+} 
+
+
+#listing-datasets .table th, .table td {
+	min-width: 200px;
+}
