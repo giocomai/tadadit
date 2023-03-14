@@ -1,0 +1,35 @@
+---
+title: "Words that count"
+description: |
+  A selection of words or expressions that have acquired a special significance in late Putin's Russia
+author: Giorgio Comai
+date: 2023-02-07
+date-modified: 2023-03-14
+image: "giocomai_computer_screen_with_text_as_data_in_cyrillic_02345e6a-3af4-4ade-bd4c-062cdc332d09.webp"
+bibliography: references.bib
+---
+
+{{< include ./../_early_disclaimer.qmd >}}
+
+## ![](giocomai_computer_screen_with_text_as_data_in_cyrillic_02345e6a-3af4-4ade-bd4c-062cdc332d09.webp) Context {#top-left-img}
+
+A number of expressions have gathered particular prominence or significance in Russia's public discourse in relation to Russia's increasingly tense relations with the West, as well as - more directly - in relation to Ukraine, the annexation of Crimea, the war in the Donbas, and the invasion started in 2022. Some of these expressions, including cultural and geographic signifiers, have received scholarly attention in recent years (e.g *Novorossiya* and *Russky mir*), others of more recent vintage in the Russian context (e.g. *denazifikatsiya*) certainly will.
+
+In this document, I keep track of some of these expressions, including reference to scholarly literature related to them, and links to analyses based on datasets generated in the course of this project.
+
+### Geographic and cultural signifiers
+
+-   **Novorossiya** - see @oloughlin2016, @laruelle2016, @suslov2017
+
+-   **Russian world / "russky mir"** - see @oloughlin2017, @starodubtseva2022, @kosienkowski2021a
+
+### Politically loaded expressions
+
+-   **collective West** - see @chimiris2022. See also the detailed post dedicated to the concept of "collective West" [published on this website](../posts/2023-03-who-says-it-first-nationalist-media-kremlin/).
+
+-   **de-nazification**
+
+### Terms that entered media discourse
+
+-   **Wagner / ЧПК Вагнер** - in this January 2023 BBC podcast @bbcnews-russianservice, for example, Liza Fokht highlights how reference to the military organisation Wagner was scarcely to be found, in particular in official sources, until well after the beginning of the invasion in February 2022
+-   **"fake" / "фейк"** - possibly inspired by Donald Trump's obsession with "fake news" which soon spread through media elsewhere, the term has come into use maintaining its English-language form also in Russian-language media

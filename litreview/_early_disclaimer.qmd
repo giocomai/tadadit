@@ -1,0 +1,5 @@
+::: {.callout-warning}
+## Work-in-progress
+
+This page is still a work-in-progress. It is shared in the spirit of keeping the research process as open as possible, but it still a __draft document__, possibly an early draft: incomplete, unedited, and possibily inaccurate. Datasets included may likewise not be fully verified.
+:::
