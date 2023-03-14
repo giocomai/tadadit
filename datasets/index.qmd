@@ -1,0 +1,12 @@
+---
+title: "Datasets"
+listing:
+  sort: "title asc"
+  type: table
+  image-align: right
+  categories: true
+  sort-ui: TRUE
+  filter-ui: true
+  feed: true  
+  fields: [title, description, categories]
+---
