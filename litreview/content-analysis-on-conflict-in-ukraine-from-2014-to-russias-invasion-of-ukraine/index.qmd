@@ -1,0 +1,51 @@
+---
+title: "Content analysis on Russian media and conflict in Ukraine: from Putin's third term to Russia's invasion of Ukraine"
+description: "A review of the scholarly literature"
+author: Giorgio Comai
+last-modified: 2022-11-24
+categories: [review of literature, content analysis, data sources]
+bibliography: references.bib
+image: "giocomai_Text_as_data_being_inserted_into_boxes_of_different_sh_8cdb1e67-8c56-47a0-84ed-2b1ba2819d1f.webp"
+---
+
+{{< include ./../_early_disclaimer.qmd >}}
+
+## ![](giocomai_Text_as_data_being_inserted_into_boxes_of_different_sh_8cdb1e67-8c56-47a0-84ed-2b1ba2819d1f.webp) Context {#top-left-img}
+
+## Approaches
+
+## Methods
+
+Even in some of the most insightful academic articles on the evolving role of media in contemporary Russia, methods of analysis are not fully formalised. @tolz2018, for example, do not offer any details about the method they used to analyse the change of formats and contents in Russian TV broadcasting after Vladimir Putin's return to the presidency in 2012 from entertainment to *agitainment*.
+
+Between 2012 and 2016, they identified four coordinated media campaigns.[^1] Anyone following with any regularity Russian media will easily recognise these media campaigns, and will have noticed the increasingly ubiquitous presence on mainstream TV channels of the kind of "soft news programmes" such as political talk shows that can easily fall under the catchy label of *agitainment.* Yet, a more systematic or structured analysis may have showed additional or different dynamics at play.
+
+[^1]: "The first focused on the Pussy Riot affair and it ran from March to September 2012. This was followed by a year -- long anti migration campaign that began in the fall of 2012. The annexation of Crimea and the so-called Ukraine crisis were the subject of the third intensive campaign from February to May 2014, and continued to dominate the media agenda until at least the end of the year. The fourth campaign covered Russia's intervention in the Syrian Civil War, from September 2015 to May 2016." [@tolz2018, p. 217]
+
+There may be a complementarity at play: methodologically less stringent analyses likely facilitate the development of theories and hypotheses, which can be then tested and refined through more methodologically formalised analyses.
+
+## Tabular summary of key relevant studies
+
+```{r summary of research, echo=FALSE}
+library("dplyr", warn.conflicts = FALSE)
+library("readr")
+
+readr::read_csv("ca_methods_and_sources.csv", show_col_types = FALSE) %>%
+  dplyr::select("study", "media", "data_source", "method", "dataset_available", "dataset_link") %>% 
+  dplyr::rename(`media analysed` = media, 
+                `source` = data_source) %>% 
+  dplyr::mutate(
+    dataset = dplyr::if_else(
+      condition = dataset_available,
+      true = stringr::str_c("<a href='",
+                            dataset_link, 
+                            "'>Link</a>"),
+      false = "Not available"
+    )) %>% 
+  dplyr::select(-"dataset_available", -"dataset_link") %>% 
+knitr::kable()
+```
+
+## Conclusions
+
+As observed by @lalova2022 in her analysis of scholarly publications on Russia, the opportunity to use digital datasets such as news archives "remain relatively untapped in scholarship" in this field. As she observes, in an increasingly authoritarian context where self-reported and survey data have additional reliability issues, and it is more difficult to conduct interviews and fieldwork, it may well be the time for scholars to explore more extensively contents published online and the digital footprints of Russian users, organisations, and institutions as potential sources of data and information.
