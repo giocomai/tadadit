@@ -1,0 +1,114 @@
+---
+title: "Text as data & data in the text"
+subtitle: "Studying conflicts in the post-Soviet space through structured analysis of textual contents available online"
+date: 2022-10-20
+last-modified: 2023-03-14
+description: "What is this project about?"
+bibliography: references.bib
+listing: 
+  - id: about
+    contents: "*.qmd"
+    type: grid
+    sort: "last-modified"
+    fields: [image, title, description]
+    grid-columns: 2
+---
+
+*A project by [Giorgio Comai](https://giorgiocomai.eu/), researcher and data analyst at [OBCT](https://www.balcanicaucaso.org/)/[CCI](https://www.cci.tn.it/)*
+
+<hr />
+
+![](../img/giocomai_highlighting_just_a_few_words_in_a_book_with_TEXT_and__eb01d7d6-f080-4b6a-8536-dccddb68ca81.webp){style="float:left; margin-right: 10px;" width="320"}
+
+Structured analysis of textual contents can take many forms and can be conducted through a variety of approaches of varying complexity.
+
+This emerges most clearly in the burgeoning number of research efforts that include a **text as data** component, ranging from basic word frequency to complex methods that rely on machine learning. In all these cases, the data come from the text itself, from the words themselves.
+
+Data, however, can also be found in the text itself, between words. For example, socio-economic data that are not readily available in nicely formatted tables may be scattered around press releases of local authorities, local news services, or other on-line sources. Researchers commonly quote such data, which they may have found serendipitously, through patient use of search engines, or some other unstructured approach. I argue that in particular for scholars and analysts working on a specific area or case, a structured approach for finding **data in the text** is often both feasible and preferable.
+
+While reference to on-line sources has become ubiquitous, and content analysis of selected official documents quite common, **structured analysis of on-line contents** is still seldom to be found, especially outside of studies that are explicitly focused on content analysis.
+
+Finally, a key component of this whole endeavour is **working in the open**. If you explore this website, you will see that many pages, including reviews of literature, are often in draft format, sometimes just early drafts (and are marked as such). **This is a feature, not a bug**. Significant efforts will be dedicated towards radical transparency throughout all phases of this endeavour, favouring open debates, earlier sharing of knowledge, positive feedback loops, and the advancement of open science practices in academia.
+
+## Project objectives and outputs
+
+![](../img/giocomai_highlighting_just_a_few_words_in_a_book_with_TEXT_and__ad7d592e-0cec-442f-bbfa-77260cbbf29f.webp){style="float:right; margin-left: 10px;" fig-align="left" width="320"}
+
+This project aims at facilitating structured analysis of on-line contents related to conflicts in the post-Soviet space by providing easier access to relevant datasets and tools.
+
+Outputs include:
+
+-   basic **case studies** in the form of brief blog posts that address a meaningful substantive question that can be addressed with these approaches (both "text as data" and "data in the text")
+
+-   easier access to basic content analysis tools and relevant textual corpora for this area of study through **publicly available web interfaces**
+
+-   the publication of relevant **textual corpora** with full metadata in on-line repositories if compatible with copyright restrictions on the original contents
+
+-   **tutorials and tools** facilitating the creation and the update of textual datasets for alternative case studies with a dedicated **package for the R programming language**
+
+-   a **review of literature**, accompanied by posts that outline **how to replicate relevant parts of these studies**, or to explore the same research question with different and possibly complementary datasets
+
+## Sources
+
+-   textual contents related to contested and occupied territories in Ukraine, as well as areas administered by Russian proxies since 2014
+
+-   textual contents published in post-Soviet de facto states
+
+-   textual contents published by Russian media and institutions
+
+## Previous work
+
+![](../img/giocomai_TEXT_AS_DATA__DATA_IN_THE_TEXT_pastel_colours_comics_s_ef58faff-dd90-41b5-a4dc-ff4f5e25aede.webp){fig-align="left" style="float:left; margin-right: 10px;" width="320"}
+
+This project is part of a research journey that has focused on **contested spaces** in the countries of the former Soviet Union, dealing in particular with socio-economic aspects and sources of external support for the entities that govern these territories.
+
+It stems also from a parallel journey with computer programming focused on **data analysis and data visualisation**, and a conviction that technical hurdles unnecessarily restrict access to approaches that should be more readily available to scholars working in area studies, as well as on peace and conflict research.
+
+I have outlined some of these considerations in multiple occasions, including,
+
+-   most briefly, in section 4 of this blog post, "[There's a lot of evidence on-line, and often Google won't help](https://giorgiocomai.eu/post/2018-04-08-non-recognition-is-the-symptom-not-the-cause/#4-theres-a-lot-of-evidence-online-and-often-google-wont-help)", 8 April 2018
+
+<!-- -->
+
+-   in a scholarly article:
+
+    -   Comai, Giorgio. 2017. "[Quantitative Analysis of Web Content in Support of Qualitative Research. Examples from the Study of Post-Soviet de Facto States.](http://publications.tlu.ee/index.php/stss/article/view/346)" *Studies of Transition States and Societies* 9 (1).
+
+-   in public presentations, including:
+
+    -   "[Surfing the post-Soviet web with style. Text mining post-Soviet de facto states](https://giorgiocomai.eu/talk/surfing-post-soviet-web/)", in Tbilisi in 2016
+
+    -   "[Roundtable: Research Data Quality Assessment for the Area-Studies on the post-Soviet region: New Approaches needed?](https://giorgiocomai.eu/talk/research-data-quality-assessment/)", in Tartu in 2016 - see [presentation slides](https://giorgiocomai.eu/talk/research-data-quality-assessment/2017-06-06-pdf-comai-tartu.pdf)
+
+    -   "[Victims of double standards: double victimhood and changing narratives in Azerbaijan's public rhetoric](https://giorgiocomai.eu/talk/double-victimhood-double-standards/)" - in Gorizia in 2018, see key points in the form of a [Twitter thread](https://twitter.com/giocomai/status/1071069167699353600/)
+
+-   in blog posts or articles that to different extents rely on these methods, including:
+
+    -   "[Russophobia in Russian official statements and media. A word frequency analysis](https://giorgiocomai.eu/post/2021-08-01-russophobia-word-frequency/)", 1 August 2021
+
+    -   "[How much has the 2020 war in Nagorno Karabakh been in the news? A comparison with August 2008 war in South Ossetia](https://giorgiocomai.eu/post/2020-10-how-much-has-nagorno-karabakh-been-in-the-news/)", 14 October 2020
+
+    -   "[After a new president came to power, what happened to Transnistria's media?](https://giorgiocomai.eu/post/after-a-new-president-came-to-power-what-happened-to-transnistria-s-media/)", 18 June 2018
+
+    -   "[Abkhazia's parliamentary elections: not for the famous?](https://giorgiocomai.eu/post/abkhazia-s-parliamentary-elections-not-for-the-famous/)", 31 March 2017
+
+    -   "[Word frequency of Ukraine, Crimea, DNR/LNR and Novorossiya on 1tv.ru](https://giorgiocomai.eu/post/2017-03-20-word-frequency-of-ukraine-crimea-dnr-lnr-and-novorossiya-on-1tv-ru.en/)", 20 March 2017
+
+    -   "[Russia and pensions in post-Soviet de facto states](https://giorgiocomai.eu/post/russia-and-pensions-in-post-soviet-de-facto-states/)", 1 February 2016
+
+-   Implicitly, by publishing this dataset:
+
+    -   "[kremlin_en - A textual dataset based on the contents published on the English-language version of the Kremlin's website](https://giorgiocomai.eu/publication/comai_kremlin_en_2021/)", May 2021
+
+## Funding and disclaimers
+
+![](../img/giocomai_highlighting_just_a_few_words_in_a_book_with_TEXT_and__8511f200-3b9c-4454-8b4b-e467e8f8e861.webp){style="float:right; margin-left: 10px;" fig-align="left" width="320"}
+
+This project is **hosted by [OBCT](https://www.balcanicaucaso.org/)/[CCI](https://www.cci.tn.it/)**. It is **carried out with the support of the Italian Ministry of Foreign Affairs and International Cooperation** under art. 23 bis, D.P.R. 18/1967. All opinions expressed within the scope of this project represent the opinion of their author and not those of the Ministry.
+
+> "*Le posizioni contenute nel presente report sono espressione esclusivamente degli autori e non rappresentano necessariamente le posizioni del Ministero degli Affari Esteri e della Cooperazione Internazionale"*
+
+## More about this project
+
+::: {#about}
+:::
