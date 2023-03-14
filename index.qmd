@@ -1,0 +1,92 @@
+---
+title: "Text as data & data in the text"
+subtitle: "Studying conflicts in post-Soviet spaces through structured analysis of textual contents available online"
+listing: 
+  - id: about
+    contents: "about/*.qmd"
+    type: grid
+    image-height: 240px
+    sort: "date"
+    fields: [image, title, description]
+  - id: posts
+    contents: posts
+    sort: "date desc"
+    image-align: right
+    type: default
+    categories: false
+    sort-ui: false
+    filter-ui: false
+    feed: true
+  - id: litreview
+    contents: litreview
+    sort: "date desc"
+    type: default
+    image-align: left
+    categories: false
+    sort-ui: false
+    filter-ui: false
+    feed: true
+    fields: [image, title, description]
+  - id: datasets
+    contents: datasets
+    sort: "date desc"
+    type: table
+    image-align: right
+    categories: true
+    sort-ui: false
+    filter-ui: true
+    feed: true  
+    fields: [title, description, categories]
+  - id: tutorials
+    contents: tutorials
+    sort: "date desc"
+    type: default
+    image-align: right
+    categories: false
+    sort-ui: false
+    filter-ui: false
+    feed: true
+---
+
+*A project led by [Giorgio Comai](https://giorgiocomai.eu/), researcher and data analyst at [OBCT](https://www.balcanicaucaso.org/)/[CCI](https://www.cci.tn.it/), carried out with the support of the Italian MFA (see below for details and disclaimers).*
+
+<hr />
+
+## About this project
+
+::: {#about}
+:::
+
+## Posts and updates
+
+::: {#posts}
+:::
+
+## Review of literature
+
+::: {#litreview}
+:::
+
+## Datasets
+
+::: {#datasets}
+:::
+
+## Tutorials
+
+[![](img/castarter_logo.webp){style="float:right; margin-left: 10px;" fig-align="left" width="320"}](https://github.com/giocomai/castarter)The tutorials are mostly based on [`castarter`](https://github.com/giocomai/castarter) - Content Analysis Starter Toolkit for the R programming language, and will target users with beginner or beginner-intermediate coding skills. As the package gains new features, the tutorials will become more accessible; eventually, some of them will be accessible to users with no coding experience at all.
+
+A draft version of the [documentation for the package `castarter` is already available online](http://castarter.tadadit.xyz/). Both documentation and functionalities of the package will mature in the coming months.
+
+<hr />
+
+::: {#tutorials}
+:::
+
+## Funding and disclaimers
+
+![](img/giocomai_highlighting_just_a_few_words_in_a_book_with_TEXT_and__8511f200-3b9c-4454-8b4b-e467e8f8e861.webp){style="float:right; margin-left: 10px;" fig-align="left" width="320"}
+
+This project is **hosted by [OBCT](https://www.balcanicaucaso.org/)/[CCI](https://www.cci.tn.it/)**. It is **carried out with the support of the Italian Ministry of Foreign Affairs and International Cooperation** under art. 23 bis, D.P.R. 18/1967. All opinions expressed within the scope of this project represent the opinion of their author and not those of the Ministry.
+
+> "*Le posizioni contenute nel presente report sono espressione esclusivamente degli autori e non rappresentano necessariamente le posizioni del Ministero degli Affari Esteri e della Cooperazione Internazionale"*
