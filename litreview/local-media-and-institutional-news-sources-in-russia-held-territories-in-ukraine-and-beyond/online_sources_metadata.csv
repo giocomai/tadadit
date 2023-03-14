@@ -1,0 +1,33 @@
+column_name,mandatory,format,description
+id,TRUE,numeric,Numeric identifier to be attributed to each language version of each source; to be used for reference and without intrinsic meaning.
+domain_id,TRUE,character string,"A combination of the plain domain name, underscore, and the language code of the main language. E.g. 1tv.ru_ru for the Russian language version of the website of Russian tv 1tv.ru"
+wikidata_id,FALSE,character string. Must start with capital Q followed by an integer,Wikidata identifier of the source.
+date_recorded,TRUE,a date in the YYYY-MM-DD format,"Date when a given record was added, updated, or checked"
+url,TRUE,"a url, must start with http",Link to the home page or main page of the source in the relevant language
+news_section_url,FALSE,"a url, must start with http",Link to the page were “all news” (or similar) are posted. 
+base_state,FALSE,"Two-letter country code, iso2c, fallback on Eurostat",State whose sovereignty over a territory is generally recognised. To be left empty in case of international media.
+entity,FALSE,character. Common name of entity or region.,"The name of the region, territory, or entity. Generic name of region to be preferred to self-designations that apply to only a specific period. E.g. “Donetsk” would apply to pre-2014, 2014-2022, and post-2022. To be left empty if it applies to a whole state."
+allegiance,FALSE,character string. Common name. ,If the source is explicitly loyal to one side in a conflict or to de facto authorities (see e.g. P945 in Wikidata)
+category,TRUE,"one of: media, local institution",Category a given source belongs to
+medium,TRUE,"one of: website, telegram, [name of social media]",Type of source
+language,TRUE,WMF language code; typically a two letter languge code for most languages; reference: https://www.wikidata.org/wiki/Help:Wikimedia_language_codes/lists/all; use “und” for undetermined,"Main language used in the source. Separate language versions of a source should be recorded separately; in case of mixed-language sources, values can be separated by a semicolumn."
+name_original,TRUE,"character string, original language",Name of the source or institutions in its original format
+self_described_as,FALSE,"character string, original language","The source as it describes itself, in its original language"
+name_en,TRUE,"character string, English","Name of the source, typically a transliteration of the original or common name if used"
+description_en,FALSE,"character string, English",A brief description of the source. It may include the translation of the original name. 
+activity_start,FALSE,"a date in the YYYY-MM-DD format (or only YYYY, or only YYYY-MM if exact date unknown)",Date when the source started publications
+activity_end,FALSE,"a date in the YYYY-MM-DD format (or only YYYY, or only YYYY-MM if exact date unknown)",Date when the source ended publications or was closed
+earliest_available_online,FALSE,"a date in the YYYY-MM-DD format (or only YYYY, or only YYYY-MM if exact date unknown)",Refers to the date of the earliest post available online
+license,FALSE,"character string, acronym of the license or brief characterisation","If available, concise reference to the license (e.g. CC-BY)"
+telegram,FALSE,"a url, must start with http",Direct link to main page of the given source on the respective service
+vkontakte,FALSE,"a url, must start with http",Direct link to main page of the given source on the respective service
+twitter,FALSE,"a url, must start with http",Direct link to main page of the given source on the respective service
+facebook,FALSE,"a url, must start with http",Direct link to main page of the given source on the respective service
+instagram,FALSE,"a url, must start with http",Direct link to main page of the given source on the respective service
+tiktok,FALSE,"a url, must start with http",Direct link to main page of the given source on the respective service
+youtube,FALSE,"a url, must start with http",Direct link to main page of the given source on the respective service
+rutube,FALSE,"a url, must start with http",Direct link to main page of the given source on the respective service
+odnoklassniki,FALSE,"a url, must start with http",Direct link to main page of the given source on the respective service
+yandex_zen,FALSE,"a url, must start with http",Direct link to main page of the given source on the respective service
+tiktok,FALSE,"a url, must start with http",Direct link to main page of the given source on the respective service
+fediverse,FALSE,"a url, must start with http",Direct link to main page of the given source on the respective service

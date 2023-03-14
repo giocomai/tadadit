@@ -1,0 +1,252 @@
+---
+title: "Local media and institutional news sources in Russia-held territories in Ukraine and beyond"
+description: |
+  A dataset with basic details about relevant online sources
+author: Giorgio Comai
+date: 2023-02-07
+date-modified: 2023-03-13
+image: "giocomai_Text_as_data_being_inserted_into_boxes_of_different_sh_cd6e2174-e01f-4c5b-8f55-946d8adc7bb6.webp"
+---
+
+{{< include ./../_early_disclaimer.qmd >}}
+
+## ![](giocomai_Text_as_data_being_inserted_into_boxes_of_different_sh_cd6e2174-e01f-4c5b-8f55-946d8adc7bb6.webp) Context {#top-left-img}
+
+This document introduces a dataset with basic details about online sources that are relevant to this research. These include not only sources from or about Russia-held territories in Ukraine, but also other online sources that may be relevant either as a term of reference (e.g. local media in neighbouring Russian regions or contested territories elsewhere in the post-Soviet space) or because of their direct or indirect impact (e.g. national media in Russia, Ukraine).
+
+This is a work in progress and unlikely to ever reach a state where it can be considered complete. Indeed, I add sources that may be of relevance as I advance in my research or as I encouter them serendipitously.
+
+Its purpose is to keep a systematic record of relevant sources that can be used as a starting point for more specific research questions, and grow as a result.
+
+The full dataset can be downloaded [as a .csv file](online_sources.csv). Full metadata specification is likewise available [as a .csv file](online_sources_metadata.csv)
+
+::: {.callout-tip}
+## Note
+
+[*Allegiance*](https://www.wikidata.org/wiki/Property:P945) is provided only in reference to local media and institutions in contested territories when it is immediately apparent and obvious. Independent sources or others whose allegiance is not self-evident are all recorded as "other". The field *allegiance* is not relevant for sources not specifically related to contested territories (e.g. it is not used for national Russian or Ukrainian media).
+:::
+
+```{r setup, eval=TRUE, include = FALSE}
+renv::use(lockfile = "renv_post.lock")
+packages_v <- c("dplyr", 
+                "readr",
+                "reactable", 
+                "glue")
+
+lapply(packages_v, require, character.only = TRUE)
+
+```
+
+```{r renv, eval = FALSE, include = FALSE}
+renv::snapshot(packages = packages_v,
+               lockfile = "renv_post.lock")
+```
+
+
+```{r include = FALSE}
+sources_df <- read_csv(
+  file = "online_sources.csv",
+  col_types = cols(col_character())
+  ) |> 
+  mutate(domain = stringr::str_remove(string = url,
+                                      pattern = stringr::fixed("https://")) |>
+           stringr::str_remove(pattern = stringr::fixed("http://")) |> 
+            stringr::str_remove(pattern = "/$") |> 
+           stringr::str_remove(pattern = "^www.")
+           ) |> 
+  select(domain, entity, allegiance, category, medium, language, name_original, name_en, base_state)
+
+```
+
+
+## Media or other online sources reporting news from or about Russia-held territories in Ukraine
+
+### Allegiance to Russia
+
+```{r echo = FALSE}
+#| column: screen-inset
+sources_df |> 
+filter(allegiance == "Russia",
+       category == "media", 
+       base_state == "UA",
+       is.na(entity) == FALSE) |> 
+  select(!c("allegiance", "category", "base_state")) |> 
+  reactable(highlight = TRUE)
+    
+```
+
+
+### Allegiance to Ukraine
+
+```{r echo = FALSE}
+#| column: screen-inset
+sources_df |> 
+filter(allegiance == "Ukraine",
+       category == "media", 
+       base_state == "UA",
+       is.na(entity) == FALSE) |> 
+  select(!c("allegiance", "category", "base_state")) |> 
+  reactable(highlight = TRUE)
+    
+```
+
+
+### Other
+
+
+```{r echo = FALSE}
+#| column: screen-inset
+sources_df |> 
+filter(is.na(allegiance),
+       category == "media", 
+       base_state == "UA",
+       is.na(entity) == FALSE) |> 
+  select(!c("allegiance", "category", "base_state")) |> 
+  reactable(highlight = TRUE)
+    
+```
+
+## Local institutions of Russia-held territories in Ukraine
+
+### Allegiance to Russia
+
+
+```{r echo = FALSE}
+#| column: screen-inset
+sources_df |> 
+filter(allegiance == "Russia",
+       category == "local_institution", 
+       base_state == "UA",
+       is.na(entity) == FALSE) |> 
+  select(!c("allegiance", "category", "base_state")) |> 
+  reactable(highlight = TRUE)
+    
+```
+
+
+### Allegiance to Ukraine
+
+
+```{r echo = FALSE}
+#| column: screen-inset
+sources_df |> 
+filter(allegiance == "Ukraine",
+       category == "local_institution", 
+       base_state == "UA",
+       is.na(entity) == FALSE) |> 
+  select(!c("allegiance", "category", "base_state")) |> 
+  reactable(highlight = TRUE)
+    
+```
+
+
+### Other
+
+
+```{r echo = FALSE}
+#| column: screen-inset
+sources_df |> 
+filter(is.na(allegiance),
+       category == "local_institution", 
+       base_state == "UA",
+       is.na(entity) == FALSE) |> 
+  select(!c("allegiance", "category", "base_state")) |> 
+  reactable(highlight = TRUE)
+    
+```
+
+
+## Russian national media
+
+
+```{r echo = FALSE}
+#| column: screen-inset
+sources_df |> 
+filter(is.na(allegiance),
+       category == "media", 
+       base_state == "RU",
+       is.na(entity) == TRUE) |> 
+  select(!c("allegiance", "category", "base_state", "entity")) |> 
+  reactable(highlight = TRUE)
+    
+```
+
+
+## Russian national institutions
+
+
+```{r echo = FALSE}
+#| column: screen-inset
+sources_df |> 
+filter(is.na(allegiance),
+       category == "national_institution", 
+       base_state == "RU",
+       is.na(entity) == TRUE) |> 
+  select(!c("allegiance", "category", "base_state", "entity")) |> 
+  reactable(highlight = TRUE)
+    
+```
+
+
+## Metadata specification {#metadata-specification}
+
+```{r include = FALSE}
+metadata_df <- read_csv(
+  file = "online_sources_metadata.csv", 
+  col_types = cols(
+    column_name = col_character(),
+    mandatory = col_logical(),
+    format = col_character(),
+    description = col_character()
+  )) 
+# metadata_df$format[metadata_df$format=="WMF language code; typically a two letter languge code for most languages; reference: https://www.wikidata.org/wiki/Help:Wikimedia_language_codes/lists/all; use “und” for undetermined"] <- "WMF language code; typically a two letter languge code for most languages; <a href='https://www.wikidata.org/wiki/Help:Wikimedia_language_codes/lists/all'>reference</a>; use “und” for undetermined"
+```
+
+The table with metadata description includes a technical specification and a brief description for all fields included in the full dataset available for download:
+
+*`r glue::glue_collapse(x = metadata_df$column_name, sep = ", ")`.*
+
+The full metadata specification is available [as a .csv file](online_sources_metadata.csv), as well as in the table below.
+
+
+```{r echo = FALSE, eval = TRUE}
+#| column: screen-inset
+metadata_df |> 
+  reactable::reactable(columns = list(
+    column_name = colDef(maxWidth = 192), 
+    mandatory = colDef(maxWidth = 128),
+    format = colDef(maxWidth = 256), 
+    description = colDef(minWidth = 256)
+  ),
+  #defaultPageSize = 3,
+  compact = TRUE,
+  #height = 320, 
+  pagination = FALSE,
+  highlight = TRUE,
+  sortable = FALSE,
+  bordered = FALSE)
+```
+
+
+```{r echo = FALSE, eval = FALSE}
+#| column: screen-inset
+
+metadata_df |> 
+  datatable(options = list(dom = "ptip",
+                           pageLength = 3,
+                           ordering=FALSE),
+            caption = "Metadata description and specification",
+            rownames = FALSE,
+            editable = FALSE,
+            escape = FALSE
+            )
+```
+
+
+::: {.callout-note}
+## Datasets available for download
+
+[**Full dataset (.csv)**](online_sources.csv)
+
+[**Metadata specification (.csv)**](online_sources_metadata.csv) - See the [Metadata specification section](#metadata-specification) in this document
+:::
