@@ -1,0 +1,82 @@
+---
+title: "Initiatives conducting content analysis related to Russia's invasion of Ukraine"
+description: "A review of content-analysis-based ongoing initiatives and past studies related to Russia's invasion of Ukraine, local dynamics in the Donbas or other Russia-controlled territories in Ukraine"
+author: Giorgio Comai
+date: 2022-11-20
+last-modified: 2022-11-20
+categories: [review of literature, content analysis]
+image: "giocomai_typewriter_and_many_pages_of_text_with_drawing_of_a_uk_1964f021-ddfc-41cc-a4d6-4187e7be5b13.webp"
+bibliography: references.bib
+---
+
+{{< include ./../_early_disclaimer.qmd >}}
+
+## ![](giocomai_typewriter_and_many_pages_of_text_with_drawing_of_a_uk_1964f021-ddfc-41cc-a4d6-4187e7be5b13.webp) Context {#top-left-img}
+
+### Russian Media Observation and Research (RuMOR)
+
+**Self-described as**: Tracking Russia's domestic war narratives and disinformation. Principal Investigator Paul Goode.
+
+**Based at**: [Institute of European, Russian, and Eurasian Studies](https://carleton.ca/eurus/), Carlton University
+
+**Funded by**: The Social Sciences and Humanities Research Council of Canada
+
+### Texty.org.ua
+
+[Texty.org.ua](https://texty.org.ua/p/about-en/) is an independent media organisation based in Ukraine.
+
+They also conduct systematic monitoring of Russian media.
+
+See: https://texty.org.ua/tag/disinfomonitor/
+
+Example: [African Mercenaries Escape Poverty by Coming to Die for Ukraine. Russian Media Monitoring Report, 28 November-4 December 2022](https://texty.org.ua/articles/108450/african-mercenaries-escape-poverty-by-coming-to-die-for-ukraine-russian-media-monitoring-report-28-november-4-december-2022/)
+
+**Methodology**:
+
+> We have built a corpus of all the materials from Russian websites and those maintained by the occupation force (almost 22,000 news items) for our weekly disinformation monitoring report. Each paragraph was processed by the algorithm which defines its topic automatically. The resulting topics (i.e. groups with similar content) were short-listed by the topics relating to the war or its consequences for Russia. The number of mentions of a certain topic was then counted for each publication. Our conclusions are based on the respective findings and the quotes from paragraphs referring to each topic. [Source](https://texty.org.ua/articles/108450/african-mercenaries-escape-poverty-by-coming-to-die-for-ukraine-russian-media-monitoring-report-28-november-4-december-2022/)
+
+**Funded by**: This specific activity is [funded by NDI](https://texty.org.ua/articles/108450/african-mercenaries-escape-poverty-by-coming-to-die-for-ukraine-russian-media-monitoring-report-28-november-4-december-2022/)
+
+### Putin 20 years - the words, the person, the sysem
+
+A multimedia project based on content analysis of presidential speeches and press releases.
+
+<https://putin.dekoder.org/en/>
+
+Dekoder
+
+**About**: A joint project by dekoder and the Research Centre for East European Studies at the University of Bremen. See <https://putin.dekoder.org/about/>
+
+### Russia Media Monitor
+
+\[...\]
+
+## Public opinion research
+
+Of course, public opinion research is not based on content analysis, but these may offer relevant insights for further research on specific time frames or cases based on content analysis.
+
+### Russia Watcher
+
+**Self-described as**: "The Russia Watcher is a daily tracking survey of Russian public opinion, run by political scientists at the Department of Politics, Princeton University"
+
+**Based at**: Department of Politics, Princeton University
+
+**Official website**: <https://russiawatcher.com/>
+
+**On the Fediverse**: [https://mastodon.world/\@russia_watcher](https://mastodon.world/@russia_watcher)
+
+**On Twitter**: <https://twitter.com/russia_watcher>
+
+### Extreme scan
+
+https://www.extremescan.eu/about
+
+### Chronicles
+
+https://www.chronicles.report/en
+
+## Previous projects
+
+@tolz2018
+
+"Mediating Post -- Soviet Difference: An Analysis of Russian Television Representations of Inter -- Ethnic Cohesion Issues," which was funded by the UK's Arts and Humanities Research Council \[project code AH/HO18964/1\]; and "Reframing Russia: From Cold War to Information War?," which is funded by the UK's Arts and Humanities Research Council \[project code AH/P00508X/1\].
