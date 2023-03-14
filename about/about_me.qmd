@@ -1,0 +1,52 @@
+---
+title: "Giorgio Comai"
+#subtitle: "Researcher and data analyst at OBCT/CCI."
+description: "Giorgio Comai is lead researcher of the project."
+image: profile.jpg
+date: 2022-10-22
+last-modified: 2023-03-14
+about:
+  id: hero-heading
+  template: solana
+  image-shape: round
+  image-width: 10rem
+  image: profile.jpg
+  links:
+    - icon: mastodon
+      text: Fediverse
+      href: https://fediverse.giorgiocomai.eu/tadadit
+    - icon: twitter
+      text: twitter
+      href: https://twitter.com/giocomai
+    - icon: github
+      text: Github
+      href: https://github.com/giocomai
+    - icon: link
+      text: My website
+      href: https://giorgiocomai.eu
+    - icon: google-scholar
+      text: Google Scholar
+      href: https://scholar.google.it/citations?user=ooSIsS0AAAAJ
+listing: 
+  - id: about
+    contents: "*.qmd"
+    type: grid
+    sort: "date"
+    fields: [image, title, description]
+    grid-columns: 2
+---
+
+::: {#hero-heading}
+I am a researcher and data analyst at [OBCT](https://www.balcanicaucaso.org/)/[CCI](https://www.cci.tn.it/).
+
+For a long time, I have been conducting research on post-Soviet affairs, focusing in particular on de facto states. I have been visiting Russia and other post-Soviet countries since 2000, and I speak fluently Russian and Romanian.
+
+In recent years, I have increasingly been working on structured approaches for analysing online sources in conflict studies and international relations, data collection methods, and related ethical issues.
+
+I have also been working as a data analyst and consultant, crunching data at the European Data Journalism Network ([EDJNet](https://europeandatajournalism.eu/)), writing code and developing packages in the R programming language, and working on data visualisation and geographic data analysis.
+:::
+
+## More about this project
+
+::: {#about}
+:::

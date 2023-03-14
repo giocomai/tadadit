@@ -9,7 +9,7 @@ listing:
   - id: about
     contents: "*.qmd"
     type: grid
-    sort: "last-modified"
+    sort: "date"
     fields: [image, title, description]
     grid-columns: 2
 ---
