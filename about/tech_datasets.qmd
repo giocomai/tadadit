@@ -1,0 +1,40 @@
+---
+title: "Datasets and tools"
+subtitle: "Datasets and tools"
+description: "Find out more about the datasets and the tech stack at the core of this project."
+date: 2022-10-21
+last-modified: 2023-03-14
+image: "../img/giocomai_text_as_data_on_a_computer_screen_on_a_desk_sketch_in__48689719-4edf-4dba-b9d4-c9151867d7ce.webp"
+listing: 
+  - id: about
+    contents: "*.qmd"
+    type: grid
+    sort: "date"
+    fields: [image, title, description]
+    grid-columns: 2
+---
+
+## Datasets
+
+![](../img/giocomai_text_as_data_on_a_computer_screen_on_a_desk_sketch_in__48689719-4edf-4dba-b9d4-c9151867d7ce.webp){style="float:right; margin-left: 10px;" fig-align="left" width="320"}Datasets generated in the course of this project are available for download in the [dedicated section of this website](./../datasets). After more comprehensive quality checks, they will be formally released.
+
+For an example of a basic textual dataset based on contents published by the Kremlin, see:
+
+> Giorgio Comai (2021). kremlin_en - A textual dataset based on the contents published on the English-language version of the Kremlin's website, v. 1.0, *Discuss Data*, [\<doi:10.48320/5EB1481E-AE89-45BF-9C88-03574910730A\>](https://doi.org/10.48320/5EB1481E-AE89-45BF-9C88-03574910730A).
+
+## Tools and software
+
+[![](../img/castarter_logo.webp){style="float:right; margin-left: 10px;" fig-align="left" width="320"}](https://castarter.tadadit.xyz/) There are many great solutions, both proprietary and open source, to process and analyse data. Most of them either assume that the user already has textual data in a structured format, or that they know how to get them. Others allow for text mining on a large scale, but make it somewhat difficult to customise or refine the output.
+
+Textual datasets collected during the course of this project are created with an updated iteration of `castarter` - Content analysis starter toolkit for R - a package for the R programming language aimed at facilitating the process for users who may have only limited familiarity with R.
+
+The package also allows for sharing datasets through interactive web interfaces that allow for basic analyses without requiring any technical knowledge.
+
+Documentation, tutorial and publicly available interfaces will published in the course of this project.
+
+The R package [`castarter`](https://github.com/giocomai/castarter) is available on GitHub. While still under active development, basic features are already mostly functional. Both documentation and functionalities of the package will mature in the coming months. Some tutorials are already available in the [dedicated section](./../tutorials) of this website.
+
+## More about this project
+
+::: {#about}
+:::
