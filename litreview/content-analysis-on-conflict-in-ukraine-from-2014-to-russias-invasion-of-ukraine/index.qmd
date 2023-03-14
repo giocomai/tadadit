@@ -2,6 +2,7 @@
 title: "Content analysis on Russian media and conflict in Ukraine: from Putin's third term to Russia's invasion of Ukraine"
 description: "A review of the scholarly literature"
 author: Giorgio Comai
+date: 2022-11-24
 last-modified: 2022-11-24
 categories: [review of literature, content analysis, data sources]
 bibliography: references.bib

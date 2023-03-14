@@ -1,0 +1,84 @@
+---
+title: "Available textual datasets that are relevant for the analysis of Russia's invasion of Ukraine and conflicts in the region"
+description: "What datasets are publicly available?"
+author: Giorgio Comai
+last-modified: 2022-11-21
+categories: [review of literature, content analysis, data sources]
+image: "giocomai_many_words_and_cyrillic_text_coming_out_of_a_tv_set_wi_10a1e1e3-b449-4132-8e24-fd07c53dc4d8.webp"
+bibliography: references.bib
+---
+
+{{< include ./../_early_disclaimer.qmd >}}
+
+## ![](giocomai_many_words_and_cyrillic_text_coming_out_of_a_tv_set_wi_10a1e1e3-b449-4132-8e24-fd07c53dc4d8.webp) Context {#top-left-img}
+
+This project is based on the assumption that the researcher has no access to proprietary software or proprietary datasets. For those who effectively needs them or can afford them, these are surely sensible points of reference; there may also be few good alternatives for some media formats or for large-scale analyses.
+
+Such sources are however rarely affordable for anyone outside established academic institutions or businesses. Besides, in practice, contents generated in contested territories are rarely included in established datasets.
+
+The textual datasets at the core of this project are generated via text mining using open source solutions in a way that can be replicated by anyone with a computer, an internet connection, and the necessary skills. However, online sources retrieved through text mining do not exist in a vacuum, and of course need not be the sole point of reference.
+
+With this in mind, in this section I include references to potentially relevant sources.
+
+## Reviews of different datasets/corpora
+
+@kopotev2021 offers a review of "Corpora in Text-Based Russian Studies". They point at a variety of sources, ranging from do-it-yourself datasets to established online resources, highlighting in particular two of them: the Russian National Corpus and the Integrum database
+
+## Open access datasets
+
+### Duma Speeches: A Term Frequency Analysis
+
+[Russian State Duma Transcripts 1994--2021](https://discuss-data.net/dataset/fb52dac2-66e3-47a3-86c5-b2a3dadf41bf/)
+
+@dekoder.org2021
+
+## Commercial sources of Russian media contents
+
+### Integrum World Wide
+
+[Integrum](http://www.integrumworld.com/) is a Russia-based service that offers services such as media and social media monitoring. It includes transcripts of TV broadcasts. It is used, for example, [by the RuMOR project](https://twitter.com/RuMOR_CarletonU/status/1590519546397745154).
+
+**Website**: <http://www.integrumworld.com/>
+
+Used by:
+
+-   @lankina2017
+-   RuMOR project (see e.g. [this post](https://twitter.com/RuMOR_CarletonU/status/1590519546397745154))
+
+## Non-commercial sources of media contents
+
+### GDELT - The Global Database of Events, Language, and Tone
+
+**Website**: <https://www.gdeltproject.org/>
+
+GDELT includes also TV recordings, including of Russian TV stations:
+
+https://api.gdeltproject.org/api/v2/tvv/tvv
+
+### Media Cloud
+
+**An initiative by**: \> Media Cloud is a consortium research project across multiple institutions, including the University of Massachusetts Amherst, Northeastern University, and the Berkman Klein Center for Internet & Society at Harvard University.
+
+**Website**: <https://mediacloud.org/>
+
+**N.B.**: Due to a number of issues, Media Cloud has partially incomplete data for various periods of time. For details, see e.g. this [November 2022 update](https://mediacloud.org/news/2022/11/4/media-cloud-tools-update-for-november-2022) or make sure you check the current state of affairs before using these data for structured analyses.
+
+## International providers of media and other textual contents
+
+-   Lexis Nexis
+-   Proquest
+-   Factiva
+
+## A list of lists
+
+### Ultimate 🚀 Data Sources for \[Textual\] Content Analysis in Communication and Media Research (UDS4CA)
+
+A [curated list](https://docs.google.com/document/d/1pfEDiIU6iDbrbMSnfkTgDsZBAY5h02zmVYGPZIB25gE/) ([apparently](https://twitter.com/cbpuschmann/status/1563160885837053953)) by [Cornelius Puschmann](https://twitter.com/cbpuschmann), with the credited support of the "Twitter Hive Mind".
+
+### Meteor - Media texts Open Registry
+
+**Self-described as:**
+
+> OPTED Meteor (Media Text Open Registry) is an inventory for European journalistic texts and is part of the EU-funded Project OPTED where researchers work towards the creation of a new European research infrastructure for the study of political communication in Europe. Please visit opted.eu for more information about the project.
+
+**Website**: <https://meteor.opted.eu/>
