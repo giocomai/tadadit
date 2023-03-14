@@ -1,0 +1,55 @@
+---
+title: "Introducing 'tadadit.xyz'"
+description: "A short introduction to the core principles and ideas at the basis of this initiative."
+author: Giorgio Comai
+date: 2023-03-15
+last-modified: 2023-03-15
+categories: [tadadit]
+image: "giocomai_computer_screen_with_text_as_data_in_cyrillic_ddd3f932-3357-43b4-865b-ab2ca8e5a048.webp"
+---
+
+## ![](giocomai_computer_screen_with_text_as_data_in_cyrillic_ddd3f932-3357-43b4-865b-ab2ca8e5a048.webp) Context {#top-left-img}
+
+Studying conflicts in the post-Soviet space through structured analysis of textual contents available online: this is the objective of "Tadadit.xyz", which is just an acronym for "Text as data & data in the text".
+
+At the most basic, this is just a small contribution to the increasing amount of scholarship that relies on some form of content analysis, a trend that for better or worse is likely to increase in this space due to limited or constrained access to Russia and contested territories.
+
+I should add from the outset that I am rather sceptic about research that relies primarily on **content analysis**. But I still feel that **structured analysis** of online contents has a significant role to play, including in contexts such as area studies and peace and conflict research.
+
+This is obviously part of a big debate, so, in brief, here are the contributions I wish to make.
+
+My starting point is that, if not for the technical hurdles, a lot more scholars working on these issue would rely on structured analysis of online contents.
+
+I am not only referring to things such as word frequency analysis or more advanced techniques, but more broadly, at the idea that online sources can be analysed in a structured manner, rather than through serendipitous encounters via search engines or socaial media. Structured approaches for parsing selected online sources can be useful for finding specific data points, as well as information about places, institutions, individuals, amounts of resources, and governance practices. These is what I mean with "**data in the text**", beyond the more established and generally more quantititative "**text as data**".
+
+Mostly, the final goal of a research endeavour does not lie in either "text as data" or "data in the text" are. These are just useful means, almost invariably complementary to other methods, for finding more evidence, developing better research questions, testing and potentially dismissing lines of inquiry, and, ultimately, giving better answers to meaningful reserch questions.
+
+## What to expect on *tadadit.xyz*
+
+Based on this, here is how I hope this initiative will offer a small contribution towards mainstreaming some of these approaches.
+
+-   **Substantive articles demonstrating this approach** with concrete examples of how it can be useful, including both more classic pieces based on word frequency, as well as others showing how relevant data can usefully be found through structured approaches to text analysis
+    -   besides the classic final results, these posts will give access to **procedural steps** and will show, for example, **keywords in context**, giving the reader more opportunities to make up their own minds about the arguments proposed
+    -   full access to **interactive interfaces** for further exploring the datasets, empowering the reader, and giving them the possibility to test alternative hypotheses and challenge the interpretation proposed in the articles themselves (*interactive interfaces not yet publicly available, but coming soon*)
+-   **Increased availability to pre-processed textual datasets** relevant to scholars working on conflicts in post-Soviet spaces
+    -   pre-processed textual datasets, when contents are available unencumbered by copyright restrictions
+    -   access to pre-processed datasets through interactive interfaces, when full sharing of the data is not possible
+-   **Easier access to the tools needed to create similar datasets** and keep them up-to-date based on the specific interests of a researcher. Scholars working on these issues will often want a dataset based on items posted by a small local institution in a small town, or some other organisation: if this approach is to become more common, then it should be relatively easy to create new textual datasets and the keep them up to date. We need better open tools and more tutorials that explain how to use these tools in contexts such as the ones we are interested in.
+    -   with this in mind, I am working on a new iteration of an open source package I've been working on for a few years, [`castarter`](https://github.com/giocomai/castarter) - Content Analysis Starter Toolkit for the R programming language
+    -   at this stage, it streamlines the text mining workflows for researchers that have some familiarity with the R programming language and how the internet works, but does little for the rest
+    -   the short term goal is to improve the package and make it accessible for people who have very limited programming skills and limited understanding of how the internet works, both by further simplifying the workflows and by producing a series of beginner-level tutorials
+    -   the long term goal it to make most or all of the process available through a web interface that does not require any programming skill, and make it much easier to collect textual datasets, explore them, and, fundamentally, share them in a readily usable format with the wider public or selected colleagues
+
+## Working in the open
+
+Finally, a key component of this whole endeavour is **working in the open**. If you explore this website, you will see that many pages, including reviews of literature, are often in draft format, sometimes just early drafts (and are marked as such). **This is a feature, not a bug**. Significant efforts will be dedicated towards radical transparency throughout all phases of this endeavour, favouring open debates, earlier sharing of knowledge, positive feedback loops, and the advancement of open science practices in academia.
+
+Radical transparency through all stages of the research process can be helpful in sharing ideas and methods, receiving feedback, and reducing the impact of some of the great scourges of academia: almost-finished papers that remain in some half-forgotten folder, or advanced research that is not available *for years* until publication, with the possible exception of a few individuals that attended a conference presentation.
+
+I will consider further options for making it easier to find out about new posts as they are published (e.g. email notifications), as well as for giving feedback (I'm not a fan of blog comments, but I may consider them, or some other alternative system).
+
+In the meantime, you can stay up-to-date by following this website's [RSS feed](https://fediverse.giorgiocomai.eu/users/tadadit) or the [project's account in the Fediverse](https://fediverse.giorgiocomai.eu/users/tadadit), or consider [opening an issue on the repository](https://github.com/giocomai/tadadit/) where this website is hosted (it is uncommon in the humanities to rely on this approach, but it's really a rather useful format for debating specific issues).
+
+## Credits and disclaimers
+
+This project is carried out by [Giorgio Comai](https://giorgiocomai.eu/), senior researcher at [OBCT](https://balcanicaucaso.org/)/[CCI](https://www.cci.tn.it/), with the support of the Italian Ministry of Foreign Affairs and International Cooperation under art. 23 bis, D.P.R. 18/1967. All opinions expressed within the scope of this project represent the opinion of their author and not those of the Ministry.
