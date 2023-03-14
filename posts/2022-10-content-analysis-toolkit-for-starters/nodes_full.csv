@@ -1,0 +1,18 @@
+id,text,classifier
+1,"Determine URL structure
+of index pages",
+2,"Determine the filenames of index pages
+to be stored locally",
+3,"Are all index pages
+already stored locally?",choice
+4,Download index pages,
+5,Extract links to content pages,
+6,"Download content pages
+(if missing)",
+7,Extract text and metadata,
+8,Textual corpus built,
+9,Is this an update?,choice
+10,Download one (more) index page,
+11,Extract links,
+12,"Are there new links
+to content pages?",

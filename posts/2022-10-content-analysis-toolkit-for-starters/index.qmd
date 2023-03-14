@@ -1,0 +1,167 @@
+---
+title: "What's needed in a content analysis toolkit for starters?"
+description: "In order to analyse text, one needs to have text in a structured format. How do we get there?"
+author: "Giorgio Comai"
+date: "2022-11-07"
+categories: [overview, castarter, rstats]
+image: "giocomai_text_as_data_on_a_computer_screen_on_a_desk_sketch_in__7464326f-d3d9-4670-b32f-a3641e0f8322.webp"
+---
+
+```{r setup, eval=TRUE, include = FALSE}
+renv::use(lockfile = "renv_post.lock")
+# remotes::install_github("giocomai/nomnomlgraph")
+packages_v <- c("dplyr", 
+                "readr",
+                "nomnomlgraph")
+
+lapply(packages_v, require, character.only = TRUE)
+
+```
+
+```{r renv, eval = FALSE, include = FALSE}
+renv::snapshot(packages = packages_v,
+               lockfile = "renv_post.lock")
+```
+
+## ![](giocomai_text_as_data_on_a_computer_screen_on_a_desk_sketch_in__7464326f-d3d9-4670-b32f-a3641e0f8322.webp) Context {#top-left-img}
+
+Manuals and tutorials presenting content analysis techniques are often based on the assumption that a structured textual dataset is available to the researcher. This is convenient and understandable, as it would not make sense to start each time with technicalities about data collection methods.
+
+And yet, very often relevant textual datasets need to be built by the researcher. For those working on current affairs or recent events, the starting point is often texts published on-line by institutions, media, NGOs, activists, etc.
+
+As a scholar working at the intersection of area studies with peace and conflict research, the textual datasets that I felt were most useful for my research were based on contents published by institutions and media based in the area under study: not only big national media, such as e.g. national TV stations in Russia, but rather local news agencies and institutions, such as those based in contested territories. If there are various way to access data from larger media in a structured format via paid services such as LexisNexis, there is not much ready-made for the scholar working on local contexts in these areas.
+
+More often than not, the solution to these problems comes from text mining/scraping relevant on-line sources. There is plenty of tutorials on how to do these things on the web, but in most cases I feel there is not enough attention dedicated to the workflow, and to the menial tasks that are the basis of text mining, such as managing files consistently, ensure consistency and minimise repeated processes across multiple sessions, deal with archiving and backups, and keep track of what is where, as well as the time when each content was retrieved.
+
+When working on contemporary affairs, it is also important to be able to update a textual dataset as easily as possible.
+
+When doing text mining as a scholar, it is also important to be able to tell how a given piece of information was found, and when a given page was visited.
+
+In this post, I will describe how I deal with these issues in the package for the R programming language I have been developing, [`castarter`](https://github.com/giocomai/castarter) - Content analysis starter toolkit for R. This post, however, does not include any code, and outlines only key concepts and steps of the workflow, so it should be relevant also to readers who are not interested in using R or my package.
+
+## Basic setup
+
+When processing the archive of a website, there are typically two types of pages that are most relevant:
+
+-   **index pages**. These are pages that usually include some form of list of the pages with actual contents we are interested in. They are often in a format such as:
+
+    -   https://example.com/all_posts?page=1
+
+    -   https://example.com/all_posts?page=2
+
+    -   etc.
+
+        Index pages may also not be visible to the user, and may include:
+
+    -   Sitemaps: typically in https://example.com/sitemap.xml or as defined in https://example.com/robots.txt
+
+    -   RSS feed: typically useful only to retrieve recent posts, and found e.g. in https://example.com/feed, https://example.com/feed.rss, or in some other location often shown in the header of the website
+
+-   **content pages**. These are pages that include the actual content we are interested in. These have urls such as:
+
+    -   https://example.com/node/12345 or
+
+    -   https://example.com/post/this-is-a-post
+
+Conceptually, the contents of the **index pages** are expected to change constantly as new posts are published, so in case of an update, they will need to be downloaded again. Conceptually, **content pages** are expected to remain unchanged, at least in their core parts.
+
+At the most basic, this is what should happen when extracting textual contents from the archive of a website.
+
+```{r basic diagram, echo=FALSE, include=TRUE}
+
+
+edges_basic <- read_csv(
+  file = "edges_basic.csv",
+  col_types = cols(
+    from = col_character(),
+    to = col_character(),
+    association = col_character()
+  )) 
+
+nodes_basic <- read_csv(
+  file = "nodes_basic.csv",
+  col_types = cols(
+    id = col_character(),
+    text = col_character(),
+    classifier = col_character()
+  )) 
+
+nn_graph(nodes = nodes_basic, 
+         edges = edges_basic,
+         svg = TRUE,
+         font = "Roboto Condensed",
+         height = 400)
+
+```
+
+In practice, the situation is often a bit more complicated.
+
+Firstly, there are a number of conventions to consider, such as in which folders files are to be stored? how should downloaded pages be named?
+
+Secondly, as all files may not be downloaded in the same sessions, some checks should be in place for making sure **content pages** are downloaded only once, unless there is specific reason to download them again.
+
+Thirdly, and somewhat more complicated, how should updates be managed? A slightly more detailed diagram would look as follows:
+
+```{r full diagram, echo=FALSE, include=TRUE}
+
+edges_full <- read_csv(
+  file = "edges_full.csv",
+  col_types = cols(
+    from = col_character(),
+    to = col_character(),
+    association = col_character()
+  )) 
+
+nodes_full <- read_csv(
+  file = "nodes_full.csv",
+  col_types = cols(
+    id = col_character(),
+    text = col_character(),
+    classifier = col_character()
+  )) 
+
+nn_graph(nodes = nodes_full, 
+         edges = edges_full,
+         svg = TRUE,
+         font = "Roboto Condensed",
+         height = 800)
+
+
+```
+
+## Memory, storage, backup, and other issues
+
+As each of these steps requires a series of operations, the process can easily become tedious. Other menial issues likely to cause headaches at some point include:
+
+-   disk space issues when storing data - hundreds of thousands of pages can easily take many gigabytes
+-   backup and data management issues - you may be accustomed to keep your files synced with a cloud service such as Dropbox, Google Drive, or Nextcloud, but this is mostly not a good idea in this scenario, since their client apps become quickly inefficient and painfully slow down start-up and syncing times when hundreds of thousands of files or more are involved (this is more an issue of file number, than total size)
+-   memory issues when processing the corpus - processing big datasets can crash a session due to missing ram
+
+All of these things are substantively irrelevant, of course, but effectively end up taking up a disproportionate amount of time for the researcher.
+
+These are all things that a content analysis starter toolkit should take care of, suggesting and implementing practical solutions by default, and letting the researcher dedicate their time to substantive issues.
+
+Indeed, all of the issues outlined above emerge before any analysis of the data can even take place. In my understanding, these are however the issues that a *starter* toolkit should mostly focus on: once a nicely structured dataset has been gathered, there are plenty of software solutions, tutorials, and approaches that can be used. Nothing more than the most basic data exploration should be enabled by a starter toolkit.
+
+## Features needed in a useful content analysis starter toolkit
+
+A starter toolkit should make it relatively straightforward to:
+
+-   get all relevant links from a website
+-   retrieve and store all files in a consistent manner
+-   consistently extract key textual contents and metadata from each page
+-   conduct some basic quality and sanity checks
+-   keep record of the process in both human and machine readable formats
+-   store the original files to a convenient backup location
+-   update the dataset with minimal efforts
+-   manage data from multiple websites or projects consistently
+-   make it easy to store and process data also on low-end computers
+-   conduct the most basic forms of analysis, such as word frequency
+-   export resulting datasets in standard formats, to enable more advanced techniques of analysis
+-   give access to the dataset to others
+
+Finally, it should make all of the above while being robust: it should be possible to unplug the computer at any stage of the process (download, extraction, etc.) without losing any data, and proceed from where it was stopped without issues.
+
+All of these features are already available with the R package [`castarter`](https://github.com/giocomai/castarter), or will be in the course of 2023. As this is a work in progress, each of these features will improve with time, either lowering the technical competence needed to use the package or providing more flexibility to deal with a wider set of use cases.
+
+The long-term goal for `castarter` is to enable all of the above directly through a web interface, without requiring any familiarity with programming languages nor, at least in most cases, familiarity with how html pages are built.
