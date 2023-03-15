@@ -1,6 +1,6 @@
 ---
 title: "Text as data & data in the text"
-subtitle: "Studying conflicts in post-Soviet spaces through structured analysis of textual contents available online"
+subtitle: "Studying conflicts in post-Soviet spaces through structured analysis of textual contents available on-line"
 listing: 
   - id: about
     contents: "about/*.qmd"

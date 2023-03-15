@@ -1,0 +1,782 @@
+---
+title: "Who said it first? 'The collective West' in Russia's nationalist media and official statements"
+description: "Expressions such as 'the collective West' have entered official discourse only recently. They have been in common use in nationalist media for much longer."
+author: Giorgio Comai
+date: 2023-03-14
+last-modified: 2023-03-14
+categories: [russia]
+image: "giocomai_many_words_and_cyrillic_text_coming_out_of_a_computer__c9b253d2-aa62-48f3-9098-838fda5e5d8a.webp"
+bibliography: references.bib
+---
+
+## ![](giocomai_many_words_and_cyrillic_text_coming_out_of_a_computer__c9b253d2-aa62-48f3-9098-838fda5e5d8a.webp) Context {#top-left-img}
+
+Russia's full scale invasion of Ukraine in 2022 has been accompanied by the emergence and diffusion in Russia's public discourse of new concepts and terms needed to frame in a new light what it is that Russia is really fighting against.
+
+In the case of Ukraine, this trend has been noticeable in mainstream Russian media since 2014 and has grown in the following years: Ukraine is ruled by a "junta"; it is controlled by nazi; its military forces are "formations of nationalists", etc.
+
+Russia is however also fighting a war against a larger and somewhat more sinister enemy. Its name is, increasingly, "**the collective West**", an expression that allows to reframe "the enemy" as a single hostile entity.
+
+There is not a single reference to "the collective West" in official declarations by the Russian president before 2021, but it has since become relatively common especially in "big speeches", with dozens of mentions in recent months.
+
+But where does this expression come from?
+
+In this post, I will:
+
+-   confirm that, indeed, this is a relatively new expression
+-   find that before 2021 it was very rarely used in news reporting on mainstream television, and is still used only occasionally in plain news reporting
+-   consider the possibility that it was used earlier in fringe nationalist media:
+    -   find that it was sparsely used on *Tsargrad TV* before 2021, but that it became quite common starting with 2022
+    -   find that it was consistently used in articles published on nationalist weekly newspaper *Zavtra* starting with 2015
+-   observe that the expression "collective West" has been used by fringe nationalist analysts for some years, and has entered official rhetoric only recently. It has since become commonplace on nationalist tv channel *Tsargrad*, but is still used only occasionally on mainstream tv.
+-   notice that as "collective West" enters more common use in the presidential rhetoric, previously common expressions such as "our Western partners" - supposedly neutral, but in context often deprived of positive connotations - are used less frequently and only with qualifiers (e.g. "our so-called Western partners") marking once more the obvious change in attitude.
+
+Further analysis is needed to determine the origins of "collective West" as an expression and as a framing, as well as the role of nationalist media and official discourse in popularising it. 
+
+An earlier publication analysing the concept of "collective West" (@chimiris2022) posited that before reaching the Kremlin, the expression has occasionally been used for some time in the Ministry of Foreign Affairs, particularly by its spokesperson Maria Zakharova. Yet, all of these uses come after 2015, when the expression started to be consistently used in nationalist newspaper *Zavtra*, suggesting that fringe nationalist publications may indeed have been the breeding ground where the expression established itself before going mainstream. If confirmed, this would be a new example of how concepts and framings once popular in relatively marginal nationalist circles with limited or no access to major national media are now being used and promoted directly by the Kremlin.
+
+For a rather similar excercise focused on the concept of "Russophobia", you can see my 2021 post: "[Russophobia in Russian official statements and media. A word frequency analysis](https://testzone.giorgiocomai.eu/2021-08-01-russophobia/)". Other posts on different concepts may follow.
+
+::: callout-warning
+The datasets used in this post have last been updated at different points in time between February and March 2023. Including recent data when available has been preferred over consistency. The exact cutoff date for each dataset is always shown in the subtitle of the graph.
+
+Graph columns that include partial data about a given time period are shown in a lighter shade, to highlight their incompleteness.
+
+Graphs show absolute frequency rather than relative frequency, even if the rate of publications is not perfectly stable on some of the sources included in this analysis. Given that the expression at the core of this article has never or almost never been used in earlier periods, this has limited substantive impact, and the absolute numbers remain intuitively easier to understand.
+
+The number of references has been grouped either by year or by quarter, as including shorter time periods would ultimately highlight only the buzz around a single speech, rather than the overall trend. In graphs showing data grouped by quarters "2022.1" stands for the first quarter of 2022, i.e. January to March.
+
+Full textual datasets are shared along with this post, when allowed by the license. A fullly-documented version of these dataset will be published soon. A preliminary version of the datasets is already available for downloa_ 
+
+- [__zavtra.ru_ru__](./../../datasets/zavtra.ru_ru/) - Russian weekly *Zavtra* (in Russian)
+- [__kremlin.ru_ru__](./../../datasets/kremlin.ru_ru/) - Statements from the official Kremlin website (in Russian)
+- [__kremlin.ru_en__](./../../datasets/kremlin.ru_en/) - Statements from the official Kremlin website (in English)
+
+An earlier version of this textual dataset is [available online](https://discuss-data.net/dataset/5eb1481e-ae89-45bf-9c88-03574910730a/) [@comai2021].
+
+Kremlin.ru and Zavtra.ru both publish their contents with a Creative Commons license.
+:::
+
+```{r setup, eval=TRUE, include = FALSE}
+renv::use(lockfile = "renv_post.lock")
+packages_v <- c("dplyr",
+                "dbplyr",
+                "castarter",
+                "reactable",
+                "fs",
+                "slider", 
+                "ggplot2",
+                "openssl",
+                "tibble",
+                "forcats")
+
+lapply(packages_v, require, character.only = TRUE)
+
+knitr::opts_chunk$set(echo = FALSE,
+                      fig.width = 8,
+                      fig.height = 4.5)
+theme_set(new = theme_minimal(base_family = "Roboto Condensed"))
+
+```
+
+```{r renv, eval = FALSE, include = FALSE}
+renv::snapshot(packages = packages_v,
+               lockfile = "renv_post.lock")
+```
+
+## The Kremlin
+
+::: callout-tip
+## About the dataset
+
+This section is based on both the Russian and English language version of the official website of the Kremlin. When the same content has been published twice on the website (e.g. as a press release and as a transcript) only one of the versions has been kept.
+
+:::
+
+```{r}
+cas_set_options(
+  base_folder = fs::path(fs::path_home_r(), 
+                         "R",
+                         "castarter_tadadit"),
+  
+  project = "Russian institutions",
+  website = "kremlin.ru_ru",
+)
+
+kremlin_ru_df <- cas_read_db_contents_data() |> 
+  distinct(title, date, text, .keep_all = TRUE) |> 
+  dplyr::collect()
+
+collective_west_kremlin_ru_count_df <-  kremlin_ru_df |> 
+  cas_count(string = "коллективн[[:alpha:]]+ запад")
+```
+
+```{r}
+corpus_df <- kremlin_ru_df
+
+collective_west_kremlin_ru_count_df |> 
+  
+   cas_summarise(period = "year", auto_convert = TRUE) %>% 
+  
+    mutate(alpha = if_else(date==2023, 0.9, 1)) |> 
+  ggplot2::ggplot(mapping = ggplot2::aes(x = date, y = n, alpha = alpha)) +
+  ggplot2::geom_col() +
+  ggplot2::scale_x_continuous(name = "") +
+  ggplot2::scale_y_continuous(name = "") +
+  scale_alpha_continuous(range = c(0.6, 1), guide = NULL) +
+  ggplot2::labs(
+    title = glue::glue("Number of references per year to {sQuote('collective west')} on Kremlin.ru"),
+    subtitle = stringr::str_c("Based on ",
+                              scales::number(nrow(corpus_df)),
+                              " items published in Russian between ",
+                              format.Date(x = min(corpus_df$date), "%d %B %Y"), 
+                              " and ",
+                              format.Date(x = max(corpus_df$date), "%d %B %Y"),
+                              "\nQuery: ",
+                              sQuote("коллективн* запад")),
+caption = "Data processing: Giorgio Comai (OBCT/CCI) / tadadit.xyz") +
+  ggplot2::theme_minimal(base_family = "Roboto Condensed") +
+  theme(legend.position = "none")
+```
+
+```{r}
+corpus_df <- kremlin_ru_df |> 
+  dplyr::filter(as.Date(date)>as.Date("2019-12-31")) 
+
+collective_west_kremlin_ru_count_df |> 
+  dplyr::filter(as.Date(date)>as.Date("2019-12-31")) |> 
+  cas_summarise(period = "quarter", auto_convert = TRUE) %>% 
+      mutate(alpha = if_else(date=="2023.1", 0.9, 1)) |> 
+  ggplot2::ggplot(mapping = ggplot2::aes(x = date, y = n, alpha = alpha)) +
+  ggplot2::geom_col() +
+  ggplot2::scale_x_discrete(name = "", guide = guide_axis(angle = 45)) +
+  ggplot2::scale_y_continuous(name = "") +
+    scale_alpha_continuous(range = c(0.6, 1), guide = NULL) +
+  ggplot2::labs(
+    title = glue::glue("Number of references per quarter to {sQuote('collective west')} on Kremlin.ru"),
+    subtitle = stringr::str_c("Based on ",
+                              scales::number(nrow(corpus_df)),
+                              " items published in Russian between ",
+                              format.Date(x = min(corpus_df$date), "%d %B %Y"), 
+                              " and ",
+                              format.Date(x = max(corpus_df$date), "%d %B %Y"),
+                              "\nQuery: ",
+                              sQuote("коллективн* запад")),
+caption = "Data processing: Giorgio Comai (OBCT/CCI) / tadadit.xyz") +
+  ggplot2::theme_minimal(base_family = "Roboto Condensed")
+```
+
+Before 2021, the expression "collective West" has never been used, not a single time, in any of the tens of thousands of statements published on Kremlin's website since 2000. Since then, the expression has featured quite frequently, in particular in occasion of "big speeches". See below all relevant mentions, first in Russian, then in English.
+
+```{r kwic for kremlin_ru}
+#| column: screen-inset
+kremlin_ru_kwic <- cas_kwic(corpus = kremlin_ru_df,
+         string = c("коллективн[[:alpha:]]+ запад"),
+         same_sentence = TRUE,
+         regex = TRUE) |>  
+  dplyr::select(date, title, before, string, after, url) |> 
+  dplyr::mutate(title = stringr::str_c("<a href='", url, "'>", title, "</a>")) |> 
+  dplyr::select(-url) |> 
+  dplyr::mutate(date = as.Date(date)) |> 
+  dplyr::arrange(date)  |> 
+  mutate(string = stringr::str_c(string, " ", stringr::str_extract(string = after, pattern = "[[:graph:]]+")), 
+         after = stringr::str_remove(string = after, pattern = "[[:graph:]]+"))
+
+
+kremlin_ru_kwic %>% 
+  reactable::reactable(filterable = TRUE,
+                       highlight = TRUE, 
+                       resizable = TRUE,
+                       defaultPageSize = 5,
+                       columns = list(
+                         date = reactable::colDef(maxWidth = 130),
+                         title = reactable::colDef(html = TRUE),
+                         before = reactable::colDef(align = "right",
+                                                    minWidth = 100),
+                         string = reactable::colDef(maxWidth = 180),
+                         after = reactable::colDef(minWidth = 100)
+                       ))
+
+```
+
+<hr />
+
+```{r}
+cas_set_options(
+  base_folder = fs::path(fs::path_home_r(), 
+                         "R",
+                         "castarter_tadadit"),
+  
+  project = "Russian institutions",
+  website = "kremlin.ru_en",
+)
+
+kremlin_en_df <- cas_read_db_contents_data() |> 
+  distinct(title, date, text, .keep_all = TRUE) |> 
+  dplyr::collect()
+
+```
+
+```{r kwic for kremlin_en}
+#| column: screen-inset
+kremlin_en_kwic <- cas_kwic(corpus = kremlin_en_df,
+         string = c("collective west"),
+         ignore_case = TRUE,
+         same_sentence = TRUE,
+         regex = TRUE) |>  
+  dplyr::select(date, title, before, string, after, url) %>% 
+  dplyr::mutate(title = stringr::str_c("<a href='", url, "'>", title, "</a>")) %>% 
+  dplyr::select(-url) |> 
+  dplyr::mutate(date = as.Date(date)) |> 
+  dplyr::arrange(date)  |> 
+    mutate(string = stringr::str_c(string, " ", stringr::str_extract(string = after, pattern = "[[:graph:]]+")), 
+         after = stringr::str_remove(string = after, pattern = "[[:graph:]]+"))
+
+
+kremlin_en_kwic %>% 
+  dplyr::arrange(date) |> 
+  reactable::reactable(filterable = TRUE,
+                       highlight = TRUE, 
+                       resizable = TRUE,
+                       defaultPageSize = 5,
+                       columns = list(
+                         date = reactable::colDef(maxWidth = 130),
+                         title = reactable::colDef(html = TRUE),
+                         before = reactable::colDef(align = "right",
+                                                    minWidth = 100),
+                         string = reactable::colDef(maxWidth = 180),
+                         after = reactable::colDef(minWidth = 100)
+                       ))
+
+```
+
+On 21 April 2021, for the first time, Vladimir Putin used the expression "collective West", or, more precisely "the so-called collective West". But "so-called" by whom? And how did this expression enter his vocabulary?
+
+## Pervy Kanal
+
+It appears that the source of inspiration was not Russia's *First Channel*, one of the main TV channels in Russia (*Pervy Kanal* - [link to Wikipedia page of *Pervy Kanal* for more context](https://en.wikipedia.org/wiki/Channel_One_Russia)).
+
+Indeed, the expression was barely used in mainstream news reporting before Putin's speech in April 2021.
+
+The following graphs are based only on the transcripts of regular news segments available online. It should be noted that these do not include transcripts of the talk shows, where inflammatory or politically loaded statements are more prevalent.
+
+```{r}
+library("castarter")
+
+cas_set_options(base_folder = fs::path(fs::path_home_r(), 
+                                       "R",
+                                       "castarter_tadadit"),
+                project = "Russian media",
+                website = "1tv.ru_ru"
+)
+
+
+pervy_df <- cas_read_db_contents_data() |> 
+  dplyr::collect() |> 
+  dplyr::mutate(date = as.Date(datetime)) |> 
+  dplyr::filter(date > as.Date("2016-12-31"))
+
+```
+
+```{r}
+collective_west_pervy_ru_count_df <-  pervy_df |> 
+  cas_count(string = "коллективн[[:alpha:]]+ запад")
+```
+
+```{r}
+corpus_df <- pervy_df
+
+collective_west_pervy_ru_count_df |> 
+   cas_summarise(period = "quarter", auto_convert = TRUE) %>% 
+    mutate(alpha = if_else(date=="2023.1", 0.7, 1)) |> 
+  ggplot2::ggplot(mapping = ggplot2::aes(x = date, y = n, alpha = alpha)) +
+  ggplot2::geom_col() +
+  ggplot2::scale_x_discrete(name = "", guide = guide_axis(angle = 45)) +
+  ggplot2::scale_y_continuous(name = "") +
+    scale_alpha_continuous(range = c(0.6, 1), guide = NULL) +
+  ggplot2::labs(
+    title = glue::glue("Number of references per quarter to {sQuote('collective west')} on 1tv.ru"),
+    subtitle = stringr::str_c("Based on ",
+                              scales::number(nrow(corpus_df)),
+                              " items published in Russian between ",
+                              format.Date(x = min(corpus_df$date), "%d %B %Y"), 
+                              " and ",
+                              format.Date(x = max(corpus_df$date), "%d %B %Y"),
+                              "\nQuery: ",
+                              sQuote("коллективн* запад")),
+caption = "Data processing: Giorgio Comai (OBCT/CCI) / tadadit.xyz") +
+  ggplot2::theme_minimal(base_family = "Roboto Condensed") +
+  theme(legend.position = "none")
+```
+
+```{r}
+per_day_1tv <- pervy_df |> 
+  group_by(date) |> 
+  count() |>
+  ungroup() |> 
+  summarise(mean = mean(n)) |> 
+  pull(mean) |> 
+  round()
+```
+
+It appears that bar a few occasional earlier mentions, the expression "collective West" has effectively entered into use only starting with 2021, and even more in 2022. Given the very high number of publications (about `r per_day_1tv` items are published each day on 1tv.ru), this shows still a relatively low frequency, with the expression used on average once every couple of days in recent months. Besides, most of the early mentions are in fact repeated quotes of Putin's speeches in multiple news segments.
+
+In this case, it appears that things go mostly as expected in the Russian context, with the media adapting to the terminology and narratives established by the Kremlin, and actually not adopting this specific expression until recently.
+
+```{r kwic for pervy_ru}
+#| column: screen-inset
+pervy_ru_kwic <- cas_kwic(corpus = pervy_df,
+         string = c("коллективн[[:alpha:]]+ запад"),
+         same_sentence = TRUE,
+         regex = TRUE) |>  
+  dplyr::select(date, title, before, string, after, url) %>% 
+  dplyr::mutate(title = stringr::str_c("<a href='", url, "'>", title, "</a>")) %>% 
+  dplyr::select(-url) %>% 
+  mutate(date = as.Date(date)) |> 
+  dplyr::arrange(date) |> 
+    mutate(string = stringr::str_c(string, " ", stringr::str_extract(string = after, pattern = "[[:graph:]]+")), 
+         after = stringr::str_remove(string = after, pattern = "[[:graph:]]+"))
+
+
+pervy_ru_kwic %>% 
+  reactable::reactable(filterable = TRUE,
+                       highlight = TRUE, 
+                       resizable = TRUE,
+                       defaultPageSize = 5,
+                       columns = list(
+                         date = reactable::colDef(maxWidth = 130),
+                         title = reactable::colDef(html = TRUE),
+                         before = reactable::colDef(align = "right",
+                                                    minWidth = 100),
+                         string = reactable::colDef(maxWidth = 180),
+                         after = reactable::colDef(minWidth = 100)
+                       ))
+
+```
+
+## Nationalist media
+
+### Tsargrad
+
+Tsargrad TV ([link to Wikipedia page](https://en.wikipedia.org/wiki/Tsargrad_TV)) is a Russian nationalist television channel launched in 2015 by Konstantin Malofeev.
+
+```{r}
+cas_set_options(
+  base_folder = fs::path(fs::path_home_r(), 
+                         "R",
+                         "castarter_tadadit"),
+  
+  project = "Russian media",
+  website = "Tsargrad.tv",
+)
+
+tsargrad_df <- cas_read_db_contents_data() |> 
+  dplyr::collect()
+
+```
+
+```{r}
+collective_west_tsargrad_ru_count_df <-  tsargrad_df |> 
+  cas_count(string = "коллективн[[:alpha:]]+ запад")
+```
+
+```{r}
+corpus_df <- tsargrad_df
+
+collective_west_tsargrad_ru_count_df |> 
+   cas_summarise(period = "year", auto_convert = TRUE) %>% 
+      mutate(alpha = if_else(date==2023, 0.7, 1)) |> 
+  ggplot2::ggplot(mapping = ggplot2::aes(x = date, y = n, alpha = alpha)) +
+  ggplot2::geom_col() +
+  ggplot2::scale_x_continuous(name = "", breaks = scales::breaks_pretty(10)) +
+  ggplot2::scale_y_continuous(name = "") +
+  scale_alpha_continuous(range = c(0.6, 1), guide = NULL) +
+  ggplot2::labs(
+    title = glue::glue("Number of references per year to {sQuote('collective west')} on Tsargrad.tv"),
+    subtitle = stringr::str_c("Based on ",
+                              scales::number(nrow(corpus_df)),
+                              " items published in Russian between ",
+                              format.Date(x = min(corpus_df$date), "%d %B %Y"), 
+                              " and ",
+                              format.Date(x = max(corpus_df$date), "%d %B %Y"),
+                              "\nQuery: ",
+                              sQuote("коллективн* запад")),
+caption = "Data processing: Giorgio Comai (OBCT/CCI) / tadadit.xyz") +
+  ggplot2::theme_minimal(base_family = "Roboto Condensed")
+```
+
+Before 2021, references to the "collective West" are very sporadic.
+
+```{r}
+collective_west_tsargrad_ru_count_df |> 
+  dplyr::filter(as.Date(date) > as.Date("2013-01-01")) |> 
+   cas_summarise(period = "quarter", auto_convert = TRUE) |> 
+      mutate(alpha = if_else(date=="2023.1", 0.7, 1)) |> 
+  ggplot(mapping = aes(x = date, y = n, alpha = alpha)) +
+  geom_col() +
+  scale_x_discrete(name = "", guide = guide_axis(angle = 45)) +
+  scale_y_continuous(name = "", limits = c(0, NA)) +
+  scale_alpha_continuous(range = c(0.6, 1), guide = NULL) +
+  labs(title = "Number of mentions of 'collective West' on Tsargrad.tv, by quarter",
+       subtitle = stringr::str_c("Based on ",
+                              scales::number(nrow(corpus_df)),
+                              " items published in Russian between ",
+                              format.Date(x = min(corpus_df$date), "%d %B %Y"), 
+                              " and ",
+                              format.Date(x = max(corpus_df$date), "%d %B %Y"),
+                              "\nQuery: ",
+                              sQuote("коллективн* запад")),
+       caption = "Data processing: Giorgio Comai (OBCT/CCI) / tadadit.xyz")  + 
+  theme_minimal(base_family = "Roboto Condensed") 
+```
+
+```{r kwic for tsargrad_tv}
+#| column: screen-inset
+tsargrad_ru_kwic <- cas_kwic(corpus = tsargrad_df,
+         string = c("коллективн[[:alpha:]]+ запад"),
+         same_sentence = TRUE,
+         regex = TRUE) |>  
+  dplyr::select(date, title, before, string, after, url) %>% 
+  dplyr::mutate(title = stringr::str_c("<a href='", url, "'>", title, "</a>")) %>% 
+  dplyr::select(-url) %>%
+  dplyr::mutate(date = as.Date(date)) |> 
+  dplyr::arrange(date) |> 
+    mutate(string = stringr::str_c(string, " ", stringr::str_extract(string = after, pattern = "[[:graph:]]+")), 
+         after = stringr::str_remove(string = after, pattern = "[[:graph:]]+"))
+
+
+tsargrad_ru_kwic %>% 
+  reactable::reactable(filterable = TRUE,
+                       highlight = TRUE, 
+                       resizable = TRUE,
+                       defaultPageSize = 5,
+                       columns = list(
+                         date = reactable::colDef(maxWidth = 130),
+                         title = reactable::colDef(html = TRUE),
+                         before = reactable::colDef(align = "right",
+                                                    minWidth = 100),
+                         string = reactable::colDef(maxWidth = 180),
+                         after = reactable::colDef(minWidth = 100)
+                       ))
+
+```
+
+```{r}
+per_day <- tsargrad_df |> 
+  group_by(date) |> 
+  count() |>
+  ungroup() |> 
+  summarise(mean = mean(n)) |> 
+  pull(mean) |> 
+  round()
+```
+
+In particular considering the very high number of publications (about `r per_day` items are published each day on Tsargrad.tv), mentions before 2021 are very sporadic. It is only with 2022, that references to the "collective West" become commonplace, after Vladimir Putin started to use the term and in particular after the launch of Russia's invasion of Ukraine.
+
+### Zavtra
+
+Zavtra has been published as a weekly printed broadsheet newspaper since the 1993. *Zavtra*'s ideology, outlined [in a dedicated page on its official website](https://zavtra.ru/about), is a version of Russian nationalism that celebrates Russia's Tsarist past, its Stalinist glory, and Russia's inevitable future rise to victory.
+
+In the same text, they also boast to have created trends that have entered the mainstream:
+
+> "Over the years, we at *Zavtra* have created several ideologies, several powerful trends that have entered and continue to enter the public consciousness."
+
+Could the concept of "collective West" be one such instance?
+
+```{r}
+cas_set_options(
+  base_folder = fs::path(fs::path_home_r(), 
+                         "R",
+                         "castarter_tadadit"),
+  
+  project = "Russian media",
+  website = "Zavtra.ru",
+)
+
+zavtra_df <- cas_read_db_contents_data() |> 
+  dplyr::collect()
+
+```
+
+```{r}
+collective_west_zavtra_ru_count_df <-  zavtra_df |> 
+  cas_count(string = "коллективн[[:alpha:]]+ запад")
+```
+
+```{r}
+corpus_df <- zavtra_df
+
+collective_west_zavtra_ru_count_df |> 
+   cas_summarise(period = "year", auto_convert = TRUE) %>% 
+      mutate(alpha = if_else(date==2023, 0.7, 1)) |> 
+  ggplot2::ggplot(mapping = ggplot2::aes(x = date, y = n, alpha = alpha)) +
+  ggplot2::geom_col() +
+  ggplot2::scale_x_continuous(name = "") +
+  ggplot2::scale_y_continuous(name = "") +
+  ggplot2::scale_alpha_continuous(range = c(0.6, 1), guide = NULL) +
+  ggplot2::labs(
+    title = glue::glue("Number of references per year to {sQuote('collective west')} on Zavtra.ru"),
+    subtitle = stringr::str_c("Based on ",
+                              scales::number(nrow(corpus_df)),
+                              " items published in Russian between ",
+                              format.Date(x = min(corpus_df$date), "%d %B %Y"), 
+                              " and ",
+                              format.Date(x = max(corpus_df$date), "%d %B %Y")),
+caption = "Data processing: Giorgio Comai (OBCT/CCI) / tadadit.xyz") +
+  ggplot2::theme_minimal(base_family = "Roboto Condensed")
+```
+
+There are two early mentions in 2000 and 2005, but the expressions starts to feature routinely only starting with the summer of 2015, as appears more clearly from the following graph.
+
+```{r}
+collective_west_zavtra_ru_count_df |> 
+  dplyr::filter(as.Date(date) > as.Date("2013-01-01")) |> 
+   cas_summarise(period = "quarter", auto_convert = TRUE) |> 
+      mutate(alpha = if_else(date=="2023.1", 0.7, 1)) |> 
+  ggplot(mapping = aes(x = date, y = n, alpha = alpha)) +
+  geom_col() +
+  scale_x_discrete(name = "", guide = guide_axis(angle = 45)) +
+  scale_y_continuous(name = "", limits = c(0, NA)) +
+    ggplot2::scale_alpha_continuous(range = c(0.6, 1), guide = NULL) +
+  labs(title = "Number of mentions of 'collective West' on Zavtra.ru, by quarter",
+           subtitle = stringr::str_c("Based on ",
+                              scales::number(nrow(corpus_df)),
+                              " items published in Russian between ",
+                              format.Date(x = min(corpus_df$date), "%d %B %Y"), 
+                              " and ",
+                              format.Date(x = max(corpus_df$date), "%d %B %Y")),
+       caption = "Data processing: Giorgio Comai (OBCT/CCI) / tadadit.xyz")  + 
+  theme_minimal(base_family = "Roboto Condensed") 
+```
+
+Even if it is only starting with 2015 that the expression becomes commonplace, the first mention appearing in 2014 summarises in a single sentence many of the themes that would feature prominently in the official rhetoric in later years.
+
+> "On 19-21 February in Kyiv took place a neo-nazi-Banderite coup, inspired by the collective West, and, first of all, the United States." --- "[After the coup](https://zavtra.ru/blogs/posle-putcha))", Andrey Fursov, 13 March 2014
+
+```{r kwic for zavtra_ru}
+#| column: screen-inset
+zavtra_ru_kwic <- cas_kwic(corpus = zavtra_df,
+         string = c("коллективн[[:alpha:]]+ запад"),
+         same_sentence = TRUE,
+         regex = TRUE) |>  
+  dplyr::select(date, title, before, string, after, url) %>% 
+  dplyr::mutate(title = stringr::str_c("<a href='", url, "'>", title, "</a>")) %>% 
+  dplyr::select(-url) %>% 
+  mutate(date = as.Date(date)) |> 
+  dplyr::arrange(date) |> 
+    mutate(string = stringr::str_c(string, " ", stringr::str_extract(string = after, pattern = "[[:graph:]]+")), 
+         after = stringr::str_remove(string = after, pattern = "[[:graph:]]+"))
+
+
+zavtra_ru_kwic %>% 
+  reactable::reactable(filterable = TRUE,
+                       highlight = TRUE, 
+                       resizable = TRUE,
+                       defaultPageSize = 5,
+                       columns = list(
+                         date = reactable::colDef(maxWidth = 130),
+                         title = reactable::colDef(html = TRUE),
+                         before = reactable::colDef(align = "right",
+                                                    minWidth = 100),
+                         string = reactable::colDef(maxWidth = 180),
+                         after = reactable::colDef(minWidth = 100)
+                       ))
+
+```
+
+```{r}
+zavtra_collective_west_df <- zavtra_df |> 
+  filter(stringr::str_detect(
+    string = text,
+    pattern = stringr::regex(pattern = "коллективн[[:alpha:]]+ запад",
+                             ignore_case = TRUE))) |> 
+  tidytext::unnest_tokens(output = text,
+                          input = text,
+                          to_lower = FALSE,
+                          token = "sentences") |> 
+  filter(stringr::str_detect(
+    string = text,
+    pattern = stringr::regex(pattern = "коллективн[[:alpha:]]+ запад",
+                             ignore_case = TRUE))) |> 
+  # dplyr::mutate(author = stringr::str_extract(string = author, pattern = "[[:alpha:]]+ [[:alpha:]]+")) |> 
+  dplyr::mutate(date = as.Date(date))
+```
+
+Even if the expression is used by a wide range of authors, almost half of the mentions can be tracked to three authors (the third of them is actually an editorial collective). Their names are listed below:
+
+```{r}
+top_authors_df <- zavtra_collective_west_df |> 
+  group_by(author) |> 
+  count(sort = TRUE) |> 
+  mutate(author = stringi::stri_trans_general(author, 'latin'))
+
+top_authors_df |> 
+  reactable()
+```
+
+```{r}
+top_authors_df |> 
+  ungroup() |> 
+  head(10) |> 
+  left_join(
+    zavtra_collective_west_df |> 
+  mutate(author = stringi::stri_trans_general(author, 'latin')),
+    by = "author", 
+    multiple = "all"
+  ) |> 
+  rename(n_author = n) |> 
+  group_by(author, n_author, date, id) |> 
+  count() |> 
+  arrange(n_author) |> 
+  mutate(date = as.Date(date)) |> 
+  ungroup() |> 
+  mutate(author = glue::glue("{author} ({n_author})")) |> 
+  
+  mutate(author = forcats::fct_inorder(author)) |> 
+  ggplot() +
+  geom_point(mapping = aes(x = date, y = author,size = n), alpha = 0.6) +
+  scale_x_date("") +
+  scale_y_discrete("") +
+  scale_size("Number of mentions per article", breaks = c(1, 2, 4, 8)) +
+  theme(legend.position = "bottom") +
+  labs(title = "Top 10 Zavtra.ru authors using most frequently the expression 'collective West'",
+       subtitle = "Odered by total number of times 'collective West' has been used by each author",
+       caption = "Data processing: Giorgio Comai (OBCT/CCI) / tadadit.xyz")
+
+```
+
+Even if there is not a distinct "manifesto" piece that explicitly introduces the term (or if there is, I haven't yet found it), it seems clear that is is starting with the late summer of 2015 that the expression really becomes widespread on *Zavtra*. More than anybody else, it appears that it is Zavtra's deputy director [Alexander Nagorny](https://ru.wikipedia.org/wiki/%D0%9D%D0%B0%D0%B3%D0%BE%D1%80%D0%BD%D1%8B%D0%B9,_%D0%90%D0%BB%D0%B5%D0%BA%D1%81%D0%B0%D0%BD%D0%B4%D1%80_%D0%90%D0%BB%D0%B5%D0%BA%D1%81%D0%B5%D0%B5%D0%B2%D0%B8%D1%87)'s insistent references to "collective West" that really set the trend. As the deputy director of *Zavtra* between 1997 and his death in 2020, Nagorny has been a regular contributor to the newspaper for years, and yet, only starting with 2015 he started to use the expression routinely.
+
+Without further qualitative analysis, it is difficult to gauge what is really the starting point that made the expression go mainstream, but this initial quantitative analysis offers useful hints.
+
+## What about "our Western partners"?
+
+Before the "collective West" entered official discourse, how did the Kremlin refer to these countries?
+
+Other phrases may have been in use, but "Western partners" has long been a standard expression, even if seldom used in the "good times" of the early 2000s. Indeed, it is in the "bad years" of 2014 and 2022 that the expression has been used most frequently by Russia's president.
+
+As you look at the these graphs below and scroll down the use of the expression in context, you may want to pay attention in particular to recent months:
+
+-   there have been zero references to "Western partners" in the first two months of 2023, which are part of the dataset
+-   recent mentions in 2022 show how the expression "Western partners" is becoming explicitly problematised, and cannot be used seriously any more. We see more references to our "so-called Western partners" and even, on [7 December 2022](http://en.kremlin.ru/events/councils/70046), "our -- we should put it in quotation marks -- 'Western partners.'"
+
+```{r}
+western_partners_kremlin_ru_count_df <-  kremlin_ru_df |> 
+  cas_count(string = "западн[[:alpha:]]+ партн|партн[[:alpha:]]+ на западе")
+```
+
+```{r}
+corpus_df <- kremlin_ru_df
+
+western_partners_kremlin_ru_count_df |> 
+   cas_summarise(period = "year", auto_convert = TRUE) %>% 
+  mutate(date = as.character(date)) |> 
+  ggplot2::ggplot(mapping = ggplot2::aes(x = date, y = n)) +
+  ggplot2::geom_col() +
+  ggplot2::scale_x_discrete(name = "",
+                              guide = guide_axis(angle = 45),
+                             # breaks = scales::breaks_pretty(n = 18),
+                             # limits = c(1999, 2023)
+                            ) +
+  ggplot2::scale_y_continuous(name = "") +
+  ggplot2::labs(
+    title = glue::glue("Number of references per year to {sQuote('western partners')} on Kremlin.ru"),
+    subtitle = stringr::str_c("Based on ",
+                              scales::number(nrow(corpus_df)),
+                              " items published in Russian between ",
+                              format.Date(x = min(corpus_df$date), "%d %B %Y"), 
+                              " and ",
+                              format.Date(x = max(corpus_df$date), "%d %B %Y")),
+caption = "Data processing: Giorgio Comai (OBCT/CCI) / tadadit.xyz") +
+  ggplot2::theme_minimal(base_family = "Roboto Condensed")
+```
+
+As you can see from the keywords in context, this catches all the Russian forms of both "Western partners" and "partners in the West".
+
+```{r}
+#| column: screen-inset
+kremlin_partners_ru_kwic <- cas_kwic(corpus = kremlin_ru_df,
+         string = c("запад[[:alpha:]]+ партн|партн[[:alpha:]]+ на западе"),
+         ignore_case = TRUE,
+         same_sentence = TRUE,
+         regex = TRUE) |>  
+  dplyr::select(date, title, before, string, after, url) %>% 
+  dplyr::mutate(title = stringr::str_c("<a href='", url, "'>", title, "</a>")) %>% 
+  dplyr::select(-url) |> 
+  dplyr::mutate(date = as.Date(date)) |> 
+  dplyr::arrange(date)  |> 
+    mutate(string = stringr::str_c(string, " ", stringr::str_extract(string = after, pattern = "[[:graph:]]+")), 
+         after = stringr::str_remove(string = after, pattern = "[[:graph:]]+"))
+
+kremlin_partners_ru_kwic %>% 
+  reactable::reactable(filterable = TRUE,
+                       highlight = TRUE, 
+                       resizable = TRUE,
+                       defaultPageSize = 5,
+                       columns = list(
+                         date = reactable::colDef(maxWidth = 130),
+                         title = reactable::colDef(html = TRUE),
+                         before = reactable::colDef(align = "right",
+                                                    minWidth = 100),
+                         string = reactable::colDef(maxWidth = 180),
+                         after = reactable::colDef(minWidth = 100)
+                       ))
+```
+
+```{r}
+#| column: screen-inset
+kremlin_partners_en_kwic <- cas_kwic(corpus = kremlin_en_df,
+         string = c("western partners|partners in the West"),
+         ignore_case = TRUE,
+         same_sentence = TRUE,
+         regex = TRUE) |>  
+  dplyr::select(date, title, before, string, after, url) %>% 
+  dplyr::mutate(title = stringr::str_c("<a href='", url, "'>", title, "</a>")) %>% 
+  dplyr::select(-url) |> 
+  dplyr::mutate(date = as.Date(date)) |> 
+  dplyr::arrange(date)  |> 
+    mutate(string = stringr::str_c(string, " ", stringr::str_extract(string = after, pattern = "[[:graph:]]+")), 
+         after = stringr::str_remove(string = after, pattern = "[[:graph:]]+"))
+
+
+kremlin_partners_en_kwic %>% 
+  reactable::reactable(filterable = TRUE,
+                       highlight = TRUE, 
+                       resizable = TRUE,
+                       defaultPageSize = 5,
+                       columns = list(
+                         date = reactable::colDef(maxWidth = 130),
+                         title = reactable::colDef(html = TRUE),
+                         before = reactable::colDef(align = "right",
+                                                    minWidth = 100),
+                         string = reactable::colDef(maxWidth = 180),
+                         after = reactable::colDef(minWidth = 100)
+                       ))
+```
+
+Finally, I should add that there is some indication that the expression "West" itself has become more common. The following graph is based on a simple word count of references to "West", and does not differentiate between its use in generic expressions and the geo-politicised ones. Yet, the booming number of references in 2022 gives a clear hint that a new phase has started.
+
+```{r}
+corpus_df <- kremlin_ru_df
+
+west_kremlin_ru_count_df <-  kremlin_ru_df |> 
+  cas_count(string = "запад")
+
+west_kremlin_ru_count_df|> 
+   cas_summarise(period = "year", auto_convert = TRUE) %>% 
+ # mutate(date = as.character(date)) |> 
+  ggplot2::ggplot(mapping = ggplot2::aes(x = date, y = n)) +
+  ggplot2::geom_col() +
+   ggplot2::scale_x_continuous(name = "", breaks = scales::breaks_pretty(10)) +
+  ggplot2::scale_y_continuous(name = "") +
+  ggplot2::labs(
+    title = glue::glue("Number of references per year to {sQuote('West')} on Kremlin.ru"),
+    subtitle = stringr::str_c("Based on ",
+                              scales::number(nrow(corpus_df)),
+                              " items published in Russian between ",
+                              format.Date(x = min(corpus_df$date), "%d %B %Y"), 
+                              " and ",
+                              format.Date(x = max(corpus_df$date), "%d %B %Y")),
+caption = "Data processing: Giorgio Comai (OBCT/CCI) / tadadit.xyz") +
+  ggplot2::theme_minimal(base_family = "Roboto Condensed")
+```

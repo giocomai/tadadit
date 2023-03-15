@@ -10,7 +10,7 @@ categories: [dataset, Russian media, Russian language]
 {{< include ./../_early_disclaimer.qmd >}}
 
 ```{r setup, echo = FALSE, message=FALSE}
-library("extrafont")
+#library("extrafont")
 knitr::opts_chunk$set(echo = FALSE,
                       fig.width = 8,
                       fig.height = 4.5)
