@@ -46,7 +46,7 @@ Graphs show absolute frequency rather than relative frequency, even if the rate 
 
 The number of references has been grouped either by year or by quarter, as including shorter time periods would ultimately highlight only the buzz around a single speech, rather than the overall trend. In graphs showing data grouped by quarters "2022.1" stands for the first quarter of 2022, i.e. January to March.
 
-Full textual datasets are shared along with this post, when allowed by the license. A fullly-documented version of these dataset will be published soon. A preliminary version of the datasets is already available for downloa_ 
+Full textual datasets are shared along with this post, when allowed by the license. A fullly-documented version of these dataset will be published soon. A preliminary version of the datasets is already available for download.
 
 - [__zavtra.ru_ru__](./../../datasets/zavtra.ru_ru/) - Russian weekly *Zavtra* (in Russian)
 - [__kremlin.ru_ru__](./../../datasets/kremlin.ru_ru/) - Statements from the official Kremlin website (in Russian)
