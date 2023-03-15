@@ -2,7 +2,7 @@ project:
   type: website
 
 website:
-  title: "Text as data & conflicts in the post-Soviet space"
+  title: "tadadit.xyz"
   site-url: https://tadadit.xyz/
   favicon: favicon.png
   navbar:
@@ -14,7 +14,6 @@ website:
         text: Home
       - href: about/about.qmd
         text: About this project
-
   twitter-card:
     creator: "@giocomai"
   open-graph: true
