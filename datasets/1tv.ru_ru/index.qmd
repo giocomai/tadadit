@@ -1,0 +1,140 @@
+---
+title: "1tv.ru_ru"
+description: "All items published on the Pervy Kanal (1tv.ru)"
+author: Giorgio Comai
+date: 2023-03-13
+last-modified: 2023-04-24
+categories: [dataset, Russian media, Russian language]
+---
+
+{{< include ./../_early_metadata_only_disclaimer.qmd >}}
+
+```{r setup, echo = FALSE}
+knitr::opts_chunk$set(echo = FALSE,
+                      fig.width = 8,
+                      fig.height = 4.5)
+
+library("ggplot2")
+library("dplyr", warn.conflicts = FALSE)
+
+ggplot2::theme_set(new = theme_minimal(base_family = "Roboto Condensed"))
+
+```
+
+```{r}
+
+library("castarter")
+
+cas_set_options(
+  base_folder = fs::path(fs::path_home_r(), 
+                         "R",
+                         "castarter_tadadit"),
+  project = "Russian media",
+  website = "1tv.ru_ru" 
+)
+
+corpus_df <- cas_read_db_contents_data() %>% 
+  dplyr::collect()
+
+```
+
+```{r write_corpus, eval = FALSE}
+
+
+cas_write_corpus(corpus = corpus_df,
+                 arrange_by = datetime,
+                 token = "sentences",
+                 partition = "year")
+```
+
+```{r}
+max_date <- max(as.Date(corpus_df$date))
+
+min_date <- min(as.Date(corpus_df$date))
+
+total_items <- nrow(corpus_df)
+
+
+```
+
+## Summary statistics
+
+```{r results='asis'}
+body_text <- stringr::str_c(
+  "**Dataset name**: 1tv.ru_ru",
+  "**Dataset description**: all items published on Pervy Kanal",
+  paste("**Start date**:", min_date),
+  paste("**End date**:", max_date),
+  paste("**Total items**:", scales::number(total_items)),
+  paste("**Available columns**:", colnames(corpus_df) %>% 
+          stringr::str_c(collapse = "; ")),
+  sep = "\n\n")
+
+cat(body_text)
+```
+
+```{r}
+#| column: body
+#| fig-width: 8
+#| fig-height: 4.5
+corpus_df |>
+  mutate(year = lubridate::year(date)) |> 
+  count(year) |> 
+  ggplot(mapping = aes(x = year, y = n)) +
+  geom_col() +
+  scale_y_continuous(name = "", labels = scales::number) +
+  scale_x_continuous(name = "", breaks = scales::pretty_breaks(n = 10)) +
+  labs(
+    title = "Number of items per year published on Pervy Kanal (1tv.ru)",
+    subtitle = stringr::str_c(
+      "Based on ",
+      scales::number(nrow(corpus_df)),
+      " items published between ",
+      format.Date(x = min(corpus_df$date), "%d %B %Y"), 
+      " and ",
+      format.Date(x = max(corpus_df$date), "%d %B %Y")),
+    caption = "Source: Giorgio Comai / tadadit.xyz"
+  )
+```
+
+```{r}
+words_per_day_df <- corpus_df |> 
+  cas_count_total_words(pattern = "[\\w]+") |> 
+  mutate(date = lubridate::as_date(date),
+         string = "total words")
+
+words_per_day_df |> 
+  cas_summarise(period = "year", auto_convert = TRUE) |>
+  rename(year = date) |> 
+  ggplot(mapping = aes(x = year, y = n)) +
+  geom_col() +
+  scale_y_continuous(name = "", labels = scales::number) +
+  scale_x_continuous(name = "", breaks = scales::pretty_breaks(n = 10)) +
+  labs(title = "Number of words per year published on Pervy Kanal (1tv.ru)",
+       subtitle = stringr::str_c("Based on ",
+                                 scales::number(nrow(corpus_df)),
+                                 " items published between ",
+                                 format.Date(x = min(corpus_df$date), "%d %B %Y"), 
+                                 " and ",
+                                 format.Date(x = max(corpus_df$date), "%d %B %Y")),
+       caption = "Source: Giorgio Comai / tadadit.xyz")
+```
+
+```{r eval = FALSE}
+corpus_df |> 
+  dplyr::filter(text=="") |> 
+  head() |> 
+  dplyr::pull(id)
+
+short_df <- corpus_df |> 
+  dplyr::mutate(char = nchar(text)) |> 
+  dplyr::mutate(year = lubridate::year(date)) |> 
+  dplyr::filter(year == 2022) |> 
+  dplyr::arrange(char) |> 
+  dplyr::select(text, date, url) |> 
+  dplyr::slice_head(prop = 0.1)
+
+short_df |> dplyr::collect() |> View()
+```
+
+From the graphs, it appears that starting with 2022 the number of items published has increased, but the length of text for each of them has decreased significantly. Indeed, it is more common to find in textual form just a brief summary of the news reported rather than a full transcript of the video. This is due to have significant impact on content analyses that rely on this dataset.

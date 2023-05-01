@@ -20,7 +20,7 @@ Its purpose is to keep a systematic record of relevant sources that can be used 
 
 The full dataset can be downloaded [as a .csv file](online_sources.csv). Full metadata specification is likewise available [as a .csv file](online_sources_metadata.csv)
 
-::: {.callout-tip}
+::: callout-tip
 ## Note
 
 [*Allegiance*](https://www.wikidata.org/wiki/Property:P945) is provided only in reference to local media and institutions in contested territories when it is immediately apparent and obvious. Independent sources or others whose allegiance is not self-evident are all recorded as "other". The field *allegiance* is not relevant for sources not specifically related to contested territories (e.g. it is not used for national Russian or Ukrainian media).
@@ -42,7 +42,6 @@ renv::snapshot(packages = packages_v,
                lockfile = "renv_post.lock")
 ```
 
-
 ```{r include = FALSE}
 sources_df <- read_csv(
   file = "online_sources.csv",
@@ -57,7 +56,6 @@ sources_df <- read_csv(
   select(domain, entity, allegiance, category, medium, language, name_original, name_en, base_state)
 
 ```
-
 
 ## Media or other online sources reporting news from or about Russia-held territories in Ukraine
 
@@ -75,7 +73,6 @@ filter(allegiance == "Russia",
     
 ```
 
-
 ### Allegiance to Ukraine
 
 ```{r echo = FALSE}
@@ -90,9 +87,7 @@ filter(allegiance == "Ukraine",
     
 ```
 
-
 ### Other
-
 
 ```{r echo = FALSE}
 #| column: screen-inset
@@ -110,7 +105,6 @@ filter(is.na(allegiance),
 
 ### Allegiance to Russia
 
-
 ```{r echo = FALSE}
 #| column: screen-inset
 sources_df |> 
@@ -123,9 +117,7 @@ filter(allegiance == "Russia",
     
 ```
 
-
 ### Allegiance to Ukraine
-
 
 ```{r echo = FALSE}
 #| column: screen-inset
@@ -139,9 +131,7 @@ filter(allegiance == "Ukraine",
     
 ```
 
-
 ### Other
-
 
 ```{r echo = FALSE}
 #| column: screen-inset
@@ -155,9 +145,7 @@ filter(is.na(allegiance),
     
 ```
 
-
 ## Russian national media
-
 
 ```{r echo = FALSE}
 #| column: screen-inset
@@ -171,9 +159,7 @@ filter(is.na(allegiance),
     
 ```
 
-
 ## Russian national institutions
-
 
 ```{r echo = FALSE}
 #| column: screen-inset
@@ -186,7 +172,6 @@ filter(is.na(allegiance),
   reactable(highlight = TRUE)
     
 ```
-
 
 ## Metadata specification {#metadata-specification}
 
@@ -208,7 +193,6 @@ The table with metadata description includes a technical specification and a bri
 
 The full metadata specification is available [as a .csv file](online_sources_metadata.csv), as well as in the table below.
 
-
 ```{r echo = FALSE, eval = TRUE}
 #| column: screen-inset
 metadata_df |> 
@@ -227,7 +211,6 @@ metadata_df |>
   bordered = FALSE)
 ```
 
-
 ```{r echo = FALSE, eval = FALSE}
 #| column: screen-inset
 
@@ -242,8 +225,7 @@ metadata_df |>
             )
 ```
 
-
-::: {.callout-note}
+::: callout-note
 ## Datasets available for download
 
 [**Full dataset (.csv)**](online_sources.csv)

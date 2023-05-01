@@ -25,3 +25,5 @@ id,domain_id,wikidata_id,date_recorded,url,news_section_url,base_state,entity,al
 24,novorosinform.org_ru,,2023-03-08,https://novorosinform.org/,,UA,,Russia,media,website,ru,Информационное агентство «Новороссия»,,,,,,,,https://t.me/novorosinform,https://vk.com/public71860258,,,,,,http://ok.ru/novorosinform,,,
 25,dontimes.ru_ru,,2023-03-08,https://dontimes.ru/,https://dontimes.ru/category/vse-novosti/,UA,Donetsk,Russia,media,website,ru,Донецкое время,Все самое интересное о жизни в Донецкой Народной Республике,,,,,,,,,,,,,,,,,
 26,rg.ru_ru,Q1853433,2023-03-10,https://rg.ru/,,RU,,Russia,media,website,ru,Российская газета,,Rossiyskaya Gazeta,,,,,,,,,,,,,,,,
+27,cominf.org_ru,,2023-03-26,https://cominf.org/,,GE,South Ossetia,,media,website,ru,"Государственное информационное агентство ""Рес""",,News agency RES (South Ossetia),,,,,,,,,,,,,,,,
+28,apsnypress2020.archiveab.ru_ru,,2023-03-26,https://www.apsnypress2020.archiveab.ru/ru/,,GE,Abkhazia,,media,website,ru,,,Apsnypress archive,,,,,,,,,,,,,,,,

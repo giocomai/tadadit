@@ -1,0 +1,5 @@
+::: callout-warning
+## Work-in-progress
+
+This is an early release of the dataset metadata. Further context and quality checks will be added. The dataset itself cannot be shared due to copyright restrictions.
+:::
