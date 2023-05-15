@@ -1,0 +1,967 @@
+---
+title: "Traditional, conservative, Christian, distinct... how supposedly old values emerged in the official and media discourse in Russia since 2012"
+description: "Expressions such as 'the collective West' have entered official discourse only recently. They have been in common use in nationalist media for much longer."
+author: Giorgio Comai
+date: 2023-05-15
+last-modified: 2023-05-15
+categories: [russia]
+image: "giocomai_many_words_and_cyrillic_text_coming_out_of_a_tv_set_wi_10a1e1e3-b449-4132-8e24-fd07c53dc4d8.webp"
+bibliography: references.bib
+---
+
+{{< include ./../_early_disclaimer.qmd >}}
+
+**N.B. This post is actually in draft form and a work in progress, it has not reached its final version**
+
+## ![](giocomai_many_words_and_cyrillic_text_coming_out_of_a_tv_set_wi_10a1e1e3-b449-4132-8e24-fd07c53dc4d8.webp) Context {#top-left-img}
+
+```{r setup, echo = FALSE}
+knitr::opts_chunk$set(echo = FALSE,
+                      warning = FALSE,
+                      message = FALSE,
+                      fig.width = 8,
+                      fig.height = 4.5, 
+                      fig.align = "center")
+
+library("ggplot2")
+library("dplyr", warn.conflicts = FALSE)
+
+ggplot2::theme_set(new = theme_minimal(base_family = "Roboto Condensed"))
+
+source("functions.R")
+```
+
+"Traditional values" have emerged in Russia's public discourse with new vigour starting with 2011-2012 [see e.g. @duquenoy2018, p. 94.] and have soon become prevalent in Russian official and public discourse. With Putin's return to the presidency, conservatism has become "official state posture" [@laruelle2016, p. 287] in Russia. Increased reliance on conservative ideology may have been conceived largely instrumentally [@rodkiewicz2015], as a discursive turn useful to reconsolidate after the wave of protests of 2011-2012 [@sharafutdinova2014], but in the following years it has solidified as a central component of the Kremlin's narrative about Russia itself, as well as its contrapposition with the West. These values have been called "traditional", "conservative", "Christian" - all expressions which would suggest they may be to some extent universal. And yet, they were also unique, something that made Russia a "distinct civilisation" [@tsygankov2016].
+
+Well before Russia's fulls scale invasion of Ukraine in 2022, "spiritual-moral values" became an issue of national security in Russia, and a form of defence against foreign threats and influence [@østbø2017]. Indeed, "traditional Russian spiritual-moral values" ("традиционные российские духовно-нравственные ценности") explicitly and repeatedly featured in the national security strategy of the Russian Federation introduced in 2015 (and then again in the more recent strategy introduced in 2021), in contrast to previous versions of the same document [@presidentoftherussianfederation2015,@presidentoftherussianfederation2021]. "Traditional spiritual-moral values" are mentioned 10 times in the Foreign Policy Concept of the Russian Federation approved on 31 March 2023 [@presidentoftherussianfederation2023].
+
+In 2022, they arguably became an important part of the rhetoric repertoir used to legitimise Russia's military actions, and have become even more clearly "a focal point in the domestic crackdown on the liberal opposition, and in the standoff between Russia and the West in international affairs [@østbø2017, p. 202].
+
+In this post, I will explore references to "values" in Russian official discourse and media in Russia. More specifically, I will:
+
+-   identify which qualifiers have most commonly been added to "values" in the last two decades
+
+-   check the relative frequency of various expressions used to refer to these values (e.g. traditional VS conservative VS Christian), and how they have evolved
+
+-   check if indeed references to "traditional values" (or similar expressions) has increased in 2012 compared to previous years
+
+-   check if there is a change in connection to Russia's invasion of Ukraine and in more recent months.
+
+## How frequent are references to "values"?
+
+Let's start with the English-language version of the Kremlin's website, which should give some context, and then switch to a wider range of sources which are available only in Russian.
+
+```{r}
+
+library("castarter")
+
+cas_set_options(
+  base_folder = fs::path(fs::path_home_r(), 
+                         "R",
+                         "castarter_tadadit"),
+  project = "Russian institutions",
+  website = "kremlin.ru_en" 
+)
+
+kremlin.ru_en <- cas_read_corpus(partition = "year",
+                                 token = "sentences")
+
+kremlin.ru_en_values_df <- kremlin.ru_en |> 
+  dplyr::filter(stringr::str_detect(string = text, pattern = "(V|v)alues")) |> 
+  dplyr::filter(stringr::str_detect(string = text, pattern = "Russia greatly values|Russia values|Russia highly values", negate = TRUE)) |> 
+  dplyr::select(date, title, url, text)
+```
+
+### The unit of analysis
+
+Throughout this post, the main unit of analysis will be the *sentence*. As will become soon apparent, qualifiers that clarify which "values" are being talked about often do not come immediately before or after the word "values" itself, but are part of longer expressions. Also, quite often more than qualifier is included (e.g. "spiritual-moral values"), and it is helpful to consider all of them.[^1]
+
+[^1]: It is not easy to remove completely all references to values that actually express a different meaning of the word, e.g. when it is used as a verb. To reduce their number, from the subset of sentences that include "values" in sentences such as "Russia greatly values" or "Russia values", used in cases such as "Russia values its reputation as a reliable, proven partner..."
+
+English-language version of Kremlin.ru has `r scales::number(nrow(kremlin.ru_en |> dplyr::distinct(doc_id) |> dplyr::collect()))` items in total published between `r kremlin.ru_en |> dplyr::slice_min(date, n = 1, with_ties = FALSE) |> dplyr::pull(date, as_vector = TRUE) |> format("%d %B %Y")` and `r kremlin.ru_en |> dplyr::slice_max(date, n = 1, with_ties = FALSE) |> dplyr::pull(date, as_vector = TRUE) |> format("%d %B %Y")`. If we count in sentences, rather than in items published, we have `r scales::number(nrow(kremlin.ru_en))` sentences in total in our corpus. Among them, `r scales::number(nrow(kremlin.ru_en_values_df))` make reference to "values". Let's look at their distribution.
+
+```{r}
+
+values_en_summary_wide_df <- create_values_summary_wide(all_df = kremlin.ru_en,
+                                                        values_df = kremlin.ru_en_values_df)
+  #dplyr::filter(year>1999, year<2023)
+# For clarity, only data related to the period 2000-2022 will be included in the graphs below. 
+```
+
+While there is an increase in the absolute number of references to "values", this is overall balanced out once we account for the increasing number of text published by the Kremlin each year.
+
+See the data in both relative and absolute formats looking at the tabs.
+
+::: column-page
+::: panel-tabset
+## Relative frequency
+
+```{r}
+#| out-width: 100%
+values_en_summary_wide_df |> 
+  dplyr::mutate(relative_freq = values/all) |> 
+  ggplot2::ggplot(mapping = ggplot2::aes(x = year, y = relative_freq)) +
+  ggplot2::geom_col() +
+  ggplot2::scale_y_continuous(name = "", labels = \(x) scales::percent(x = x, accuracy = 0.2)) +
+  ggplot2::scale_x_continuous(name = "", breaks = scales::pretty_breaks(n = 10)) +
+  ggplot2::labs(
+    title = glue::glue("Relative frequency of sentences mentioning {sQuote('values')} on Kremlin.ru (English version)"),
+    subtitle = stringr::str_c(
+      "Based on ",
+      scales::number(nrow(kremlin.ru_en)),
+      " sentences published between ",
+      format.Date(x = kremlin.ru_en |> dplyr::slice_min(date, n = 1,with_ties = FALSE) |> dplyr::pull(date, as_vector = TRUE), "%d %B %Y"), 
+      " and ",
+      format.Date(x = kremlin.ru_en |> dplyr::slice_max(date, n = 1,with_ties = FALSE) |> dplyr::pull(date, as_vector = TRUE), "%d %B %Y")),
+    caption = "Source: Giorgio Comai / tadadit.xyz")
+```
+
+## Absolute frequency
+
+```{r}
+#| out-width: 100%
+values_en_summary_wide_df |> 
+  
+ggplot2::ggplot(mapping = ggplot2::aes(x = year, y = values)) +
+  ggplot2::geom_col() +
+    ggplot2::scale_y_continuous(name = "", labels = \(x) scales::number(x = x)) +
+  ggplot2::scale_x_continuous(name = "", breaks = scales::pretty_breaks(n = 10)) +
+  ggplot2::labs(
+    title = glue::glue("Absolute frequency of sentences mentioning {sQuote('values')} on Kremlin.ru (English version)"),
+                                       subtitle = stringr::str_c(
+      "Based on ",
+      scales::number(nrow(kremlin.ru_en)),
+      " sentences published between ",
+      format.Date(x = kremlin.ru_en |> dplyr::slice_min(date, n = 1,with_ties = FALSE) |> dplyr::pull(date, as_vector = TRUE), "%d %B %Y"), 
+      " and ",
+      format.Date(x = kremlin.ru_en |> dplyr::slice_max(date, n = 1,with_ties = FALSE) |> dplyr::pull(date, as_vector = TRUE), "%d %B %Y")),
+    caption = "Source: Giorgio Comai / tadadit.xyz")
+```
+
+## Tabular data
+
+```{r}
+values_en_summary_wide_df |> 
+  dplyr::mutate(`without_values` = all - values) |> 
+  dplyr::rename(with_values = values) |> 
+  dplyr::mutate(year = as.character(year)) |> 
+  knitr::kable(caption = "Number of sentences that do or do not include references to 'values' per year on the English language version of the Kremlin's website", format.args = list(big.mark = " "))
+```
+:::
+:::
+
+An argument could possibly be made that the increased number of publications on the Kremlin's website reflect the fact that more less relevant events are effectively being covered, but that the overall number "big speeches" where one would talk about values has effectively remained constant, and hence the absolute numbers are what really matters. But even looking at absolute numbers, we can see that the "moral turn" that according to the literature has started in 2012 is not really reflected in a sudden spike of references to "values" in the presidential rhetoric. Indeed, even if the figure for 2012 is much higher than that for the last year of Medvedev's presidency in 2011, it is very much comparable to the the number of mentioned recorded in 2007 and 2008. Only beginning with 2021 there is an effective increase if we focus on absolute numbers.[^2]
+
+[^2]: Excluding all press releases and focusing exclusiely on transcripts does not change significantly the broad trends that emerge from these graphs.
+
+Ultimately, however, it is not the number of references to "values" per se that is most relevant: what type of values have been talked about at different points in time may be more revealing.
+
+```{r eval = FALSE}
+values_en_summary_wide_df |> 
+  dplyr::mutate(`without_values` = all - values) |> 
+  dplyr::select(-all) |> 
+  tidyr::pivot_longer(names_to = "type",
+                      cols = c("values", "without_values"),
+                      values_to = "n") 
+
+```
+
+## First, what "values" are we talking about?
+
+```{r}
+#kremlin.ru_en |> dplyr::slice_head(n = 10) |> dplyr::collect() |> View()
+```
+
+```{r}
+#kremlin.ru_en |> dplyr::collect() |> nrow()
+```
+
+```{r}
+library("castarter")
+
+cas_set_options(
+  base_folder = fs::path(fs::path_home_r(), 
+                         "R",
+                         "castarter_tadadit"),
+  project = "Russian institutions",
+  website = "kremlin.ru_ru" 
+)
+kremlin.ru_ru <- cas_read_corpus(partition = "year", token = "sentences")
+
+kremlin.ru_ru_values_df <- kremlin.ru_ru |> 
+  dplyr::filter(stringr::str_detect(string = text, pattern = "(Ц|ц)енност")) |> 
+  dplyr::select(date, title, url, text)
+```
+
+```{r message = FALSE}
+#| column: screen-inset
+# values_df |> dplyr::collect() |>
+#    reactable::reactable()
+
+# test <- values_df |> head(1) |> dplyr::pull(text, as_vector = TRUE) 
+# 
+# test <- stringr::str_c("ценностей ", test)
+# 
+# pattern_to_match <- "ценност[[:alpha:]]+"
+
+# see colours() for ideas
+
+
+
+
+# test_h <- stringr::str_replace_all(string = test, pattern = replacement_v)
+
+# test_h <- stringr::str_replace_all(
+#   string = test,
+#   pattern = pattern_to_match,
+#   replacement = stringr::str_c("<span style='background-color: #FFFF00'>", 
+#                                pattern_to_match, 
+#                                "</span>")
+# )
+
+# tibble::tibble(test = test_h) |> 
+#   reactable::reactable(columns = list(
+#   test = reactable::colDef(html = TRUE)))
+
+
+# crisp viridis options # https://waldyrious.net/viridis-palette-generator/
+
+#  "#FFEC8B" -> "#fde725"
+#  "#CAE1FF" -> "#440154"
+
+matches_df <- tibble::tribble(
+  ~pattern_ru,             ~pattern_en,        ~type, ~colour, 
+## Traditional
+  "духовн[[:alpha:]]+",    "spiritua[[:alpha:]]+",            "traditional",  "#FFBBFF", # lightsteelblue1
+  "традиц[[:alpha:]]+",    "traditio[[:alpha:]]+", "traditional",  "#FFBBFF", # lightsalmon1
+  "историческ[[:alpha:]]+","histor[[:alpha:]]+",   "traditional",  "#FFBBFF", # peachpuff1
+  "христианск[[:alpha:]]+","christian",            "traditional",  "#FFBBFF", # aquamarine1
+  "религиозн[[:alpha:]]+", "religious",            "traditional",  "#FFBBFF",
+  "библейск[[:alpha:]]+",  "Biblical",             "traditional",  "#FFBBFF",
+  "моральн[[:alpha:]]+",   "moral",                "traditional",  "#FFBBFF", # mistyrose1
+  "нравственн[[:alpha:]]+","moral",                "traditional",  "#FFBBFF", # wheat1
+  "семейн[[:alpha:]]+",    "family",               "traditional",  "#FFBBFF", # plum1
+  "семья",                 "family",               "traditional",  "#FFBBFF", # plum1
+  "патриот[[:alpha:]]+",   "patrioti[[:alpha:]]+", "traditional",  "#FFBBFF", # paleturquoise1
+
+  
+## Negative
+  "чужды[[:alpha:]]+",      "alien",               "negative",    "#FFA07A",# chartreuse1
+  "ложн[[:alpha:]]+",       "false",               "negative",    "#FFA07A",
+  "искаженн[[:alpha:]]+",   "warped",              "negative",    "#FFA07A",
+
+## Western
+ 
+  "прав[[:alpha:]]+ человек[[:alpha:]]+", "human rights", "Western",     "#CAE1FF",
+  "верховенств[[:alpha:]]+ закон[[:alpha:]]+", "rule of law", "Western", "#CAE1FF",
+  "свобод",                "freedom",              "Western",  "#CAE1FF",
+  "демократи[[:alpha:]]+",  "democra[[:alpha:]]+", "Western",  "#CAE1FF", # darkolivegreen1,
+  "запад[[:alpha:]]+",      "West[[:alpha:]]+",    "Western",  "#CAE1FF", # palegreen1
+  "запад[[:alpha:]]+",      "West",                "Western",  "#CAE1FF", # palegreen1
+  "европейск",              "Europ[[:alpha:]]+",   "Western",  "#CAE1FF", # olivedrab1
+  "либеральн[[:alpha:]]+",  "liberal",             "Western",  "#CAE1FF", # khaki1
+  "рыночн[[:alpha:]]+",     "market",              "Western",  "#CAE1FF", # khaki1
+  "рынка",                  "market",              "Western",  "#CAE1FF", # khaki1
+  "современн[[:alpha:]]+",  "modern",              "Western",  "#CAE1FF",
+
+  
+## Universal
+  "универсальн[[:alpha:]]+","univeral",            "universal",  "#C1FFC1", # darkseagreen1
+  "общемиров[[:alpha:]]+",  "global",              "universal",  "#C1FFC1", # darkseagreen1
+  "гуманистическ[[:alpha:]]+","humanis[[:alpha:]]+","universal", "#C1FFC1", # darkseagreen1
+  "гуманиз[[:alpha:]]+",    "humanis[[:alpha:]]+", "universal",  "#C1FFC1", # darkseagreen1
+  "гуманитарн[[:alpha:]]+", "humanitarian",        "universal",  "#C1FFC1", # darkseagreen1
+  "общечеловеческ[[:alpha:]]+","human",            "universal",  "#C1FFC1", # darkseagreen1
+  "культурны[[:alpha:]]+", "cultur[[:alpha:]]+",   "universal",  "#C1FFC1", # goldenrod1
+  "цивилизац[[:alpha:]]+",  "civiliz[[:alpha:]]+", "universal",  "#C1FFC1", # darkseagreen1
+  "цивилизац[[:alpha:]]+",  "civilis[[:alpha:]]+", "universal",  "#C1FFC1", # darkseagreen1
+  "базов[[:alpha:]]+",      "basic",               "universal",  "#C1FFC1", # honeydew1,
+  "базов[[:alpha:]]+",      "essential",           "universal",  "#C1FFC1",
+  "фундаментальн[[:alpha:]]+", "fundamental",      "universal",  "#C1FFC1", # honeydew1,
+  "основны[[:alpha:]]+",    "central",             "universal",  "#C1FFC1",
+
+## Common
+  "общи[[:alpha:]]+",       "common",              "common",     "#7FFFD4", # honeydew1,
+  "общи[[:alpha:]]+",       "shared",              "common",     "#7FFFD4", # honeydew1,
+
+
+
+  "ценност[[:alpha:]]+",   "values",               "values",       "#FFEC8B", # lightgoldenrod1
+ 
+) |> 
+  dplyr::select(-colour)
+
+types_colour_df <- matches_df |> dplyr::distinct(type) |> 
+  dplyr::mutate(colour =  scales::viridis_pal()(6)) |> 
+  dplyr::mutate(h_colour = colorspace::lighten(col = colour, amount = 0.8) )
+
+types_colour_df$h_colour[types_colour_df$type=="values"] <- types_colour_df$colour[types_colour_df$type=="values"]
+
+matches_df <- matches_df |> 
+  dplyr::left_join(y = types_colour_df, by = "type")
+
+ type_palette_v <- matches_df |> 
+  dplyr::filter(type!="values") |> 
+  dplyr::distinct(type, colour) |> 
+  tibble::deframe()
+# scales::show_col( colorspace::lighten(col = scales::viridis_pal()(6), amount = 0.7) )
+
+```
+
+There are many different types of "values" that appear in the Kremlin's statements. Here is a rather comprehensive list of the most common qualifiers or expressions used to characterise the values. They are categorised and colour-coded in order to make it easier to spot them in the quotes below. The categories are indicative and may be adjusted (suggestions welcome).
+
+```{r}
+matches_df |> 
+  dplyr::mutate(dplyr::across(c("pattern_ru", "pattern_en"), ~ stringr::str_replace_all(string = .x, pattern = stringr::fixed("[[:alpha:]]+"), replacement = "*"))) |> 
+  dplyr::mutate(pre_colour = "<span style='background-color:",
+                post_colour = "'>", 
+                post_text = "</span>") |> 
+  tidyr::unite(col = "type", pre_colour, h_colour, post_colour, type, post_text, remove = TRUE, sep = "") |> 
+  dplyr::select(-colour) |> 
+  reactable::reactable(   columns = list(type = reactable::colDef(html = TRUE)))
+ # knitr::kable(escape = FALSE, caption = "Tipology of qualifers used to characterise values")
+  
+```
+
+```{r}
+# remove:
+# "Russia values"
+# "absolute values"
+# "Russia greatly values"
+```
+
+## Different types of values in the Kremlin's official statements
+
+I will now proceed to different ways of looking at these data. First, here are all references to values found in transcripts, statements, and press releases published on the Kremlin's website between `r kremlin.ru_en |> dplyr::slice_min(date, n = 1,with_ties = FALSE) |> dplyr::pull(date, as_vector = TRUE) |> format.Date("%d %B %Y")` and `r kremlin.ru_en |> dplyr::slice_max(date, n = 1,with_ties = FALSE) |> dplyr::pull(date, as_vector = TRUE) |> format.Date("%d %B %Y")`. Look at both tabs to see the quotes in either English or Russian.
+
+For easier reference, keywords such as "[<strong>values</strong>]{style="background-color:`r types_colour_df$h_colour[types_colour_df$type=="values"]`;"}", and different types of values are highlighted and colour-coded - [traditional]{style="background-color:`r types_colour_df$h_colour[types_colour_df$type=="traditional"]`;"}, [Western]{style="background-color:`r types_colour_df$h_colour[types_colour_df$type=="Western"]`;"}, [universal]{style="background-color:`r types_colour_df$h_colour[types_colour_df$type=="universal"]`;"}, [common]{style="background-color:`r types_colour_df$h_colour[types_colour_df$type=="common"]`;"}, and [negative]{style="background-color:`r types_colour_df$h_colour[types_colour_df$type=="negative"]`;"}.
+
+::: column-screen-inset
+::: panel-tabset
+## English-language version of Kremlin.ru
+
+```{r}
+if (fs::file_exists("kremlin_en_h.rds")) {
+  kremlin_en_h_df <- readRDS(file = "kremlin_en_h.rds")
+} else {
+  kremlin_en_h_df <- cas_highlight(
+    corpus = 
+      kremlin.ru_en_values_df |> dplyr::collect(),
+    pattern = stringr::regex(pattern = matches_df[["pattern_en"]],
+                             ignore_case = TRUE), 
+    colour = matches_df[["h_colour"]])
+  saveRDS(kremlin_en_h_df, file = "kremlin_en_h.rds")
+}
+
+
+kremlin_en_h_df |>
+  dplyr::mutate(pre_url = "<a href='",
+                post_url = "'>", 
+                post_title = "</a>") |> 
+  tidyr::unite(col = "title", pre_url, url, post_url, title, post_title, remove = TRUE, sep = "") |> 
+  reactable::reactable(columns = list(
+    date = reactable::colDef(maxWidth = 130),
+    title = reactable::colDef(html = TRUE, maxWidth = 500),
+    text = reactable::colDef(html = TRUE)),
+    resizable = TRUE,
+    defaultPageSize = 5,
+   # filterable = TRUE,
+    paginationType = "jump")
+```
+
+## Russian-language version of Kremlin.ru
+
+```{r}
+
+if (fs::file_exists("kremlin_ru_h.rds")) {
+  kremlin_ru_h_df <- readRDS(file = "kremlin_ru_h.rds")
+} else {
+  kremlin_ru_h_df <- cas_highlight(corpus = kremlin.ru_ru_values_df |> dplyr::collect(),
+              pattern = stringr::regex(pattern = matches_df[["pattern_ru"]],
+                                       ignore_case = TRUE), 
+              colour = matches_df[["h_colour"]])
+  saveRDS(kremlin_ru_h_df, file = "kremlin_ru_h.rds")
+}
+
+
+kremlin_ru_h_df |>
+  dplyr::mutate(pre_url = "<a href='",
+                post_url = "'>", 
+                post_title = "</a>") |> 
+  tidyr::unite(col = "title", pre_url, url, post_url, title, post_title, remove = TRUE, sep = "") |>
+  reactable::reactable(columns = list(
+    date = reactable::colDef(maxWidth = 130),
+    title = reactable::colDef(html = TRUE, maxWidth = 500),
+  text = reactable::colDef(html = TRUE)),
+    resizable = TRUE,
+      defaultPageSize = 5,
+   # filterable = TRUE,
+    paginationType = "jump")
+```
+:::
+:::
+
+As will be immediately evident, different types of qualifiers can be present in the same sentence. Some of them are very generic; for example, talk of common values is common when meeting foreign delegations, no matter the country involved ("based on our common values..."). In some instances, they are not even used as qualifiers to values, but there is mostly a clear connection.
+
+I will now proceed to count the frequency of different types of "values" at different point in times. The reader is however still advised to have a quick look at some of the references in the early years, and some to those in recent months. Even if references to "spiritual values" are present in both, I would argue that a change in tone is evident to the human reader. This, of course, will not emerge from the numbers.
+
+### Counting different types of values by the Kremlin
+
+```{r}
+#| column: body
+kremlin.ru_en_values_type_count_df <- create_values_type_count(values_df = kremlin.ru_en_values_df,
+                                                               language = "en")
+
+kremlin.ru_en_values_type_count_df |> 
+  reactable::reactable()
+
+
+```
+
+Here are a few ways to look at these data visually. The first type of plot allows to see both absolute number and ranking of the most common types of "values" found in this dataset. Looking at the graph with "Most frequent at the bottom", it appears clearly how "traditional values" became the most common type of values since the mid-2000s, but also how the number of mentions has substantially increased in the following years. Switching to "Most frequent on the top" it emerges more clearly how the number of references to other types of values, taken together, have not really decreased... the total number has gone up due to increased references to "traditional values". Finally, the faceted barchart allows to see better the developments within each category. For example, it appears more clearly how references to "Western values" have decreased even in absolute numbers (and in spite of the fact, which does emerge from this graph, that early mentions were almost exclusively positive, while many more of the recent mentions are effectively negative in sentiment); indeed, "Western values" were the type most commonly mentioned in both 2003 and 2004.
+
+::: column-page
+::: panel-tabset
+## Most frequent at the bottom
+
+```{r}
+#| out-width: 100%
+library("ggalluvial")
+
+kremlin.ru_en_values_type_count_long_df <- create_values_type_count_long(kremlin.ru_en_values_type_count_df)
+
+kremlin.ru_en_values_type_count_long_df |> 
+  ggplot2::ggplot(mapping = ggplot2::aes(
+    x = year,
+    y = n,
+    alluvium = type,
+    fill = type,
+    label = type)) +
+  scale_fill_manual(values = type_palette_v) +
+  ggalluvial::geom_alluvium(alpha = 0.75, decreasing = TRUE) +
+      ggplot2::scale_y_continuous(name = "", labels = \(x) scales::number(x = x)) +
+  ggplot2::scale_x_continuous(name = "", breaks = scales::pretty_breaks(n = 10)) +
+  ggplot2::labs(
+    title = glue::glue("Types of qualifiers to {sQuote('values')} found on Kremlin.ru (English language)"),
+    subtitle = "Absolute number of mentions; most frequent type of values at the bottom",
+    caption = "Source: Giorgio Comai / tadadit.xyz") +
+  ggplot2::theme(legend.title = ggplot2::element_blank())
+
+
+```
+
+## Most frequent on top
+
+```{r}
+#| out-width: 100%
+kremlin.ru_en_values_type_count_long_df |> 
+  ggplot2::ggplot(mapping = ggplot2::aes(
+    x = year,
+    y = n,
+    alluvium = type,
+    fill = type,
+    label = type)) +
+  scale_fill_manual(values = type_palette_v) +
+  ggalluvial::geom_alluvium(alpha = 0.75, decreasing = FALSE) +
+      ggplot2::scale_y_continuous(name = "", labels = \(x) scales::number(x = x)) +
+  ggplot2::scale_x_continuous(name = "", breaks = scales::pretty_breaks(n = 10)) +
+  ggplot2::guides(colour = ggplot2::guide_legend(reverse=TRUE)) +
+  ggplot2::labs(
+    title = glue::glue("Types of qualifiers to {sQuote('values')} found on Kremlin.ru (English language)"),
+    subtitle = "Absolute number of mentions; most frequent type of values at the top",
+    caption = "Source: Giorgio Comai / tadadit.xyz") +
+  ggplot2::theme(legend.title = ggplot2::element_blank())
+
+```
+
+## Dodged barchart
+
+```{r}
+#| out-width: 100%
+kremlin.ru_en_values_type_count_long_df |> 
+  
+  ggplot2::ggplot(mapping = ggplot2::aes(x = year, y = n, fill = type))+
+  ggplot2::geom_col(position = ggplot2::position_dodge()) +
+  ggplot2::scale_fill_manual(values = type_palette_v) +
+    ggplot2::scale_x_continuous(name = "", breaks = scales::pretty_breaks(n = 10)) +
+   ggplot2::scale_y_continuous(name = "") +
+  ggplot2::guides(colour = ggplot2::guide_legend(reverse=TRUE)) +
+  ggplot2::labs(
+    title = glue::glue("Types of qualifiers to {sQuote('values')} found on Kremlin.ru (English language)"),
+    subtitle = "Absolute number of mentions",
+    caption = "Source: Giorgio Comai / tadadit.xyz") +
+  theme(legend.title = ggplot2::element_blank(), legend.position = "bottom")
+```
+
+## Faceted barchart
+
+```{r}
+#| fig-width: 8
+#| fig-height: 8
+#| out-width: 100%
+kremlin.ru_en_values_type_count_long_df |> 
+  
+  ggplot2::ggplot(mapping = ggplot2::aes(x = year, y = n, fill = type))+
+  ggplot2::geom_col() +
+  ggplot2::scale_fill_manual(values = type_palette_v) +
+  ggplot2::facet_grid(rows = ggplot2::vars(type), scales = "free") +
+  ggplot2::scale_x_continuous(name = "", breaks = scales::pretty_breaks(n = 10)) +
+   ggplot2::scale_y_continuous(name = "") +
+  ggplot2::labs(
+    title = glue::glue("Types of qualifiers to {sQuote('values')} found on Kremlin.ru (English language)"),
+    subtitle = "Absolute number of mentions; free scales to facilitate noticing change within each type",
+    caption = "Source: Giorgio Comai / tadadit.xyz") +
+  ggplot2::theme(legend.position = "none")
+```
+:::
+:::
+
+All of these graphs are in absolute, not relative number of mentions, which means that showed values are impacted by both the increased number of publications and the increased number of references to "values".
+
+Here are two alternative ways to look at these data.
+
+First, let's show the relative frequency of each type of qualifier, out of all qualifiers found in the same sentence as "values".
+
+```{r}
+#| column: page
+#| out-width: 100%
+kremlin.ru_en_values_type_ratio_long_df <- kremlin.ru_en_values_type_count_long_df |> 
+  dplyr::group_by(year) |> 
+  dplyr::mutate(total = sum(n)) |> 
+  dplyr::ungroup() |> 
+  dplyr::mutate(ratio = n/total)
+
+kremlin.ru_en_values_type_ratio_long_df |> 
+  ggplot2::ggplot(mapping = ggplot2::aes(
+    x = year,
+    y = ratio,
+    alluvium = type,
+    fill = type,
+    label = type)) +
+  scale_fill_manual(values = type_palette_v) +
+  ggplot2::geom_area(alpha = 0.75) +
+      ggplot2::scale_y_continuous(name = "",
+                                  labels = \(x) scales::percent(x = x),
+                                  sec.axis = ggplot2::dup_axis()) +
+  ggplot2::scale_x_continuous(name = "", breaks = scales::pretty_breaks(n = 10)) +
+  ggplot2::guides(fill = ggplot2::guide_legend(reverse=FALSE)) +
+  ggplot2::labs(
+    title = glue::glue("Types of qualifiers to {sQuote('values')} found on Kremlin.ru (English language)"),
+    subtitle = "Relative number of mentions out of all qualifiers used",
+    caption = "Source: Giorgio Comai / tadadit.xyz") +
+  ggplot2::theme(legend.title = ggplot2::element_blank())
+```
+
+This shows a more clearly the increase in qualifiers of the "traditional" type. Considering that, as shown above, more than one qualifier can be attributed to a single reference to "values", this can partly be attributed to the increased frequency of multiple qualifiers associated with traditional values: in a sentence such as "traditional spiritual, moral and family values", the current method counts four instances of qualifiers of the traditional type.
+
+An additional approach is to look specifically at the last word before "values", and drop further context. In this case, each instance of value can be associated with either one or zero categories (if the word preceding "values" is not in the list).
+
+```{r}
+#| column: page
+#| out-width: 100%
+
+
+kremlin.ru_en_values_last_word_df <- create_values_last_word(
+  kremlin.ru_en_values_df,
+  kremlin.ru_en_values_type_count_long_df, language = "en") 
+
+kremlin.ru_en_values_last_word_df |> 
+  ggplot2::ggplot(mapping = ggplot2::aes(
+    x = year,
+    y = ratio,
+    fill = type)) +
+  scale_fill_manual(values = type_palette_v) +
+  ggplot2::geom_area(alpha = 0.75) +
+  ggplot2::scale_y_continuous(name = "",
+                              labels = \(x) scales::percent(x = x),
+                              sec.axis = ggplot2::dup_axis()) +
+  ggplot2::scale_x_continuous(name = "", breaks = scales::pretty_breaks(n = 10)) +
+  ggplot2::guides(fill = ggplot2::guide_legend(reverse=FALSE)) +
+  ggplot2::labs(
+    title = glue::glue("Types of qualifiers to {sQuote('values')} found on Kremlin.ru (English language)"),
+    subtitle = "Relative number of mentions out of all qualifiers used",
+    caption = "Source: Giorgio Comai / tadadit.xyz") +
+  ggplot2::theme(legend.title = ggplot2::element_blank())
+```
+
+This shows even more clearly the increase in references to traditional values. Among all references to values, only about 20 per cent were references to traditional values in the early 2000s. This grew to about 75% starting with 2012.
+
+### Looking specifically at traditional values
+
+Finally, as we are specifically looking at "traditional values", we will be separately singling out a variety of expressions used to refer to such values to make sure we are only capturing expressions that are very clearly identifiable as "traditional values". Here is a table with the most common expressions used:
+
+```{r}
+traditional_values_df <- tibble::tibble(`Traditional values` = c("traditional spiritual and moral values",
+  "traditional Russian spiritual and moral values",
+  "traditional spiritual, moral and family values",
+  "traditional family values",
+  "traditional values",
+  "traditional national values",
+  "traditional Christian values",
+  "traditional Orthodox Christian values",
+  "traditional ethical values",
+  "traditional cultural values",
+  "Christian values",
+  "Christian traditions and values",
+  "values of Christianity",
+  "traditional, conservative values",
+  "traditional, primarily Christian values",
+  "spiritual and moral values",
+  "spiritual, moral and family values",
+  "family values",
+  "spiritual values",
+  "moral values",
+  "moral and spiritual values",
+  "moral, spiritual and patriotic values",
+  "spiritual, moral and patriotic values",
+  "patriotic values",
+  "national values",
+  "values of patriotism",
+  "spiritual and patriotic values",
+  "patriotic, spiritual and moral values"))
+
+traditional_values_df |>
+  reactable::reactable()
+ # knitr::kable(caption = "Expressions used to characterise traditional values")
+
+```
+
+How has the use of these specific expressions evolved through time?
+
+Here is a graph showing the absolute number of mentions.
+
+```{r}
+#| out-width: 100%
+#| column: page
+
+traditional_values_by_year_df <- kremlin.ru_en_values_df |> 
+    dplyr::collect() |> 
+  dplyr::filter(stringr::str_detect(string = text,
+                                    pattern = stringr::regex(stringr::str_c(traditional_values_df[["Traditional values"]], collapse = "|"), ignore_case = TRUE))) |> 
+  dplyr::mutate(year = lubridate::year(date)) |> 
+  dplyr::group_by(year) |> 
+  dplyr::summarise(n = dplyr::n()) |>
+  dplyr::ungroup() |> 
+  dplyr::arrange(year) |> 
+  dplyr::collect() 
+
+non_traditional_values_df <- kremlin.ru_en_values_df |> 
+ 
+  dplyr::collect() |> 
+  dplyr::filter(stringr::str_detect(string = text,
+                                    pattern = stringr::regex(stringr::str_c(traditional_values_df[["Traditional values"]], collapse = "|"), ignore_case = TRUE),
+                                    negate = TRUE)) 
+
+traditional_values_by_year_df |> 
+ggplot2::ggplot(mapping = ggplot2::aes(x = year, y = n)) +
+  ggplot2::geom_col() +
+    ggplot2::scale_y_continuous(name = "", labels = \(x) scales::number(x = x)) +
+  ggplot2::scale_x_continuous(name = "", breaks = scales::pretty_breaks(n = 10)) +
+  ggplot2::labs(
+    title = glue::glue("Absolute frequency of sentences mentioning traditional values on Kremlin.ru (English version)"),
+                                       subtitle = stringr::str_c(
+      "Based on ",
+      scales::number(nrow(kremlin.ru_en)),
+      " sentences published between ",
+      format.Date(x = kremlin.ru_en |> dplyr::slice_min(date, n = 1,with_ties = FALSE) |> dplyr::pull(date, as_vector = TRUE), "%d %B %Y"), 
+      " and ",
+      format.Date(x = kremlin.ru_en |> dplyr::slice_max(date, n = 1,with_ties = FALSE) |> dplyr::pull(date, as_vector = TRUE), "%d %B %Y")),
+    caption = "Source: Giorgio Comai / tadadit.xyz")
+```
+
+Here is a graph showing the relative number of mentions of the specific list of expressions associated with traditional values listed above, compared with all other references to "values".
+
+```{r}
+#| out-width: 100%
+#| column: page
+all_values_by_year_df <- kremlin.ru_en_values_df |> 
+  dplyr::mutate(year = lubridate::year(date)) |> 
+  dplyr::group_by(year) |> 
+  dplyr::count() |> 
+  dplyr::ungroup() |> 
+  dplyr::arrange(year) |> 
+  dplyr::collect()
+
+
+dplyr::bind_rows(all = all_values_by_year_df, 
+                 traditional = traditional_values_by_year_df,
+                 .id = "type") |> 
+  tidyr::pivot_wider(names_from = type, values_from = n) |> 
+  dplyr::mutate(other = all-traditional) |>
+  dplyr::mutate(traditional = traditional/all, 
+                other = other/all) |> 
+  dplyr::select(-all) |> 
+  tidyr::pivot_longer(names_to = "type", values_to = "n", cols = c("traditional", "other")) |> 
+  ggplot2::ggplot(mapping = ggplot2::aes(x = year, y = n, fill = type)) +
+  ggplot2::geom_col() +
+  ggplot2::scale_fill_viridis_d(direction = -1) +
+      ggplot2::scale_y_continuous(name = "", labels = \(x) scales::percent(x = x)) +
+  ggplot2::scale_x_continuous(name = "", breaks = scales::pretty_breaks(n = 10)) +
+  ggplot2::theme(legend.title = ggplot2::element_blank())
+
+```
+
+It appears that indeed references to such expressions characterising traditional values were little used in the early 2000s; even if they did not fully enter the Kremlin's vocabulary in the Medvedev years, thay have been used rather frequently both in 2006 and 2007, and then more consistently (and in line with expectations stemming from the literature) starting with 2012, after Putin's return to the presidency, with the partial exceptions of 2015 and 2020 (in the latter case, perhaps due to more restrained public discourse in the context of the Covid pandemic). Finally, in 2022, references to "traditional values" increased very significantly in absolute terms, and quite noticeably in relative terms compared to other expressions referring to values (in a context in which total number of references to "values" has anyway been increasing).
+
+## What about mainstream media?
+
+### Pervy Kanal
+
+```{r}
+library("castarter")
+
+cas_set_options(
+  base_folder = fs::path(fs::path_home_r(), 
+                         "R",
+                         "castarter_tadadit"),
+  project = "Russian media",
+  website = "1tv.ru_ru" 
+)
+
+pervy1tv.ru_ru <- cas_read_corpus(partition = "year",
+                                 token = "sentences")
+
+
+pervy1tv.ru_ru_values_df <- pervy1tv.ru_ru |> 
+  dplyr::filter(stringr::str_detect(string = text, pattern = "(Ц|ц)енност")) |> 
+  dplyr::select(date, title, url, text)
+
+values_en_summary_wide_df <- create_values_summary_wide(all_df = pervy1tv.ru_ru,
+                                                        values_df = pervy1tv.ru_ru_values_df)
+
+```
+
+As appears from the the page describing the dataset, a very noticeable change in the format of web publications on 1tv.ru in 2022 makes it difficult to compare data starting with 2022 with earlier periods (in brief, it became common practice to include just a brief summary of news items rather than including full transcripts). There should still be value in the long term analysis, as *Pervy Kanal*'s website includes news starting from 1998.
+
+Secondly, in Russian it is more difficult to single out references to "values" ("ценности") in their moral sense, from other references to "value", such as "the value of something".
+
+::: column-page
+::: panel-tabset
+## Relative frequency
+
+```{r}
+#| out-width: 100%
+values_en_summary_wide_df |> 
+  dplyr::mutate(relative_freq = values/all) |> 
+  ggplot2::ggplot(mapping = ggplot2::aes(x = year, y = relative_freq)) +
+  ggplot2::geom_col() +
+  ggplot2::scale_y_continuous(name = "", labels = \(x) scales::percent(x = x, accuracy = 0.2)) +
+  ggplot2::scale_x_continuous(name = "", breaks = scales::pretty_breaks(n = 10)) +
+  ggplot2::labs(
+    title = glue::glue("Relative frequency of sentences mentioning {sQuote('values')} on 1tv.ru"),
+    subtitle = stringr::str_c(
+      "Based on ",
+      scales::number(nrow(pervy1tv.ru_ru)),
+      " sentences published between ",
+      format.Date(x = pervy1tv.ru_ru |> dplyr::slice_min(date, n = 1,with_ties = FALSE) |> dplyr::pull(date, as_vector = TRUE), "%d %B %Y"), 
+      " and ",
+      format.Date(x = pervy1tv.ru_ru |> dplyr::slice_max(date, n = 1,with_ties = FALSE) |> dplyr::pull(date, as_vector = TRUE), "%d %B %Y")),
+    caption = "Source: Giorgio Comai / tadadit.xyz")
+```
+
+## Absolute frequency
+
+```{r}
+#| out-width: 100%
+values_en_summary_wide_df |> 
+  
+ggplot2::ggplot(mapping = ggplot2::aes(x = year, y = values)) +
+  ggplot2::geom_col() +
+    ggplot2::scale_y_continuous(name = "", labels = \(x) scales::number(x = x)) +
+  ggplot2::scale_x_continuous(name = "", breaks = scales::pretty_breaks(n = 10)) +
+  ggplot2::labs(
+    title = glue::glue("Absolute frequency of sentences mentioning {sQuote('values')} on 1tv.ru"),
+                                       subtitle = stringr::str_c(
+      "Based on ",
+      scales::number(nrow(pervy1tv.ru_ru)),
+      " sentences published between ",
+      format.Date(x = pervy1tv.ru_ru |> dplyr::slice_min(date, n = 1,with_ties = FALSE) |> dplyr::pull(date, as_vector = TRUE), "%d %B %Y"), 
+      " and ",
+      format.Date(x = pervy1tv.ru_ru |> dplyr::slice_max(date, n = 1,with_ties = FALSE) |> dplyr::pull(date, as_vector = TRUE), "%d %B %Y")),
+    caption = "Source: Giorgio Comai / tadadit.xyz")
+```
+
+## Tabular data
+
+```{r}
+values_en_summary_wide_df |> 
+  dplyr::mutate(`without_values` = all - values) |> 
+  dplyr::rename(with_values = values) |> 
+  dplyr::mutate(year = as.character(year)) |> 
+  knitr::kable(caption = "Number of sentences that do or do not include references to 'values' per year on the English language version of the Pervy Kanal's website (1tv.ru)", format.args = list(big.mark = " "))
+```
+:::
+:::
+
+```{r}
+#| column: body
+pervy1tv.ru_ru_values_type_count_df <- create_values_type_count(values_df = pervy1tv.ru_ru_values_df)
+
+pervy1tv.ru_ru_values_type_count_df |> 
+  reactable::reactable()
+
+```
+
+::: column-page
+::: panel-tabset
+```{r}
+
+pervy1tv.ru_ru_values_type_count_long_df <- create_values_type_count_long(pervy1tv.ru_ru_values_type_count_df)
+
+pervy1tv.ru_ru_values_type_count_long_df |> 
+  ggplot2::ggplot(mapping = ggplot2::aes(
+    x = year,
+    y = n,
+    alluvium = type,
+    fill = type,
+    label = type)) +
+  scale_fill_manual(values = type_palette_v) +
+  ggalluvial::geom_alluvium(alpha = 0.75, decreasing = TRUE) +
+      ggplot2::scale_y_continuous(name = "", labels = \(x) scales::number(x = x)) +
+  ggplot2::scale_x_continuous(name = "", breaks = scales::pretty_breaks(n = 10)) +
+  ggplot2::labs(
+    title = glue::glue("Types of qualifiers to {sQuote('values')} found on 1tv.ru"),
+    subtitle = "Absolute number of mentions; most frequent type of values at the bottom",
+    caption = "Source: Giorgio Comai / tadadit.xyz") +
+  ggplot2::theme(legend.title = ggplot2::element_blank())
+
+```
+
+## Most frequent on top
+
+```{r}
+#| out-width: 100%
+pervy1tv.ru_ru_values_type_count_long_df |> 
+  ggplot2::ggplot(mapping = ggplot2::aes(
+    x = year,
+    y = n,
+    alluvium = type,
+    fill = type,
+    label = type)) +
+  scale_fill_manual(values = type_palette_v) +
+  ggalluvial::geom_alluvium(alpha = 0.75, decreasing = FALSE) +
+      ggplot2::scale_y_continuous(name = "", labels = \(x) scales::number(x = x)) +
+  ggplot2::scale_x_continuous(name = "", breaks = scales::pretty_breaks(n = 10)) +
+  ggplot2::guides(colour = ggplot2::guide_legend(reverse=TRUE)) +
+  ggplot2::labs(
+    title = glue::glue("Types of qualifiers to {sQuote('values')} found on 1tv.ru"),
+    subtitle = "Absolute number of mentions; most frequent type of values at the top",
+    caption = "Source: Giorgio Comai / tadadit.xyz") +
+  ggplot2::theme(legend.title = ggplot2::element_blank())
+
+```
+
+## Dodged barchart
+
+```{r}
+#| out-width: 100%
+pervy1tv.ru_ru_values_type_count_long_df |> 
+  
+  ggplot2::ggplot(mapping = ggplot2::aes(x = year, y = n, fill = type))+
+  ggplot2::geom_col(position = ggplot2::position_dodge()) +
+  ggplot2::scale_fill_manual(values = type_palette_v) +
+    ggplot2::scale_x_continuous(name = "", breaks = scales::pretty_breaks(n = 10)) +
+   ggplot2::scale_y_continuous(name = "") +
+  ggplot2::guides(colour = ggplot2::guide_legend(reverse=TRUE)) +
+  ggplot2::labs(
+    title = glue::glue("Types of qualifiers to {sQuote('values')} found on 1tv.ru"),
+    subtitle = "Absolute number of mentions",
+    caption = "Source: Giorgio Comai / tadadit.xyz") +
+  theme(legend.title = ggplot2::element_blank(), legend.position = "bottom")
+```
+
+## Faceted barchart
+
+```{r}
+#| fig-width: 8
+#| fig-height: 8
+#| out-width: 100%
+
+
+pervy1tv.ru_ru_values_type_count_long_df |> 
+  
+  ggplot2::ggplot(mapping = ggplot2::aes(x = year, y = n, fill = type))+
+  ggplot2::geom_col() +
+  ggplot2::scale_fill_manual(values = type_palette_v) +
+  ggplot2::facet_grid(rows = ggplot2::vars(type), scales = "free") +
+  ggplot2::scale_x_continuous(name = "", breaks = scales::pretty_breaks(n = 10)) +
+   ggplot2::scale_y_continuous(name = "") +
+  ggplot2::labs(
+    title = glue::glue("Types of qualifiers to {sQuote('values')} found on 1tv.ru"),
+    subtitle = "Absolute number of mentions; free scales to facilitate noticing change within each type",
+    caption = "Source: Giorgio Comai / tadadit.xyz") +
+  ggplot2::theme(legend.position = "none")
+```
+:::
+:::
+
+```{r}
+#| column: page
+#| out-width: 100%
+ pervy1tv.ru_ru_values_type_ratio_long_df <- pervy1tv.ru_ru_values_type_count_long_df |> 
+  dplyr::group_by(year) |> 
+  dplyr::mutate(total = sum(n)) |> 
+  dplyr::ungroup() |> 
+  dplyr::mutate(ratio = n/total)
+
+pervy1tv.ru_ru_values_type_ratio_long_df |> 
+  ggplot2::ggplot(mapping = ggplot2::aes(
+    x = year,
+    y = ratio,
+    alluvium = type,
+    fill = type,
+    label = type)) +
+  scale_fill_manual(values = type_palette_v) +
+  ggplot2::geom_area(alpha = 0.75) +
+      ggplot2::scale_y_continuous(name = "",
+                                  labels = \(x) scales::percent(x = x),
+                                  sec.axis = ggplot2::dup_axis()) +
+  ggplot2::scale_x_continuous(name = "", breaks = scales::pretty_breaks(n = 10)) +
+  ggplot2::guides(fill = ggplot2::guide_legend(reverse=FALSE)) +
+  ggplot2::labs(
+    title = glue::glue("Types of qualifiers to {sQuote('values')} found on 1tv.ru"),
+    subtitle = "Relative number of mentions out of all qualifiers used",
+    caption = "Source: Giorgio Comai / tadadit.xyz") +
+  ggplot2::theme(legend.title = ggplot2::element_blank())
+```
+
+```{r}
+#| column: page
+#| out-width: 100%
+
+
+ pervy1tv.ru_ru_values_last_word_df <- create_values_last_word(
+   values_df  = pervy1tv.ru_ru_values_df,
+   values_type_count_long_df = pervy1tv.ru_ru_values_type_count_long_df
+   ) 
+
+pervy1tv.ru_ru_values_last_word_df |> 
+  ggplot2::ggplot(mapping = ggplot2::aes(
+    x = year,
+    y = ratio,
+    fill = type)) +
+  scale_fill_manual(values = type_palette_v) +
+  ggplot2::geom_area(alpha = 0.75) +
+  ggplot2::scale_y_continuous(name = "",
+                              labels = \(x) scales::percent(x = x),
+                              sec.axis = ggplot2::dup_axis()) +
+  ggplot2::scale_x_continuous(name = "", breaks = scales::pretty_breaks(n = 10)) +
+  ggplot2::guides(fill = ggplot2::guide_legend(reverse=FALSE)) +
+  ggplot2::labs(
+    title = glue::glue("Types of qualifiers to {sQuote('values')} found on 1tv.ru"),
+    subtitle = glue::glue("Relative number of mentions out of all qualifiers used immediated before  {sQuote('values')}"),
+    caption = "Source: Giorgio Comai / tadadit.xyz") +
+  ggplot2::theme(legend.title = ggplot2::element_blank())
+```
+
+## Leftovers
+
+This approach gives hints about trends, but is not fully satisfying as some expressions that such as democracy and freedom that were used with positive connotations in the early years under analysis, are then used to express criticism of the West, e.g.:
+
+> "They can also continue to rob everyone under the guise of democracy and freedoms, to impose neoliberal and essentially totalitarian values" - [Source](http://en.kremlin.ru/events/president/transcripts/70565)
+
+> "New Western values that are in vogue have been brought to the point of absurdity." - [Source](http://en.kremlin.ru/events/councils/70046)
+
+Against:
+
+"pseudo-values" "moral, religious, and family values" "patriotic values"
