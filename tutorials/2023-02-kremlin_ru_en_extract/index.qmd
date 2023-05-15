@@ -9,7 +9,7 @@ image: "giocomai_many_words_and_cyrillic_text_coming_out_of_a_computer__9b5d514f
 bibliography: references.bib
 ---
 
-::: {.callout-tip}
+::: callout-tip
 If you are not interested in understanding the details of how this works, you may just skip directly to the processed dataset, [ready for download](./../../datasets/kremlin.ru_en/).
 :::
 
@@ -43,7 +43,6 @@ This is a tutorial demonstrating how to extract textual contents with metadata f
 
 As this is an introductory post, all steps and functions are explained in detail.
 
-
 ## Step 1: Install `castarter`
 
 This tutorial assumes some familiarity with the R programming language. At the most basic, you should have installed [R](https://cran.r-project.org/) and an IDE such as [Rstudio](https://posit.co/download/rstudio-desktop/), start a new project, and then you can just copy/paste and run commands in a scripts and things should work. Once your setup is in place, make sure you install `castarter`.
@@ -56,7 +55,7 @@ remotes::install_github("giocomai/castarter")
 
 ## Step 2: Think of file and folder locations
 
-Everyone organises stuff on their computer in their own way. But when getting ready to retrieve hundreds of thousands of pages, some consideration should be given to organising file in a consistent manner. 
+Everyone organises stuff on their computer in their own way. But when getting ready to retrieve hundreds of thousands of pages, some consideration should be given to organising file in a consistent manner.
 
 With `castarter`, by default, everything is stored in the current working directory, but a common pattern for `castarter` users will be to keep the file with their R script in a location, often a synced folder, and then to have all the html pages stored for text mining in a non-synced folder. This is because it is common to get hundreds of thousands of pages even for relatively small projects, and storing very large number of small files slows down sync clients for the likes of Dropbox, Google Drive, and Nextcloud. If you rely on git-based approaches, you will need to add the data folders to your `.gitignore`.
 
@@ -211,6 +210,7 @@ So... we'll declare we are accessing the website as a modern browser, slightly i
 cas_download_index(user_agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.0.0 Safari/537.36",
                    wait = 3)
 ```
+
 In most cases, just running `cas_download_index()` without any other parameter should just work.
 
 Time to take a break, and let the download process go. If for any reason you need to stop the process, you can safely close the session, and re-run the script at another time, and the download process will proceed from where it stopped. This is usually not an issue when you are downloading content pages, but, depending on how index pages are built, may lead to some issues if new contents are published in the meantime.
@@ -224,7 +224,7 @@ cas_read_db_download(index = TRUE)
 ::: callout-tip
 ## Have you noticed?
 
-It is mostly not necessary to give `castarter` much information about the data themselves. Once project and website are set at the beginning of each section, then `castarter` knows where to look for finding data stored in the local database, including which urls to download, which of them have already been downloaded, and where relevant files are. This is why you don't need to tell `cas_download_index()` (and later, once urls to contents pages will be extracted, `cas_download()`) which pages should be downloaded: everything is stored in the local database and the package knows where to look for information and where to store new files without further instructions. 
+It is mostly not necessary to give `castarter` much information about the data themselves. Once project and website are set at the beginning of each section, then `castarter` knows where to look for finding data stored in the local database, including which urls to download, which of them have already been downloaded, and where relevant files are. This is why you don't need to tell `cas_download_index()` (and later, once urls to contents pages will be extracted, `cas_download()`) which pages should be downloaded: everything is stored in the local database and the package knows where to look for information and where to store new files without further instructions.
 :::
 
 ## Step 5: Getting the links to the content pages
@@ -395,8 +395,8 @@ A typical workflow for finding the right combinations may look as follows: first
 
 ```{r test extraction, eval = FALSE}
 current_file <- cas_get_path_to_files(sample = 1)
-current_file <- cas_get_path_to_files(id = 1)
-#cas_browse(id = current_file$id)
+# current_file <- cas_get_path_to_files(id = 1)
+# cas_browse(id = current_file$id)
 
 test_df <- cas_extract(extractors = extractors_l,
                        id = current_file$id,
@@ -405,7 +405,7 @@ test_df <- cas_extract(extractors = extractors_l,
 
 test_df
 
-test_df |> pull(text)
+test_df |> dplyr::pull(text)
 ```
 
 ```{r extract all contents}
@@ -627,7 +627,7 @@ cas_ia_save()
 
 ## Step 11: Keep the dataset updated
 
-This is quite easy, as this is part of the whole point of having built `castarter`, but I will describe this in a separate post. 
+This is quite easy, as this is part of the whole point of having built `castarter`, but I will describe this in a separate post.
 
 ## Step 12: At long last, look at the data
 
@@ -677,5 +677,4 @@ corpus_df |>
        caption = "Source: Giorgio Comai / tadadit.xyz")
 ```
 
-
-For an example of basic content analysis on a dataset such as this one, see the post: "[**Who said it first? ‘The collective West’ in Russia’s nationalist media and official statements**](./../../posts/2023-03-who-says-it-first-nationalist-media-kremlin/)"
+For an example of basic content analysis on a dataset such as this one, see the post: "[**Who said it first? 'The collective West' in Russia's nationalist media and official statements**](./../../posts/2023-03-who-says-it-first-nationalist-media-kremlin/)"
