@@ -201,9 +201,9 @@
     },
     "bslib": {
       "Package": "bslib",
-      "Version": "0.4.2",
+      "Version": "0.5.0",
       "Source": "Repository",
-      "Repository": "CRAN",
+      "Repository": "RSPM",
       "Requirements": [
         "R",
         "base64enc",
@@ -217,7 +217,7 @@
         "rlang",
         "sass"
       ],
-      "Hash": "a7fbf03946ad741129dc81098722fca1"
+      "Hash": "1b117970533deb6d4e992c1b34e9d905"
     },
     "cachem": {
       "Package": "cachem",
@@ -245,7 +245,7 @@
     },
     "castarter": {
       "Package": "castarter",
-      "Version": "0.0.2.9026",
+      "Version": "0.0.2.9028",
       "Source": "GitHub",
       "Remotes": "JohnCoene/marker",
       "RemoteType": "github",
@@ -253,7 +253,7 @@
       "RemoteRepo": "castarter",
       "RemoteUsername": "giocomai",
       "RemoteRef": "HEAD",
-      "RemoteSha": "925237ab50132d2ab30a71017bea17cca276bd8e",
+      "RemoteSha": "0104fa9ffd729ebbbb0a2e41888f0996dfd40d74",
       "Requirements": [
         "DBI",
         "DT",
@@ -288,7 +288,7 @@
         "waiter",
         "xml2"
       ],
-      "Hash": "62436e1455b98bab4778f34944aed578"
+      "Hash": "f5e66e043ce316b598e3b08f420d157e"
     },
     "cicerone": {
       "Package": "cicerone",
@@ -500,14 +500,14 @@
     },
     "digest": {
       "Package": "digest",
-      "Version": "0.6.31",
+      "Version": "0.6.32",
       "Source": "Repository",
-      "Repository": "CRAN",
+      "Repository": "RSPM",
       "Requirements": [
         "R",
         "utils"
       ],
-      "Hash": "8b708f296afd9ae69f450f9640be8990"
+      "Hash": "011ce1464a4716c488f4fc649c3d4d50"
     },
     "dplyr": {
       "Package": "dplyr",
@@ -1772,7 +1772,7 @@
     },
     "usethis": {
       "Package": "usethis",
-      "Version": "2.2.0",
+      "Version": "2.2.1",
       "Source": "Repository",
       "Repository": "RSPM",
       "Requirements": [
@@ -1799,7 +1799,7 @@
         "withr",
         "yaml"
       ],
-      "Hash": "a108160a30d25e9aca3444a130dd53d9"
+      "Hash": "13e65f22c6cb1aaad65f437a4bc5a6d2"
     },
     "utf8": {
       "Package": "utf8",
@@ -1823,9 +1823,9 @@
     },
     "vctrs": {
       "Package": "vctrs",
-      "Version": "0.6.2",
+      "Version": "0.6.3",
       "Source": "Repository",
-      "Repository": "CRAN",
+      "Repository": "RSPM",
       "Requirements": [
         "R",
         "cli",
@@ -1833,7 +1833,7 @@
         "lifecycle",
         "rlang"
       ],
-      "Hash": "a745bda7aff4734c17294bb41d4e4607"
+      "Hash": "d0ef2856b83dc33ea6e255caf6229ee2"
     },
     "viridisLite": {
       "Package": "viridisLite",

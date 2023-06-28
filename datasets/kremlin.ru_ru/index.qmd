@@ -96,7 +96,7 @@ corpus_df |>
 words_per_day_df <- corpus_df |> 
   cas_count_total_words() |> 
   mutate(date = lubridate::as_date(date),
-         string = "total words")
+         pattern = "total words")
 
 words_per_day_df |> 
   cas_summarise(period = "year", auto_convert = TRUE) |>
@@ -113,4 +113,63 @@ words_per_day_df |>
                                  " and ",
                                  format.Date(x = max(corpus_df$date), "%d %B %Y")),
        caption = "Source: Giorgio Comai / tadadit.xyz")
+```
+
+```{r piggyback, eval = FALSE}
+library("piggyback")
+
+data_path <- fs::path(fs::path_home_r(), 
+                      "R",
+                      "castarter_tadadit_data")
+
+fs::dir_create(data_path)
+
+library("castarter")
+
+cas_set_options(
+  base_folder = fs::path(fs::path_home_r(), 
+                         "R",
+                         "castarter_tadadit"),
+  project = "Russian institutions",
+  website = "kremlin.ru_ru" 
+)
+
+release_file <- fs::path(data_path, 
+                         "kremlin.ru_ru.csv.gz")
+
+cas_read_db_contents_data() %>% 
+  dplyr::collect() %>% 
+  readr::write_csv(file = release_file)
+
+data_df <- readr::read_csv(release_file)
+
+max_date <- max(data_df$date)
+
+min_date <- min(data_df$date)
+
+total_items <- nrow(data_df)
+
+
+
+
+body_text <- stringr::str_c(
+  "**Dataset name**: kremlin.ru_ru",
+  "**Dataset description**: all items published on the Russian language version of the Kremlin's website",
+  paste("**Start date**:", min_date),
+  paste("**End date**:", max_date),
+  paste("**Total items**:", total_items),
+  paste("**Available columns**:", colnames(data_df) %>% 
+          stringr::str_c(collapse = "; ")),
+  "**License**: [Creative Commons Attribution 4.0 International](http://creativecommons.org/licenses/by/4.0/deed.ru)",
+  sep = "\n")
+
+cat(body_text)
+
+# pb_new_release(repo = "giocomai/tadadit",
+#                tag = "kremlin.ru_ru",
+#                body = body_text)
+
+pb_upload(file = release_file, 
+          repo = "giocomai/tadadit", 
+          tag = "kremlin.ru_ru")
 ```
