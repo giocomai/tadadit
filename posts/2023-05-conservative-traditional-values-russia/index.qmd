@@ -1,19 +1,21 @@
 ---
 title: "Traditional, conservative, Christian, distinct... how supposedly old values emerged in the official and media discourse in Russia since 2012"
-description: "Expressions such as 'the collective West' have entered official discourse only recently. They have been in common use in nationalist media for much longer."
+description: "A data-driven exploration of how references to different types of values evolved in official statements and the media in Russia in the last two decades."
 author: Giorgio Comai
-date: 2023-05-15
-last-modified: 2023-05-15
+date: 2023-05-16
+last-modified: 2023-05-16
 categories: [russia]
-image: "giocomai_many_words_and_cyrillic_text_coming_out_of_a_tv_set_wi_10a1e1e3-b449-4132-8e24-fd07c53dc4d8.webp"
+image: "giocomai_many_words_and_cyrillic_text_coming_out_of_a_computer__9b5d514f-3065-408e-9d47-3c1c15020429.webp"
 bibliography: references.bib
+execute: 
+  cache: false
 ---
 
 {{< include ./../_early_disclaimer.qmd >}}
 
 **N.B. This post is actually in draft form and a work in progress, it has not reached its final version**
 
-## ![](giocomai_many_words_and_cyrillic_text_coming_out_of_a_tv_set_wi_10a1e1e3-b449-4132-8e24-fd07c53dc4d8.webp) Context {#top-left-img}
+## ![](giocomai_many_words_and_cyrillic_text_coming_out_of_a_computer__9b5d514f-3065-408e-9d47-3c1c15020429.webp) Context {#top-left-img}
 
 ```{r setup, echo = FALSE}
 knitr::opts_chunk$set(echo = FALSE,
@@ -29,13 +31,19 @@ library("dplyr", warn.conflicts = FALSE)
 ggplot2::theme_set(new = theme_minimal(base_family = "Roboto Condensed"))
 
 source("functions.R")
+
+library("castarter")
+cas_set_options(
+  base_folder = fs::path(fs::path_home_r(), 
+                         "R",
+                         "castarter_tadadit"))
 ```
 
-"Traditional values" have emerged in Russia's public discourse with new vigour starting with 2011-2012 [see e.g. @duquenoy2018, p. 94.] and have soon become prevalent in Russian official and public discourse. With Putin's return to the presidency, conservatism has become "official state posture" [@laruelle2016, p. 287] in Russia. Increased reliance on conservative ideology may have been conceived largely instrumentally [@rodkiewicz2015], as a discursive turn useful to reconsolidate after the wave of protests of 2011-2012 [@sharafutdinova2014], but in the following years it has solidified as a central component of the Kremlin's narrative about Russia itself, as well as its contrapposition with the West. These values have been called "traditional", "conservative", "Christian" - all expressions which would suggest they may be to some extent universal. And yet, they were also unique, something that made Russia a "distinct civilisation" [@tsygankov2016].
+"Traditional values" have emerged in Russia's public discourse with new vigour starting with 2011-2012 [see e.g. @duquenoy2018, p. 94.] and have soon become prevalent in Russian official and public discourse. With Putin's return to the presidency in 2012, conservatism has become "official state posture" [@laruelle2016, p. 287] in Russia. Increased reliance on conservative ideology may have been conceived largely instrumentally [@rodkiewicz2015], as a discursive turn useful to reconsolidate after the wave of protests of 2011-2012 [@sharafutdinova2014], but in the following years it has solidified as a central component of the Kremlin's narrative about Russia itself, as well as its contrapposition with the West. These values have been called "traditional", "conservative", "Christian" - all expressions which would suggest they may not be specifically Russian. And yet, they were also unique, something that made Russia a "distinct civilisation" [@tsygankov2016].
 
 Well before Russia's fulls scale invasion of Ukraine in 2022, "spiritual-moral values" became an issue of national security in Russia, and a form of defence against foreign threats and influence [@østbø2017]. Indeed, "traditional Russian spiritual-moral values" ("традиционные российские духовно-нравственные ценности") explicitly and repeatedly featured in the national security strategy of the Russian Federation introduced in 2015 (and then again in the more recent strategy introduced in 2021), in contrast to previous versions of the same document [@presidentoftherussianfederation2015,@presidentoftherussianfederation2021]. "Traditional spiritual-moral values" are mentioned 10 times in the Foreign Policy Concept of the Russian Federation approved on 31 March 2023 [@presidentoftherussianfederation2023].
 
-In 2022, they arguably became an important part of the rhetoric repertoir used to legitimise Russia's military actions, and have become even more clearly "a focal point in the domestic crackdown on the liberal opposition, and in the standoff between Russia and the West in international affairs [@østbø2017, p. 202].
+In 2022, they arguably became an important part of the rhetoric repertoir used to legitimise Russia's military actions, and have become even more clearly "a focal point in the domestic crackdown on the liberal opposition, and in the standoff between Russia and the West in international affairs" [@østbø2017, p. 202].
 
 In this post, I will explore references to "values" in Russian official discourse and media in Russia. More specifically, I will:
 
@@ -47,43 +55,45 @@ In this post, I will explore references to "values" in Russian official discours
 
 -   check if there is a change in connection to Russia's invasion of Ukraine and in more recent months.
 
+As will become apparent, some of the data sources used in this document have some features that make it more difficut to conduct consistent longitudinal analyses. Such limitations will be outlined clearly, as they are likely to have substantive impact on the results; they include issues of data availability, change in the volume of text available, and the same expressions used in different contexts (e.g. Western values were positive in the early 2000s, but negative in the early 2020s). Indeed, in this respect this post serves also as an exploration of the many challenges that come with longitudinal data analysis of textual corprora generated from online sources.
+
+## The unit of analysis
+
+Throughout this post, the main unit of analysis will be the *sentence*. As will become soon apparent, qualifiers that clarify which "values" are being talked about often do not come immediately before or after the word "values" itself, but are part of longer expressions. Also, quite often more than qualifier is included (e.g. "spiritual-moral values"); some analyses will consider all qualifiers found within the same sentence, while others, for comparison, will just consider the qualifier that immediately precedes the word "values". In such cases, the unit of analysis will only be mentions of "values" preceded by a relevant qualifier ([full list below](#first-what-values-are-we-talking-about)).
+
 ## How frequent are references to "values"?
 
 Let's start with the English-language version of the Kremlin's website, which should give some context, and then switch to a wider range of sources which are available only in Russian.
 
-```{r}
+```{r kremlin.ru_en_import}
 
-library("castarter")
-
-cas_set_options(
-  base_folder = fs::path(fs::path_home_r(), 
-                         "R",
-                         "castarter_tadadit"),
-  project = "Russian institutions",
-  website = "kremlin.ru_en" 
-)
 
 kremlin.ru_en <- cas_read_corpus(partition = "year",
-                                 token = "sentences")
+                                 token = "sentences",
+                                 project = "Russian institutions",
+                                 website = "kremlin.ru_en" )
 
 kremlin.ru_en_values_df <- kremlin.ru_en |> 
   dplyr::filter(stringr::str_detect(string = text, pattern = "(V|v)alues")) |> 
   dplyr::filter(stringr::str_detect(string = text, pattern = "Russia greatly values|Russia values|Russia highly values", negate = TRUE)) |> 
   dplyr::select(date, title, url, text)
+
+kremlin.ru_en_metadata_l <- cas_generate_metadata(corpus = kremlin.ru_en)
 ```
 
-### The unit of analysis
 
-Throughout this post, the main unit of analysis will be the *sentence*. As will become soon apparent, qualifiers that clarify which "values" are being talked about often do not come immediately before or after the word "values" itself, but are part of longer expressions. Also, quite often more than qualifier is included (e.g. "spiritual-moral values"), and it is helpful to consider all of them.[^1]
 
-[^1]: It is not easy to remove completely all references to values that actually express a different meaning of the word, e.g. when it is used as a verb. To reduce their number, from the subset of sentences that include "values" in sentences such as "Russia greatly values" or "Russia values", used in cases such as "Russia values its reputation as a reliable, proven partner..."
+English-language version of Kremlin.ru has `r scales::number(kremlin.ru_en_metadata_l$total_items)` items in total published between `r kremlin.ru_en_metadata_l$start_date |> format("%d %B %Y")` and `r kremlin.ru_en_metadata_l$end_date |> format("%d %B %Y")`. If we count sentences, rather than items published, we have `r scales::number(nrow(kremlin.ru_en))` sentences in total in our corpus. Among them, `r scales::number(nrow(kremlin.ru_en_values_df))` make reference to "values".[^1]
 
-English-language version of Kremlin.ru has `r scales::number(nrow(kremlin.ru_en |> dplyr::distinct(doc_id) |> dplyr::collect()))` items in total published between `r kremlin.ru_en |> dplyr::slice_min(date, n = 1, with_ties = FALSE) |> dplyr::pull(date, as_vector = TRUE) |> format("%d %B %Y")` and `r kremlin.ru_en |> dplyr::slice_max(date, n = 1, with_ties = FALSE) |> dplyr::pull(date, as_vector = TRUE) |> format("%d %B %Y")`. If we count in sentences, rather than in items published, we have `r scales::number(nrow(kremlin.ru_en))` sentences in total in our corpus. Among them, `r scales::number(nrow(kremlin.ru_en_values_df))` make reference to "values". Let's look at their distribution.
+[^1]: It is not easy to remove completely all references to values that actually express a totally different meaning of the word, e.g. when it is used as a verb. To reduce their number, sentences such as "Russia greatly values" or "Russia values" (e.g. "Russia values its reputation as a reliable, proven partner..."), which are the most common such cases, have been removed from the dataset from the outset. 
+
+Let's look at their distribution.
 
 ```{r}
 
-values_en_summary_wide_df <- create_values_summary_wide(all_df = kremlin.ru_en,
-                                                        values_df = kremlin.ru_en_values_df)
+values_en_summary_wide_df <- create_values_summary_wide(
+  all_df = kremlin.ru_en,
+  values_df = kremlin.ru_en_values_df)
   #dplyr::filter(year>1999, year<2023)
 # For clarity, only data related to the period 2000-2022 will be included in the graphs below. 
 ```
@@ -96,13 +106,13 @@ See the data in both relative and absolute formats looking at the tabs.
 ::: panel-tabset
 ## Relative frequency
 
-```{r}
+```{r kremlin_en_relative_frequency_barchart}
 #| out-width: 100%
 values_en_summary_wide_df |> 
   dplyr::mutate(relative_freq = values/all) |> 
   ggplot2::ggplot(mapping = ggplot2::aes(x = year, y = relative_freq)) +
   ggplot2::geom_col() +
-  ggplot2::scale_y_continuous(name = "", labels = \(x) scales::percent(x = x, accuracy = 0.2)) +
+  ggplot2::scale_y_continuous(name = "", labels = \(x) scales::percent(x = x, accuracy = 0.1)) +
   ggplot2::scale_x_continuous(name = "", breaks = scales::pretty_breaks(n = 10)) +
   ggplot2::labs(
     title = glue::glue("Relative frequency of sentences mentioning {sQuote('values')} on Kremlin.ru (English version)"),
@@ -110,15 +120,15 @@ values_en_summary_wide_df |>
       "Based on ",
       scales::number(nrow(kremlin.ru_en)),
       " sentences published between ",
-      format.Date(x = kremlin.ru_en |> dplyr::slice_min(date, n = 1,with_ties = FALSE) |> dplyr::pull(date, as_vector = TRUE), "%d %B %Y"), 
+      format.Date(x = kremlin.ru_en_metadata_l$start_date, "%d %B %Y"), 
       " and ",
-      format.Date(x = kremlin.ru_en |> dplyr::slice_max(date, n = 1,with_ties = FALSE) |> dplyr::pull(date, as_vector = TRUE), "%d %B %Y")),
+      format.Date(x = kremlin.ru_en_metadata_l$end_date, "%d %B %Y")),
     caption = "Source: Giorgio Comai / tadadit.xyz")
 ```
 
 ## Absolute frequency
 
-```{r}
+```{r kremlin_en_absolute_frequency_barchart}
 #| out-width: 100%
 values_en_summary_wide_df |> 
   
@@ -132,27 +142,28 @@ ggplot2::ggplot(mapping = ggplot2::aes(x = year, y = values)) +
       "Based on ",
       scales::number(nrow(kremlin.ru_en)),
       " sentences published between ",
-      format.Date(x = kremlin.ru_en |> dplyr::slice_min(date, n = 1,with_ties = FALSE) |> dplyr::pull(date, as_vector = TRUE), "%d %B %Y"), 
+      format.Date(x = kremlin.ru_en_metadata_l$start_date, "%d %B %Y"), 
       " and ",
-      format.Date(x = kremlin.ru_en |> dplyr::slice_max(date, n = 1,with_ties = FALSE) |> dplyr::pull(date, as_vector = TRUE), "%d %B %Y")),
+      format.Date(x = kremlin.ru_en_metadata_l$end_date, "%d %B %Y")),
     caption = "Source: Giorgio Comai / tadadit.xyz")
 ```
 
 ## Tabular data
 
-```{r}
+```{r kremlin_en_absolute_frequency_table}
 values_en_summary_wide_df |> 
-  dplyr::mutate(`without_values` = all - values) |> 
-  dplyr::rename(with_values = values) |> 
+  dplyr::mutate(`without values` = all - values) |> 
+  dplyr::rename(`with_values` = values) |> 
   dplyr::mutate(year = as.character(year)) |> 
   knitr::kable(caption = "Number of sentences that do or do not include references to 'values' per year on the English language version of the Kremlin's website", format.args = list(big.mark = " "))
 ```
 :::
 :::
 
-An argument could possibly be made that the increased number of publications on the Kremlin's website reflect the fact that more less relevant events are effectively being covered, but that the overall number "big speeches" where one would talk about values has effectively remained constant, and hence the absolute numbers are what really matters. But even looking at absolute numbers, we can see that the "moral turn" that according to the literature has started in 2012 is not really reflected in a sudden spike of references to "values" in the presidential rhetoric. Indeed, even if the figure for 2012 is much higher than that for the last year of Medvedev's presidency in 2011, it is very much comparable to the the number of mentioned recorded in 2007 and 2008. Only beginning with 2021 there is an effective increase if we focus on absolute numbers.[^2]
+An argument could possibly be made that the increased number of publications on the Kremlin's website reflects the fact that it has become more common to cover minor events, but that the overall number of "big speeches" where one would talk about values has effectively remained constant, and hence the absolute figures are what really matters. But even looking at absolute numbers, we can see that the "moral turn" that according to the literature has started in 2012 is not really reflected in a sudden spike of references to "values" in the presidential rhetoric. Indeed, even if the figure for 2012 is much higher than that for the last year of Medvedev's presidency in 2011, it is very much comparable to the the number of mentions recorded in 2007 and 2008. If we focus on absolute numbers, only beginning with 2021 there is an effective increase in comparison with 2007-2008.[^2] If instead we focus on relative numbers, we'll notice 2007, 2012, and 2022 as somewhat exceptional years, when about 0.4 per cent of all sentences included a reference to "values".
 
 [^2]: Excluding all press releases and focusing exclusiely on transcripts does not change significantly the broad trends that emerge from these graphs.
+
 
 Ultimately, however, it is not the number of references to "values" per se that is most relevant: what type of values have been talked about at different points in time may be more revealing.
 
@@ -176,24 +187,19 @@ values_en_summary_wide_df |>
 #kremlin.ru_en |> dplyr::collect() |> nrow()
 ```
 
-```{r}
-library("castarter")
+```{r kremlin_ru_ru_import}
 
-cas_set_options(
-  base_folder = fs::path(fs::path_home_r(), 
-                         "R",
-                         "castarter_tadadit"),
-  project = "Russian institutions",
-  website = "kremlin.ru_ru" 
-)
-kremlin.ru_ru <- cas_read_corpus(partition = "year", token = "sentences")
+kremlin.ru_ru <- cas_read_corpus(partition = "year",
+                                 token = "sentences",
+                                 project = "Russian institutions",
+                                 website = "kremlin.ru_ru" )
 
 kremlin.ru_ru_values_df <- kremlin.ru_ru |> 
   dplyr::filter(stringr::str_detect(string = text, pattern = "(Ц|ц)енност")) |> 
   dplyr::select(date, title, url, text)
 ```
 
-```{r message = FALSE}
+```{r value_types_input, message = FALSE}
 #| column: screen-inset
 # values_df |> dplyr::collect() |>
 #    reactable::reactable()
@@ -205,9 +211,6 @@ kremlin.ru_ru_values_df <- kremlin.ru_ru |>
 # pattern_to_match <- "ценност[[:alpha:]]+"
 
 # see colours() for ideas
-
-
-
 
 # test_h <- stringr::str_replace_all(string = test, pattern = replacement_v)
 
@@ -249,6 +252,7 @@ matches_df <- tibble::tribble(
   "чужды[[:alpha:]]+",      "alien",               "negative",    "#FFA07A",# chartreuse1
   "ложн[[:alpha:]]+",       "false",               "negative",    "#FFA07A",
   "искаженн[[:alpha:]]+",   "warped",              "negative",    "#FFA07A",
+  "тоталитарн[[:alpha:]]+",   "totalitarian",              "negative",    "#FFA07A",
 
 ## Western
  
@@ -310,7 +314,7 @@ matches_df <- matches_df |>
 
 There are many different types of "values" that appear in the Kremlin's statements. Here is a rather comprehensive list of the most common qualifiers or expressions used to characterise the values. They are categorised and colour-coded in order to make it easier to spot them in the quotes below. The categories are indicative and may be adjusted (suggestions welcome).
 
-```{r}
+```{r value_types_table}
 matches_df |> 
   dplyr::mutate(dplyr::across(c("pattern_ru", "pattern_en"), ~ stringr::str_replace_all(string = .x, pattern = stringr::fixed("[[:alpha:]]+"), replacement = "*"))) |> 
   dplyr::mutate(pre_colour = "<span style='background-color:",
@@ -318,7 +322,8 @@ matches_df |>
                 post_text = "</span>") |> 
   tidyr::unite(col = "type", pre_colour, h_colour, post_colour, type, post_text, remove = TRUE, sep = "") |> 
   dplyr::select(-colour) |> 
-  reactable::reactable(   columns = list(type = reactable::colDef(html = TRUE)))
+  dplyr::filter(type != "values") |> 
+  reactable::reactable(columns = list(type = reactable::colDef(html = TRUE)))
  # knitr::kable(escape = FALSE, caption = "Tipology of qualifers used to characterise values")
   
 ```
@@ -332,7 +337,7 @@ matches_df |>
 
 ## Different types of values in the Kremlin's official statements
 
-I will now proceed to different ways of looking at these data. First, here are all references to values found in transcripts, statements, and press releases published on the Kremlin's website between `r kremlin.ru_en |> dplyr::slice_min(date, n = 1,with_ties = FALSE) |> dplyr::pull(date, as_vector = TRUE) |> format.Date("%d %B %Y")` and `r kremlin.ru_en |> dplyr::slice_max(date, n = 1,with_ties = FALSE) |> dplyr::pull(date, as_vector = TRUE) |> format.Date("%d %B %Y")`. Look at both tabs to see the quotes in either English or Russian.
+I will now proceed to different ways of looking at these data. First, here are all references to values found in transcripts, statements, and press releases published on the Kremlin's website between `r kremlin.ru_en_metadata_l$start_date |> format.Date("%d %B %Y")` and `r kremlin.ru_en_metadata_l$end_date |> format.Date("%d %B %Y")`. Look at both tabs to see the quotes in either English or Russian.
 
 For easier reference, keywords such as "[<strong>values</strong>]{style="background-color:`r types_colour_df$h_colour[types_colour_df$type=="values"]`;"}", and different types of values are highlighted and colour-coded - [traditional]{style="background-color:`r types_colour_df$h_colour[types_colour_df$type=="traditional"]`;"}, [Western]{style="background-color:`r types_colour_df$h_colour[types_colour_df$type=="Western"]`;"}, [universal]{style="background-color:`r types_colour_df$h_colour[types_colour_df$type=="universal"]`;"}, [common]{style="background-color:`r types_colour_df$h_colour[types_colour_df$type=="common"]`;"}, and [negative]{style="background-color:`r types_colour_df$h_colour[types_colour_df$type=="negative"]`;"}.
 
@@ -340,7 +345,7 @@ For easier reference, keywords such as "[<strong>values</strong>]{style="backgro
 ::: panel-tabset
 ## English-language version of Kremlin.ru
 
-```{r}
+```{r kremlin_en_h_df}
 if (fs::file_exists("kremlin_en_h.rds")) {
   kremlin_en_h_df <- readRDS(file = "kremlin_en_h.rds")
 } else {
@@ -371,7 +376,7 @@ kremlin_en_h_df |>
 
 ## Russian-language version of Kremlin.ru
 
-```{r}
+```{r kremlin_ru_h_df}
 
 if (fs::file_exists("kremlin_ru_h.rds")) {
   kremlin_ru_h_df <- readRDS(file = "kremlin_ru_h.rds")
@@ -401,9 +406,19 @@ kremlin_ru_h_df |>
 :::
 :::
 
-As will be immediately evident, different types of qualifiers can be present in the same sentence. Some of them are very generic; for example, talk of common values is common when meeting foreign delegations, no matter the country involved ("based on our common values..."). In some instances, they are not even used as qualifiers to values, but there is mostly a clear connection.
+As will be immediately evident, different types of qualifiers can be present in the same sentence. Some of them are very generic; for example, talk of common values is common when meeting foreign delegations, no matter the country involved ("based on our common values..."). In a few instances, they are not even used as qualifiers to values, but in the overwhelming majority of cases there is a clear connection.
 
-I will now proceed to count the frequency of different types of "values" at different point in times. The reader is however still advised to have a quick look at some of the references in the early years, and some to those in recent months. Even if references to "spiritual values" are present in both, I would argue that a change in tone is evident to the human reader. This, of course, will not emerge from the numbers.
+I will now proceed to count the frequency of different types of "values" at different point in times. The reader is however advised to have a quick look in the table above at some of the references in the early years as well as to those in recent months. Even if references to "spiritual values" are present in both, I would argue that a change in tone is evident to the human reader. This, of course, will not emerge from the numbers.
+
+For example, on 11 June 2000, president Putin made reference to Russia within:
+
+> "the unity of Europe on the basis of common values of progress, democracy and freedom" ([source](http://en.kremlin.ru/events/president/transcripts/24202))
+
+Reference to the values of democracy and freedom, are quite different in recent documents. For example, in a 21 February 2023 Presidential Address to the Federal Assembly, president Putin made reference to freedom and democracy along with "values", but this is made with scorn with reference to the West:
+
+> "They can also continue to rob everyone under the guise of democracy and freedoms, to impose neoliberal and essentially totalitarian values..." ([source](http://en.kremlin.ru/events/president/transcripts/70565))
+
+Both of these quotes are counted as intances of "values" associated with multiple "Western" qualifiers.
 
 ### Counting different types of values by the Kremlin
 
@@ -663,9 +678,9 @@ ggplot2::ggplot(mapping = ggplot2::aes(x = year, y = n)) +
       "Based on ",
       scales::number(nrow(kremlin.ru_en)),
       " sentences published between ",
-      format.Date(x = kremlin.ru_en |> dplyr::slice_min(date, n = 1,with_ties = FALSE) |> dplyr::pull(date, as_vector = TRUE), "%d %B %Y"), 
+      format.Date(x = kremlin.ru_en_metadata_l$start_date, "%d %B %Y"), 
       " and ",
-      format.Date(x = kremlin.ru_en |> dplyr::slice_max(date, n = 1,with_ties = FALSE) |> dplyr::pull(date, as_vector = TRUE), "%d %B %Y")),
+      format.Date(x = kremlin.ru_en_metadata_l$end_date, "%d %B %Y")),
     caption = "Source: Giorgio Comai / tadadit.xyz")
 ```
 
@@ -708,26 +723,23 @@ It appears that indeed references to such expressions characterising traditional
 ### Pervy Kanal
 
 ```{r}
-library("castarter")
-
-cas_set_options(
-  base_folder = fs::path(fs::path_home_r(), 
-                         "R",
-                         "castarter_tadadit"),
-  project = "Russian media",
-  website = "1tv.ru_ru" 
-)
 
 pervy1tv.ru_ru <- cas_read_corpus(partition = "year",
-                                 token = "sentences")
+                                  token = "sentences",
+                                  project = "Russian media",
+                                  website = "1tv.ru_ru" )
 
+
+pervy1tv.ru_ru_metadata_l <- cas_generate_metadata(corpus = pervy1tv.ru_ru)
 
 pervy1tv.ru_ru_values_df <- pervy1tv.ru_ru |> 
   dplyr::filter(stringr::str_detect(string = text, pattern = "(Ц|ц)енност")) |> 
   dplyr::select(date, title, url, text)
 
-values_en_summary_wide_df <- create_values_summary_wide(all_df = pervy1tv.ru_ru,
-                                                        values_df = pervy1tv.ru_ru_values_df)
+values_en_summary_wide_df <- create_values_summary_wide(
+  all_df = pervy1tv.ru_ru,
+  values_df = pervy1tv.ru_ru_values_df)
+
 
 ```
 
@@ -745,7 +757,7 @@ values_en_summary_wide_df |>
   dplyr::mutate(relative_freq = values/all) |> 
   ggplot2::ggplot(mapping = ggplot2::aes(x = year, y = relative_freq)) +
   ggplot2::geom_col() +
-  ggplot2::scale_y_continuous(name = "", labels = \(x) scales::percent(x = x, accuracy = 0.2)) +
+  ggplot2::scale_y_continuous(name = "", labels = \(x) scales::percent(x = x, accuracy = 0.1)) +
   ggplot2::scale_x_continuous(name = "", breaks = scales::pretty_breaks(n = 10)) +
   ggplot2::labs(
     title = glue::glue("Relative frequency of sentences mentioning {sQuote('values')} on 1tv.ru"),
@@ -753,9 +765,9 @@ values_en_summary_wide_df |>
       "Based on ",
       scales::number(nrow(pervy1tv.ru_ru)),
       " sentences published between ",
-      format.Date(x = pervy1tv.ru_ru |> dplyr::slice_min(date, n = 1,with_ties = FALSE) |> dplyr::pull(date, as_vector = TRUE), "%d %B %Y"), 
+      format.Date(x = pervy1tv.ru_ru_metadata_l$start_date, "%d %B %Y"), 
       " and ",
-      format.Date(x = pervy1tv.ru_ru |> dplyr::slice_max(date, n = 1,with_ties = FALSE) |> dplyr::pull(date, as_vector = TRUE), "%d %B %Y")),
+      format.Date(x = pervy1tv.ru_ru_metadata_l$end_date, "%d %B %Y")),
     caption = "Source: Giorgio Comai / tadadit.xyz")
 ```
 
@@ -775,15 +787,15 @@ ggplot2::ggplot(mapping = ggplot2::aes(x = year, y = values)) +
       "Based on ",
       scales::number(nrow(pervy1tv.ru_ru)),
       " sentences published between ",
-      format.Date(x = pervy1tv.ru_ru |> dplyr::slice_min(date, n = 1,with_ties = FALSE) |> dplyr::pull(date, as_vector = TRUE), "%d %B %Y"), 
+      format.Date(x = pervy1tv.ru_ru_metadata_l$start_date, "%d %B %Y"), 
       " and ",
-      format.Date(x = pervy1tv.ru_ru |> dplyr::slice_max(date, n = 1,with_ties = FALSE) |> dplyr::pull(date, as_vector = TRUE), "%d %B %Y")),
+      format.Date(x = pervy1tv.ru_ru_metadata_l$end_date, "%d %B %Y")),
     caption = "Source: Giorgio Comai / tadadit.xyz")
 ```
 
 ## Tabular data
 
-```{r}
+```{r values_en_summary_wide_df_kable}
 values_en_summary_wide_df |> 
   dplyr::mutate(`without_values` = all - values) |> 
   dplyr::rename(with_values = values) |> 
@@ -793,7 +805,7 @@ values_en_summary_wide_df |>
 :::
 :::
 
-```{r}
+```{r pervy1tv.ru_ru_values_type_count_df}
 #| column: body
 pervy1tv.ru_ru_values_type_count_df <- create_values_type_count(values_df = pervy1tv.ru_ru_values_df)
 
@@ -953,6 +965,17 @@ pervy1tv.ru_ru_values_last_word_df |>
     caption = "Source: Giorgio Comai / tadadit.xyz") +
   ggplot2::theme(legend.title = ggplot2::element_blank())
 ```
+
+## Tsargrad
+
+```{r}
+cas_read_corpus(project = "Russian media",
+                website = "tsargrad.tv_ru",
+                token = "sentences",
+                partition = "year")
+```
+
+
 
 ## Leftovers
 

@@ -1,0 +1,150 @@
+---
+title: "Processing mixed-media data published on Telgram channels with R: the case of 'Prigozhin's hat'"
+description: "Prigozhin's press service actively responds via Telegram to questions asked by journalists. Questions are mostly posted as screenshots, responses are mostly posted as audio messages, other posts include video. How do we turn these into something that can be searched and analysed?"
+author: Giorgio Comai
+date: 2023-07-24
+last-modified: 2023-07-24
+categories: [tutorials, russia, prigozhin]
+image: "giocomai_many_words_and_cyrillic_text_coming_out_of_a_computer__9b5d514f-3065-408e-9d47-3c1c15020429.webp"
+bibliography: references.bib
+---
+
+{{< include ./../../litreview/_early_disclaimer.qmd >}}
+
+## ![](giocomai_many_words_and_cyrillic_text_coming_out_of_a_computer__9b5d514f-3065-408e-9d47-3c1c15020429.webp) Context {#top-left-img}
+
+```{r setup, eval=TRUE, include = FALSE}
+renv::use(lockfile = "renv_post.lock")
+packages_v <- c("dplyr",
+                "fs",
+                "ggplot2",
+                "castarter",
+                "arrow",
+                "tesseract",
+                "jsonlite",
+                "svglite")
+
+lapply(packages_v, require, character.only = TRUE)
+
+theme_set(new = theme_minimal(base_family = "Roboto Condensed"))
+
+source("functions.R")
+# source("datasets.R")
+
+# base path for the export folder from Telegram
+# actual path included in the txt files, not committed to git
+base_folder <- readLines("base_folder.txt") 
+```
+
+```{r renv, eval = FALSE, include = FALSE}
+renv::snapshot(packages = packages_v,
+               lockfile = "renv_post.lock")
+```
+
+As the Kremlin tightened its control of narratives and news that feature in mainstream media, Telegram has gained a significant role as the venue where Russian citizens of different persuasions look for information and opinions. Indeed, Telegram has remained one of the few uncensored on-line spaces (another one being YouTube) that can be freely accessed from Russia without having to rely on VPNs or other censorship circumvention techniques.
+
+In many ways, mainstream media and Telegram channels seem to be two parallel information spaces, with debates and news that are dominant on Telegram (where re-posts among popular channels are common) may be completely ignored by major broadcast media. Indeed, the invisble line tightly separating these spaces is punctured only occasionally, and figures that are prominent on Telegram or even Western discourse about the war would be almost unknown to people who relied strictly on federal TV channels to get their news.
+
+In the full web archive of news of Russia's *Pervy Kanal*, there is literally only a handful of mentions of Evgeny Prigozhin until June 2023, all of them related to questions Putin has received in interviews in earlier years and that refer to Prigozhin's involvement with the so-called "troll factory" based in Saint Petersburg. But there is no reference to his role in Ukraine, not even during the months-long battle of Bakhmut; not even a hint or passing reference to the growing tensions between Prigozhin and the Ministry of defence that marked the months preceeding Prigozhin's mutiny.\[\^ This applies only to the online news archive of 1tv.ru, which does not include full transcripts of all broadcasts. Even if Prigozhin's role may have emerged in debates during talk shows, his complete absence from standard news reporting remains telling.\] And yet, most respondents to opinion polls seemed [to know enough about Prigozhin to have an opinion about him](https://www.levada.ru/2023/06/29/padenie-avtoriteta-evgeniya-prigozhina-i-otnoshenie-k-ispolzovaniyu-nayomnikov-i-zaklyuchyonnyh-v-voennyh-dejstviyah/). For a brief period before the mutiny, he was one of the public figures [most frequently mentioned approvingly by survey respondents](https://www.levada.ru/2023/05/31/odobrenie-institutov-rejtingi-politikov-maj-2023-goda/), at one point even [the most frequently mentioned after president Putin](https://theins.ru/obshestvo/263313), even if this is likely more the result of a relatively small number of strong supporters rather than widespread support.
+
+Either way, it seems clear that contents spread through Telegram reach a substantial part of the Russian population. Telegram channels is also the primary way used by figures such as Prigozhin to share their opinions and messages. In brief, there is plenty of good reasons for scholars interested in the spread of information and narratives related to Russia's invasion of Ukraine to dedicate some attention to Russian-language Telegram channels. Indeed, there have been some efforts that outline the [prevalence of pro-Kremlin Telgram channels](https://medium.com/dfrlab/pro-kremlin-telegram-channels-in-russia-outperforming-channels-critical-of-russia-f2076ebef3ea). The website [tgstat.ru](https://tgstat.ru/en) collects statistics about popular Telegram channels in each language.
+
+Rather than dealing with a large number of Telegram channels and their interactions, this post focuses on the task of analysing the contents published by a single Telegram channels, the official channel of Evgeny Prigozhin. It is an interesting case not only because of its obvious relevance in relation to the war, but also technically, because of the variety of formats it employs, which is indicative of a space where video or even audio messages may be just as important, and sometime more telling, than written words.
+
+In brief, Prigozhin's press service actively responds via Telegram to questions asked by journalists. Questions are mostly posted as screenshots, responses are mostly posted as audio messages, other posts include video. How do we turn these into something that can be searched and analysed?
+
+## Step 1: Get the data out of Telegram
+
+From Telegram Desktop, it easy to export the full archive of Telegram channel in machine-readable format, exporting all posts with metadata as a single .json file, as well as all images and files in dedicated subfolders. 
+
+```{r}
+messages_df <- process_telegram_json(fs::path(base_folder, "result.json"))
+```
+
+First, let's have a look at some basic information about the dataset we have:
+
+__Earliest post__: `r min(messages_df$date)`
+
+__Latest post__: `r max(messages_df$date)`
+
+__Total number of posts__: `r scales::number(nrow(messages_df))`
+
+```{r prigozhin_barchart_by_month, echo=FALSE}
+#| out-width: 100%
+
+messages_df |> 
+  dplyr::mutate(year = lubridate::year(date),
+                month = lubridate::month(date)) |> 
+  dplyr::group_by(year, month) |> 
+  dplyr::count() |> 
+  dplyr::ungroup() |> 
+  dplyr::mutate(month = as.factor(month)) |> 
+  ggplot(mapping = aes(x = month, y = n)) +
+  geom_col() +
+  scale_x_discrete("") +
+  scale_y_continuous("") +
+  facet_wrap(~ year, nrow = 1) +
+  labs(title = paste0("Number of posts per month published on the Telegram channel ", sQuote("Prigozhin's hat")),
+             subtitle = stringr::str_c(
+        "Based on ",
+        scales::number(nrow(messages_df)),
+        " posts published",
+        " between ",
+        format.Date(x = min(messages_df$date), "%d %B %Y"), 
+        " and ",
+        format.Date(x = max(messages_df$date), "%d %B %Y")),
+      caption = "Data processing: Giorgio Comai (OBCT/CCI) / tadadit.xyz") +
+    ggplot2::theme_minimal(base_family = "Roboto Condensed") +
+    ggplot2::theme(legend.position = "none",
+                   text = element_text(family = "Roboto Condensed"))
+```
+
+It appears there is a distinct *crescendo* in the number of posts published by this channel, from just a handful a month until September 2020, then mopstly between 40 and 80 until September 2022, going up to more than 200 post per month until July 2023, when the channel fell almost silent post-Mutiny, afer averaging close to 10 posts per day in the previous months. 
+
+Even these basic descriptive statistics reflect some of the things we know about Prigozhin: the big increase in posts in October 2022 can easily be explained by the fact that it is only then, more precisely on 26 September 2022, that [Prigozhin publicly admitted its ties to Wagner](https://www.reuters.com/world/europe/russias-prigozhin-admits-link-wagner-mercenaries-first-time-2022-09-26/). Two years earlier, on 23 September 2020, [the US treasury significantly expanded its sanctions](https://www.reuters.com/world/europe/russias-prigozhin-admits-link-wagner-mercenaries-first-time-2022-09-26/) against entities linked to Prigozhin, which may be related to him taking a more public role. 
+
+Since the very beginning of its online presence, Prigozhin's press team published the questions it received as a screenshot, and added Prigozhin's own reply either in the text of the message or as an additional screenshot with text. As emerges from the following graph, it is basically only starting with 2023 that Prigozhin started to respond with audio messages - often, angry rants - that quickly became a trademark element of its communication.
+
+
+```{r prigozhin_barchart_files_by_month, echo=FALSE}
+#| out-width: 100%
+
+messages_df |> 
+  dplyr::mutate(year = as.factor(lubridate::year(date)),
+                month = as.factor(lubridate::month(date))) |> 
+  dplyr::filter(is.na(file)==FALSE,
+                media_type == "audio_file"|mime_type=="audio/x-wav") |> 
+  dplyr::group_by(year, month) |> 
+  dplyr::count() |> 
+  dplyr::ungroup() |> 
+  tidyr::complete(year, month, fill = list(n = 0)) |> 
+
+  ggplot(mapping = aes(x = month, y = n)) +
+  geom_col() +
+  scale_x_discrete("") +
+  scale_y_continuous("") +
+  facet_wrap(~ year, nrow = 1) +
+  labs(title = paste0("Number of audio files per month posted on the Telegram channel ", sQuote("Prigozhin's hat")),
+             subtitle = stringr::str_c(
+        "Based on ",
+        scales::number(nrow(messages_df)),
+        " posts published",
+        " between ",
+        format.Date(x = min(messages_df$date), "%d %B %Y"), 
+        " and ",
+        format.Date(x = max(messages_df$date), "%d %B %Y")),
+      caption = "Data processing: Giorgio Comai (OBCT/CCI) / tadadit.xyz") +
+    ggplot2::theme_minimal(base_family = "Roboto Condensed") +
+    ggplot2::theme(legend.position = "none",
+                   text = element_text(family = "Roboto Condensed"))
+```
+
+## Step 2: An overview of data extracted
+
+## Step 3: OCR images
+
+```{r}
+library("tesseract")
+```
+
+## Step 4: Speech-to-text of audio and video
