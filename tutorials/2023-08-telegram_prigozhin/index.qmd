@@ -22,7 +22,8 @@ packages_v <- c("dplyr",
                 "arrow",
                 "tesseract",
                 "jsonlite",
-                "svglite")
+                "av",
+                "gt")
 
 lapply(packages_v, require, character.only = TRUE)
 
@@ -41,6 +42,14 @@ renv::snapshot(packages = packages_v,
                lockfile = "renv_post.lock")
 ```
 
+
+```{r install_whisper, eval=FALSE}
+Sys.setenv(WHISPER_CFLAGS = "-mavx -mavx2 -mfma -mf16c")
+remotes::install_github("bnosac/audio.whisper", force = TRUE)
+Sys.unsetenv("WHISPER_CFLAGS")
+```
+
+
 As the Kremlin tightened its control of narratives and news that feature in mainstream media, Telegram has gained a significant role as the venue where Russian citizens of different persuasions look for information and opinions. Indeed, Telegram has remained one of the few uncensored on-line spaces (another one being YouTube) that can be freely accessed from Russia without having to rely on VPNs or other censorship circumvention techniques.
 
 In many ways, mainstream media and Telegram channels seem to be two parallel information spaces, with debates and news that are dominant on Telegram (where re-posts among popular channels are common) may be completely ignored by major broadcast media. Indeed, the invisble line tightly separating these spaces is punctured only occasionally, and figures that are prominent on Telegram or even Western discourse about the war would be almost unknown to people who relied strictly on federal TV channels to get their news.
@@ -55,19 +64,19 @@ In brief, Prigozhin's press service actively responds via Telegram to questions 
 
 ## Step 1: Get the data out of Telegram
 
-From Telegram Desktop, it easy to export the full archive of Telegram channel in machine-readable format, exporting all posts with metadata as a single .json file, as well as all images and files in dedicated subfolders. 
+From Telegram Desktop, it easy to export the full archive of Telegram channel in machine-readable format, exporting all posts with metadata as a single .json file, as well as all images and files in dedicated subfolders.
 
-```{r}
+```{r process_telegram_json, echo=FALSE}
 messages_df <- process_telegram_json(fs::path(base_folder, "result.json"))
 ```
 
 First, let's have a look at some basic information about the dataset we have:
 
-__Earliest post__: `r min(messages_df$date)`
+**Earliest post**: `r min(messages_df$date)`
 
-__Latest post__: `r max(messages_df$date)`
+**Latest post**: `r max(messages_df$date)`
 
-__Total number of posts__: `r scales::number(nrow(messages_df))`
+**Total number of posts**: `r scales::number(nrow(messages_df))`
 
 ```{r prigozhin_barchart_by_month, echo=FALSE}
 #| out-width: 100%
@@ -99,12 +108,11 @@ messages_df |>
                    text = element_text(family = "Roboto Condensed"))
 ```
 
-It appears there is a distinct *crescendo* in the number of posts published by this channel, from just a handful a month until September 2020, then mopstly between 40 and 80 until September 2022, going up to more than 200 post per month until July 2023, when the channel fell almost silent post-Mutiny, afer averaging close to 10 posts per day in the previous months. 
+It appears there is a distinct *crescendo* in the number of posts published by this channel, from just a handful a month until September 2020, then mopstly between 40 and 80 until September 2022, going up to more than 200 post per month until July 2023, when the channel fell almost silent post-Mutiny, afer averaging close to 10 posts per day in the previous months.
 
-Even these basic descriptive statistics reflect some of the things we know about Prigozhin: the big increase in posts in October 2022 can easily be explained by the fact that it is only then, more precisely on 26 September 2022, that [Prigozhin publicly admitted its ties to Wagner](https://www.reuters.com/world/europe/russias-prigozhin-admits-link-wagner-mercenaries-first-time-2022-09-26/). Two years earlier, on 23 September 2020, [the US treasury significantly expanded its sanctions](https://www.reuters.com/world/europe/russias-prigozhin-admits-link-wagner-mercenaries-first-time-2022-09-26/) against entities linked to Prigozhin, which may be related to him taking a more public role. 
+Even these basic descriptive statistics reflect some of the things we know about Prigozhin: the big increase in posts in October 2022 can easily be explained by the fact that it is only then, more precisely on 26 September 2022, that [Prigozhin publicly admitted its ties to Wagner](https://www.reuters.com/world/europe/russias-prigozhin-admits-link-wagner-mercenaries-first-time-2022-09-26/). Two years earlier, on 23 September 2020, [the US treasury significantly expanded its sanctions](https://www.reuters.com/world/europe/russias-prigozhin-admits-link-wagner-mercenaries-first-time-2022-09-26/) against entities linked to Prigozhin, which may be related to him taking a more public role.
 
 Since the very beginning of its online presence, Prigozhin's press team published the questions it received as a screenshot, and added Prigozhin's own reply either in the text of the message or as an additional screenshot with text. As emerges from the following graph, it is basically only starting with 2023 that Prigozhin started to respond with audio messages - often, angry rants - that quickly became a trademark element of its communication.
-
 
 ```{r prigozhin_barchart_files_by_month, echo=FALSE}
 #| out-width: 100%
@@ -139,12 +147,76 @@ messages_df |>
                    text = element_text(family = "Roboto Condensed"))
 ```
 
-## Step 2: An overview of data extracted
+## Step 2: An overview of the kind of posts published
+
+Posts published on "Prigozhin's hat" Telegram channel are mostly based on a combination of formats; sometimes the contents are repeated in more than one format, sometimes they are not. 
+
+For example, [this post](https://t.me/Prigozhin_hat/3796) shows a question asked by a media organisation as a screenshot: 
+
+```{=html}
+<script async src="https://telegram.org/js/telegram-widget.js?22" data-telegram-post="Prigozhin_hat/3796" data-width="100%"></script>
+```
+
+Conveniently, this is accompanied by [another post](https://t.me/Prigozhin_hat/3795) that includes both the question and the answer given in both textual and audio format:
+
+```{=html}
+<script async src="https://telegram.org/js/telegram-widget.js?22" data-telegram-post="Prigozhin_hat/3795" data-width="100%"></script>
+```
+
+In this case, everything seems easy: we can in principle ignore both the screenshotted picture and the audio-file, as the very same contents are presented also in textual format. 
+
+But then, in other occasions there are only audio-files or voice messages with no context whatsoever. This was the case, for example, for most messages posted during the mutiny on 24 June, including [the one that announced its end](https://t.me/Prigozhin_hat/3798):
+
+```{=html}
+<script async src="https://telegram.org/js/telegram-widget.js?22" data-telegram-post="Prigozhin_hat/3798" data-width="100%"></script>
+```
+
+
+In others still, the content of the question previously-screenshotted is transcribed, but Prigozhin's comments are conveyed only in audio format. 
+
+
+```{=html}
+<script async src="https://telegram.org/js/telegram-widget.js?22" data-telegram-post="Prigozhin_hat/3618" data-width="100%"></script>
+```
+
+
+Finally, there are occasional posts including some documents or video files:
+
+```{=html}
+<script async src="https://telegram.org/js/telegram-widget.js?22" data-telegram-post="Prigozhin_hat/3811" data-width="100%"></script>
+```
+
+First, let's look at some actual posts. 
+
+```{r}
+messages_df |> 
+  dplyr::arrange(dplyr::desc(date_unixtime))
+```
+
+
+
+
+```{r}
+# https://t.me/Prigozhin_hat/3814
+```
+
+
 
 ## Step 3: OCR images
 
-```{r}
-library("tesseract")
+```{r ocr_extract_images}
+
+ocr_images(messages_df = messages_df,
+           base_folder = base_folder,
+           destination_folder = "prigozhin_photo_transcribed",
+           engine = "rus")
+
 ```
+
+
+```{r}
+
+```
+
 
 ## Step 4: Speech-to-text of audio and video
