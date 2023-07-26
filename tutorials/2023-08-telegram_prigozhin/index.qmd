@@ -1,9 +1,9 @@
 ---
-title: "Processing mixed-media data published on Telgram channels with R: the case of 'Prigozhin's hat'"
+title: "Processing mixed-media data published on Telegram channels: the case of 'Prigozhin's hat'"
 description: "Prigozhin's press service actively responds via Telegram to questions asked by journalists. Questions are mostly posted as screenshots, responses are mostly posted as audio messages, other posts include video. How do we turn these into something that can be searched and analysed?"
 author: Giorgio Comai
-date: 2023-07-24
-last-modified: 2023-07-24
+date: 2023-07-26
+last-modified: 2023-07-26
 categories: [tutorials, russia, prigozhin]
 image: "giocomai_many_words_and_cyrillic_text_coming_out_of_a_computer__9b5d514f-3065-408e-9d47-3c1c15020429.webp"
 bibliography: references.bib
@@ -147,6 +147,8 @@ messages_df |>
                    text = element_text(family = "Roboto Condensed"))
 ```
 
+
+
 ## Step 2: An overview of the kind of posts published
 
 Posts published on "Prigozhin's hat" Telegram channel are mostly based on a combination of formats; sometimes the contents are repeated in more than one format, sometimes they are not. 
@@ -186,25 +188,22 @@ Finally, there are occasional posts including some documents or video files:
 <script async src="https://telegram.org/js/telegram-widget.js?22" data-telegram-post="Prigozhin_hat/3811" data-width="100%"></script>
 ```
 
-First, let's look at some actual posts. 
 
-```{r}
-messages_df |> 
-  dplyr::arrange(dplyr::desc(date_unixtime))
-```
+Video files often include spoken comments, or depict meetings. They are only very occasionally central to Prigozhin's communication, and even when they are, mostly not for the spoken content. Video files should not be dismissed, however, and they may actually be an important part of the communication of other Telegram channels, all the way from Strelkov to the "military bloggers" who produce video contents.  
 
 
-
-
-```{r}
-# https://t.me/Prigozhin_hat/3814
-```
-
+In the following steps, I will proceed with turning both images and audio messages into text format that can be searched and processed further. 
 
 
 ## Step 3: OCR images
 
-```{r ocr_extract_images}
+OCR techniques to recognised text from images are well established. In this specific case, the quality of results is hindered mainly by two aspects:
+
+- low resolution of the images
+- the fact that many of these are screenshots of emails, and they may include some email metadata at the top, or some signature text at the bottom of the email
+- the fact that there are sometimes more than one language in the same image, either because there's some clutter from the email screenshots, or because questions are asked in English and the response given in Russian (in the vast majority of cases, however, both questions and answers are given in Russian)
+
+```{r ocr_extract_images, echo = FALSE}
 
 ocr_images(messages_df = messages_df,
            base_folder = base_folder,
@@ -213,10 +212,76 @@ ocr_images(messages_df = messages_df,
 
 ```
 
+```{r text_photo_df, echo = FALSE}
+
+text_photo_df <- purrr::map(
+  .x = fs::dir_ls(path = "prigozhin_photo_transcribed"),
+  .f = function(x) {
+  readr::read_rds(file = x) |> 
+      stringr::str_c(collapse = "\n") |> 
+      tibble::enframe(value = "text_photo", name = NULL) |> 
+      dplyr::mutate(id = fs::path_file(x) |> fs::path_ext_remove() |> as.numeric()) |> 
+      dplyr::mutate(embed_photo =  stringr::str_c('<script async src="https://telegram.org/js/telegram-widget.js?22" data-telegram-post="Prigozhin_hat/', id, '" data-width="100%"></script>')) |> 
+      dplyr::relocate(id, embed_photo, text_photo)
+}) |> 
+  purrr::list_rbind() |> 
+  dplyr::arrange(id) |> 
+  dplyr::left_join(y = messages_df |> 
+  dplyr::select(c("id", "date")), by = "id") |> 
+  dplyr::relocate("date")
+
+
+
+
+```
+
+
+It's rather straightforard to extract via OCR text of the images. The following is a quick attempt, with no particular effort dedicated to polishing the results, and even as it is, it allows to quick search among transcribed text. For example, if you look for "Wagner" ("Вагнер") in the search box for the `text_photo` column, only posts where "Wagner" is mentioned in the screenshotted text will be kept. For the records, this shows that out of `r scales::number(nrow(text_photo_df))` posts with valid text extracted from the images, `r text_photo_df |> dplyr::filter(stringr::str_detect(text_photo, stringr::fixed("вагнер", ignore_case = TRUE))) |> nrow() |> scales::number()` mention "Wagner", all the way from the early days of the channel back in 2019 when Prigozhin was still vehemently denying any association with it.
+
+Some information about the following table:
+
+- the table includes all posts that have attached a photo from where seemingly meaningful text could be automatically extracted
+- the text has been automatically extracted with OCR with `tesseract`, setting the language as Russian (hence, the glaring inaccuracies where the images include contents in other languages)
+- if the post has attached more than one image, the text for each image is included in a separate row; the embedded post is always the same and it may not be immediately obvious that it includes more than one picture
+- very often, the response to the question is given in a separate post: clicking through the embedded post, and then clicking on "context" may be helpful in finding more details in the posts immediately preceding or following any given post.
+
+
+```{r datatable_text_embed_images, echo= FALSE, message=FALSE, warning=FALSE}
+#| column: screen-inset
+text_photo_df |> 
+  dplyr::filter(nchar(text_photo)>30) |> 
+  dplyr::filter(
+    purrr::map_dbl(
+      .x = text_photo,
+      .f = function(x) {mean(nchar(unlist(strsplit(x, '\\s+'))))})>3) |> 
+# exlcude images with non-text, i.e. those where OCR-ed words are on average
+# shorter than 3 characters
+  dplyr::select(-id) |> 
+  DT::datatable(
+    escape = FALSE,
+    rownames = FALSE,
+    list(
+      paging = TRUE,
+      pageLength =  3,
+      columnDefs = list(
+        list(width = "10%", targets = 0),
+        list(width = "30%", targets = 1),
+        list(width = "60%", targets = 1)),
+     dom = 'pti'
+    ),
+    filter = list(position = "top"))
+#reactable::reactable(columns = list(embed_photo = reactable::colDef(html = TRUE)))
+```
+
+
+For more detailed analysis, and depending on the type of analysis, this would likely require some more polishing efforts. Also, as the same textual content is often repeated both in the screenshotted image and as text in the original post, this may lead to extensive duplication of contents. On the other hand, if one is not into word frequency analysis but just into more effective ways to search through all contents of the channel, this may well already be of use.
+
+
+## Step 4: Speech-to-text of audio and video
+
+[Whisper speech-to-text, forthcoming]
 
 ```{r}
 
 ```
 
-
-## Step 4: Speech-to-text of audio and video
