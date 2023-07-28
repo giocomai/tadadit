@@ -43,7 +43,7 @@ renv::snapshot(packages = packages_v,
 ```
 
 
-```{r install_whisper, eval=FALSE}
+```{r install_whisper, eval=FALSE, echo = FALSE}
 Sys.setenv(WHISPER_CFLAGS = "-mavx -mavx2 -mfma -mf16c")
 remotes::install_github("bnosac/audio.whisper", force = TRUE)
 Sys.unsetenv("WHISPER_CFLAGS")
@@ -277,9 +277,103 @@ text_photo_df |>
 For more detailed analysis, and depending on the type of analysis, this would likely require some more polishing efforts. Also, as the same textual content is often repeated both in the screenshotted image and as text in the original post, this may lead to extensive duplication of contents. On the other hand, if one is not into word frequency analysis but just into more effective ways to search through all contents of the channel, this may well already be of use.
 
 
-## Step 4: Speech-to-text of audio and video
+## Step 4: Speech-to-text of audio and video attachments
+
+One of the most distinguishable features of Prigozhin's mutiny for external observers was just how much communicated through Telegram posts, mostly bare audio messages of Prigozhin's raucous voice: the mutiny was launched with an audio message and its end was declared in the same way. But audio messages had become an increasingly central component of Prigozhin's approach to communication, as it was perhaps most fitting to his harsh and increasingly unhinged comments towards Russia's military leadership and the Ministry of Defence.
+
+Many of these audio messages have been transcribed and posted as text in the same post that has the audio file, or in a separate message posted immediately sooner or later. However, others were not: these may be longer audio messages, messages with more vulgar or explicit expressions, as well as most of the messages posted during the mutiny on 24 June 2023.
+
+Due to the molteplicity of formats employed, systematically harmonising these contents through consistent deduplication may be challenging. But the first step in that direction surely involved transcribing these audio messages. 
+
+There are a variety of online services that offer speech-to-text as a service for a fee. Depending on the use case, the budget available, and the amount of audio to be transcribed they may be a valid option. Processing data locally introduces other constraints - mostly, computing time and resources - but allows for reproducibility, and makes irrelevant a set of additional concerns that may emerge by relying on third parties, including questions such as:
+
+- "are third-party vendors fine with me using their services transcribing prophanities by an alleged war criminal?"
+- especially for those working on violent extremism or terrorism, "will sending a bunch of extremist materials get me into trouble"?
+- if I am transcribing non-public and potentially sensitive contents, is it fine ethically to send them through a third-party, perhaps one based in different jurisdiction?
+
+Terms of service may offer some assurances, but processing data offline makes such points moot. 
+
+To transcribe these audio-messages I used OpenAI's ["Whisper" Automatic Speech Recognition model](https://github.com/openai/whisper). For ease of use and consistency with my R-based workflow, I did this through the [`audio.whisper`](https://github.com/bnosac/audio.whisper) R package, which is a wrapper around the [whisper.cpp C++ library](https://github.com/ggerganov/whisper.cpp). 
+This may sound convoluted, but it is rather straightforward in practice, as it deals with many of that complexities that users of libraries based on machine-learning models often encounter. Especially for users with poweful GPUs, this may lead to significant inefficiency. For others, this should really be just about as efficient as running the original library if `audio.whisper` is installed with the right flags (see the package's readme) and if the software is run naively, with no specific customisation or optimisations.
+
+
+
 
 [Whisper speech-to-text, forthcoming]
+
+```{r transcribe_original, eval = FALSE, echo = FALSE}
+transcribe_audio(messages_df = messages_df,
+                 base_folder = base_folder,
+                 destination_folder = "prigozhin_audio_transcribed",
+                 model = "large")
+
+
+
+```
+
+
+```{r transcribe_and_translate, eval = FALSE, echo = FALSE}
+
+transcribe_audio(messages_df = messages_df,
+                 base_folder = base_folder,
+                 destination_folder = "prigozhin_audio_transcribed_translated",
+                 model = "large",
+                 translate = TRUE)
+```
+
+
+
+```{r prigozhin_en_transcribed, echo = FALSE}
+#| column: screen-inset
+
+
+
+purrr::map(
+  .x = fs::dir_ls(path = "prigozhin_audio_transcribed_translated_large",
+                  recurse = FALSE,
+                  type = "file",
+                  glob = "*.rds"),
+  .f = function(x) {
+    current_l <- readRDS(file = x)
+    current_l[["data"]] |> 
+      tibble::as_tibble() |> 
+      dplyr::mutate(text = stringr::str_squish(text)) |> 
+      dplyr::mutate(id = fs::path_file(x) |> fs::path_ext_remove() |> as.numeric()) |> 
+      dplyr::relocate(id)
+  }) |>
+  purrr::list_rbind() |> 
+  dplyr::left_join(y = messages_df |> 
+                     dplyr::select(c("id", "datetime")),
+                   by = "id") |> 
+  dplyr::filter(datetime < lubridate::as_datetime("2023-07-01")) |> 
+  # dplyr::mutate(embed_post =  stringr::str_c('<script async src="https://telegram.org/js/telegram-widget.js?22" data-telegram-post="Prigozhin_hat/', id, '" data-width="100%"></script>')) |> 
+  dplyr::group_by(id) |> 
+  dplyr::mutate(datetime = stringr::str_c("<a href='https://t.me/Prigozhin_hat/", id, "'>", as.character(datetime), "</a>")) |> 
+  dplyr::ungroup() |> 
+  dplyr::select(id, datetime, from, to, text) |> 
+  dplyr::arrange(datetime) |> 
+  dplyr::mutate(dplyr::across(.cols = c("from", "to"),
+                              .fns = \(x) stringr::str_remove(x, "^00:") |> 
+                                stringr::str_remove("[[:punct:]]000$"))) |> 
+  DT::datatable(
+    escape = FALSE,
+    rownames = FALSE,
+    list(
+      paging = TRUE,
+      pageLength =  5,
+      columnDefs = list(
+        list(width = "5%", targets = 0),
+        list(width = "10%", targets = 1),
+        list(width = "5%", targets = 2),
+        list(width = "5%", targets = 3),
+        list(width = "65%", targets = 4)),
+      dom = 'pti'
+    ),
+    filter = list(position = "top"))
+
+
+```
+
 
 ```{r}
 

@@ -234,3 +234,57 @@ kwic_table <- function(corpus,
                          ))
   
 }
+
+
+
+#### Transcribe audio ####
+
+
+transcribe_audio <- function(messages_df,
+                             base_folder,
+                             destination_folder,
+                             model, 
+                             translate = FALSE) {
+  model_whisper <- audio.whisper::whisper(x = model, model_dir = "/home/g/bin/whisper_model")
+  
+  destination_folder_by_model <- stringr::str_c(destination_folder, "_", model)
+  
+  to_transcribe_l <- messages_df |> 
+    dplyr::arrange(dplyr::desc(date_unixtime)) |> 
+    dplyr::select(c("id", "file")) |> 
+    dplyr::filter(is.na(file)==FALSE) |> 
+    dplyr::mutate(extension = fs::path_ext(file)) |> 
+    # dplyr::distinct(extension)
+    dplyr::filter(extension %in% c("mp4", "MP4", "wav", "ogg", "mp3", "MOV")) |> 
+    purrr::transpose()
+  
+  fs::dir_create(destination_folder_by_model)
+  
+  purrr::walk(
+    .x = to_transcribe_l,
+    .progress = TRUE,
+    .f = function(x) {
+      expected_file <- fs::path(destination_folder_by_model,
+                                fs::path_ext_set(path = as.character(x$id), ext = "rds"))
+      
+      if (fs::file_exists(expected_file)==FALSE) {
+        
+        current_wav <- fs::path_ext_set(fs::file_temp(), "wav")
+        
+        av::av_audio_convert(audio = fs::path(base_folder, x$file),
+                             output = current_wav,
+                             format = "wav",
+                             sample_rate = 16000)
+        
+        transcript_original <- audio.whisper:::predict.whisper(object = model_whisper,
+                                                               newdata = current_wav,
+                                                               #language = "ru",
+                                                               trim = FALSE,
+                                                               translate = translate)
+        
+        saveRDS(object = transcript_original, file = expected_file)
+      }
+      
+    })
+  
+}
