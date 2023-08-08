@@ -4,7 +4,7 @@ description: "N.B. Automatic transcription and translation, not checked for accu
 author: Giorgio Comai
 date: 2023-08-08
 last-modified: 2023-08-08
-categories: [tutorials, russia, prigozhin]
+categories: [russia, prigozhin, transcription]
 ---
 
 Read full post with more context: "[From the 'battle of Bakhmut' to the 'march of justice': Prigozhin's audio files, transcribed](./.)"

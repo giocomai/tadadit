@@ -4,10 +4,10 @@ description: "N.B. Automatic transcription, not checked for accuracy"
 author: Giorgio Comai
 date: 2023-08-08
 last-modified: 2023-08-08
-categories: [tutorials, russia, prigozhin]
+categories: [russia, prigozhin, transcription]
 ---
 
-Read full post with more context: "[From the 'battle of Bakhmut' to the 'march of justice': Prigozhin’s audio files, transcribed](./.)"
+Read full post with more context: "[From the 'battle of Bakhmut' to the 'march of justice': Prigozhin's audio files, transcribed](./.)"
 
 ```{r setup, echo = FALSE}
 knitr::opts_chunk$set(echo = FALSE)

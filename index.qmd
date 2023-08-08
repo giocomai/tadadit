@@ -13,6 +13,8 @@ listing:
     sort: "date desc"
     image-align: right
     type: default
+    exclude:
+      categories: "transcription"
     categories: false
     sort-ui: false
     filter-ui: false
