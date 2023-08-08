@@ -1,0 +1,172 @@
+---
+title: "Prigozhin's audio files, transcribed and translated"
+description: "N.B. Automatic transcription and translation, not checked for accuracy"
+author: Giorgio Comai
+date: 2023-08-08
+last-modified: 2023-08-08
+categories: [tutorials, russia, prigozhin]
+---
+
+Read full post with more context: "[From the 'battle of Bakhmut' to the 'march of justice': Prigozhin's audio files, transcribed](./.)"
+
+```{r setup, echo = FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+source("functions.R")
+base_folder <- readLines("base_folder.txt") 
+```
+
+```{r}
+current_language <- "en"
+
+messages_df <- process_telegram_json(fs::path(base_folder, "result.json"))
+
+audio_messages_df <- messages_df |> 
+  dplyr::filter(is.na(file)==FALSE,
+                media_type == "audio_file"|mime_type=="audio/x-wav")
+transcribed_en_df <- read_transcriptions(path = "telegram_concordgroup_official_audio_transcribed_translated_large")
+transcribed_ru_df <- read_transcriptions(path = "telegram_concordgroup_official_audio_transcribed_large") |> 
+  dplyr::arrange(id)
+
+# id_with_audio_files <- audio_messages_df |> dplyr::distinct(id) |> dplyr::pull(id) |> tail()
+
+id_with_audio_files <- transcribed_en_df |> 
+  dplyr::arrange(id) |> 
+  dplyr::distinct(id) |> 
+  dplyr::pull(id)
+```
+
+::: callout-warning
+## Work-in-progress
+
+**Not all audio messages have been transcribed yet. Currently this page shows some of the earliest and some of the most recent posts. Posts are shown in order of publication.**
+
+```{r results='asis'}
+cat("__Total number of posts including audio messages__: ")
+cat(scales::number(nrow(audio_messages_df)))
+cat("<br />")
+if (current_language == "ru") {
+  cat("__Number of posts processed__: ")
+  cat(scales::number(nrow(transcribed_ru_df |> dplyr::distinct(id))))
+} else if (current_language == "en") {
+  cat("__Number of posts processed and included in this document__: ")
+  cat(scales::number(nrow(transcribed_en_df  |> dplyr::distinct(id))))
+}
+```
+:::
+
+::: callout-note
+## Basic information about this document
+
+```{r results='asis'}
+cat("__Total number of posts including audio messages__: ")
+cat(scales::number(nrow(audio_messages_df)))
+cat("<br />")
+cat("__Earliest post with audio__: ")
+cat(format.Date(x = min(audio_messages_df$date), "%d %B %Y"))
+cat("<br />")
+cat("__Most recent post with audio__: ")
+cat(format.Date(x = max(audio_messages_df$date), "%d %B %Y"))
+cat("<br />")
+
+
+```
+
+The Telegram post that has the audio message attached often does not include any text at all, or just a very brief message. It is often posted as a reply to another message, which may include a question or even the transcription of the response. When the message is posted using the "reply to" function of Telegram, reference to the original post is also included and can be seen in this document by expanding the relevant section.
+
+In some case, more context may be necessary: click through the original post on Telegram and click on the "Context" button there to see the post in context.
+:::
+
+::: callout-tip
+All audio files have been transcribed using the "Whisper" model. Find more details and context about the process in the dedicated post.
+
+**Read full post with more context**: "[From the 'battle of Bakhmut' to the 'march of justice': Prigozhin's audio files, transcribed](./.)"
+
+**Read all transcripts in Russian**: "[Prigozhin's audio files, transcribed](./prigozhin_transcribed_ru.qmd)"
+
+**Download all transcripts as a dataset**: [Prigozhin audio files, transcribed](/datasets/prigozhin_audio_files)
+:::
+
+::: callout-important
+-   place names, people, and organisation are often transcribed inconsistently, sometimes in unexpected ways. Syntagms that are unusual in the training model such as "ChVK Wagner" (used for "private military company Wagner") can be transcribed in the most unusual ways, including, e.g. "Chuvash-Kavagner"
+-   occasionally, some part of the original audio seem to be discarded in the English transcription, but are kept in the Russian one, which is more complete and accurate
+-   new lines are added automatically during the speech-to-text process (which includes the timing for each chunk, see [dataset](/datasets/prigozhin_audio_files)) and do not represent pauses in speech or end of sentences.
+:::
+
+## All posts including audio messages, transcribed
+
+```{r results='asis'}
+# #| column: screen-inset
+for (i in id_with_audio_files) {
+  current_message <- messages_df |> 
+    dplyr::filter(id == i)
+  
+  current_reply_to_message <- messages_df |> 
+    dplyr::filter(id == current_message$reply_to_message_id)
+  
+  reply_message_exists <- nrow(current_reply_to_message)>0
+  
+  current_transcribed_en <- transcribed_en_df |> 
+    dplyr::filter(id == i) 
+  
+  current_transcribed_ru <- transcribed_ru_df |> 
+    dplyr::filter(id == i) 
+  
+  #cat(stringr::str_c('<script async src="https://telegram.org/js/telegram-widget.js?22" data-telegram-post="concordgroup_official/', i, '" data-width="100%"></script>'))
+    cat(stringr::str_c("__Time posted__: ", current_message$datetime))
+  cat("\n &nbsp;  \n")
+  
+  cat(stringr::str_c("__Link to original post__: ",
+                     "<a target='_blank' href='",
+                     "https://t.me/concordgroup_official/", i,
+                     "'>",
+                     "https://t.me/concordgroup_official/", i,
+                     "</a>"))
+  cat("\n &nbsp;  \n")
+  
+  
+
+  
+  cat("<p>")
+  cat(stringr::str_c("__Text in the original post__: ", ifelse(current_message$text=="", "[empty]", current_message$text)))
+  cat("</p>")
+  
+
+  if (reply_message_exists) {
+    cat("<details>")
+    cat("<summary>Reply to post:</summary>")
+    cat(stringr::str_c("__Link to 'reply to' post__: ",
+                       "<a target='_blank' href='",
+                       "https://t.me/concordgroup_official/", i,
+                       "'>",
+                       "https://t.me/concordgroup_official/", i,
+                       "</a>"))
+    cat("<br />")
+    cat(stringr::str_c("__Text in the 'reply to' post__: <br />", ifelse(current_reply_to_message$text=="", "[empty]", current_reply_to_message$text)
+                                                                         ))
+    cat("</p>")
+    cat("</details>")
+  }
+   cat("<br />")
+   cat(stringr::str_c("__Length of the audio (in seconds)__: ", current_message$duration_seconds))
+  
+   cat("<br />")
+  if (current_language=="ru") {
+    cat("<p>")
+    cat("\n__Russian transcription of the audio file__:")
+    
+    cat(" <br />")
+    cat(current_transcribed_ru |> dplyr::pull(text) |> stringr::str_c(collapse = "<br />"))
+    cat("</p>")
+  }
+  
+  if (current_language=="en") {
+    cat("<p>")
+    cat("\n__English transcription of the audio file__:")
+    cat("<br />")
+    cat(current_transcribed_en |> dplyr::pull(text) |> stringr::str_c(collapse = "<br />"))
+    cat("</p>")
+    cat("<hr style='height: 10px;'/>")
+  }
+}
+
+```

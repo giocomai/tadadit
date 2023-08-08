@@ -1,10 +1,10 @@
 {
   "R": {
-    "Version": "4.2.3",
+    "Version": "4.3.1",
     "Repositories": [
       {
-        "Name": "REPO_NAME",
-        "URL": "https://packagemanager.rstudio.com/cran/latest"
+        "Name": "CRAN",
+        "URL": "https://cran.rstudio.com"
       }
     ]
   },
@@ -53,12 +53,11 @@
     },
     "Matrix": {
       "Package": "Matrix",
-      "Version": "1.6-0",
+      "Version": "1.5-4.1",
       "Source": "Repository",
-      "Repository": "RSPM",
+      "Repository": "CRAN",
       "Requirements": [
         "R",
-        "grDevices",
         "graphics",
         "grid",
         "lattice",
@@ -66,7 +65,7 @@
         "stats",
         "utils"
       ],
-      "Hash": "31262fd18481fab05c5e7258dac163ca"
+      "Hash": "38082d362d317745fb932e13956dccbb"
     },
     "R6": {
       "Package": "R6",
@@ -304,7 +303,7 @@
       "RemoteRepo": "castarter",
       "RemoteUsername": "giocomai",
       "RemoteRef": "HEAD",
-      "RemoteSha": "0104fa9ffd729ebbbb0a2e41888f0996dfd40d74",
+      "RemoteSha": "47589785051b3e34d4e31fd76ee08cd6c98fc239",
       "Requirements": [
         "DBI",
         "DT",
@@ -339,7 +338,20 @@
         "waiter",
         "xml2"
       ],
-      "Hash": "f5e66e043ce316b598e3b08f420d157e"
+      "Hash": "38228d21bfc89b03f3f12a4024c21032"
+    },
+    "changepoint": {
+      "Package": "changepoint",
+      "Version": "2.2.4",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Requirements": [
+        "R",
+        "methods",
+        "stats",
+        "zoo"
+      ],
+      "Hash": "da0cd08f38ad8fd15763460641916596"
     },
     "cicerone": {
       "Package": "cicerone",
@@ -372,7 +384,7 @@
       "Requirements": [
         "utils"
       ],
-      "Hash": "69e9cd8290f9ae4f3bb7019810590ac6"
+      "Hash": "3f038e5ac7f41d4ac41ce658c85e3042"
     },
     "colorspace": {
       "Package": "colorspace",
@@ -561,7 +573,7 @@
         "R",
         "rlang"
       ],
-      "Hash": "29ea51cd5dc54b7fa60d5e7d8347e123"
+      "Hash": "bb0eec2fe32e88d9e2836c2f73ea2077"
     },
     "evaluate": {
       "Package": "evaluate",
