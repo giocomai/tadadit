@@ -1,12 +1,11 @@
 ---
-title: "From the 'battle of Bakhmut' to the 'march of justice': Prigozhin's audio files, transcribed / On processing mixed-media posts published on Telegram channels)"
+title: "From the 'battle of Bakhmut' to the 'march of justice': Prigozhin's audio files, transcribed"
 description: "Prigozhin's press service actively responds via Telegram to questions asked by journalists. Questions are mostly posted as screenshots, responses are mostly posted as audio messages, other posts include video. How do we turn these into something that can be searched and analysed?"
 author: Giorgio Comai
 date: 2023-08-08
 last-modified: 2023-08-08
 categories: [tutorials, russia, prigozhin]
 image: "giocomai_many_words_and_cyrillic_text_coming_out_of_a_computer__9b5d514f-3065-408e-9d47-3c1c15020429.webp"
-bibliography: references.bib
 ---
 
 {{< include ./../../litreview/_early_disclaimer.qmd >}}
