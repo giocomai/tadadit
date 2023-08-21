@@ -1,3 +1,4 @@
+#Sys.sleep(25*60)
 setwd(fs::path(here::here(), "posts", "2023-08-telegram_prigozhin"))
 
 base_folder <- readLines("base_folder.txt")

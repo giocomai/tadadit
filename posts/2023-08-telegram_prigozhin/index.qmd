@@ -2,10 +2,10 @@
 title: "From the 'battle of Bakhmut' to the 'march of justice': Prigozhin's audio files, transcribed"
 description: "Prigozhin's press service actively responds via Telegram to questions asked by journalists. Questions are mostly posted as screenshots, responses are mostly posted as audio messages, other posts include video. How do we turn these into something that can be searched and analysed?"
 author: Giorgio Comai
-date: 2023-08-08
-last-modified: 2023-08-08
+date: 2023-08-22
+last-modified: 2023-08-22
 categories: [tutorials, russia, prigozhin]
-image: "giocomai_many_words_and_cyrillic_text_coming_out_of_a_computer__9b5d514f-3065-408e-9d47-3c1c15020429.webp"
+image: "giocomai_visual_representation_of_an_audio_wave_file_an_audio_m_5ae21a9b-dd21-4a79-95bb-1a9e35d1eaf4.webp"
 ---
 
 {{< include ./../../litreview/_early_disclaimer.qmd >}}
@@ -13,16 +13,16 @@ image: "giocomai_many_words_and_cyrillic_text_coming_out_of_a_computer__9b5d514f
 ::: callout-note
 ## Summary of key results
 
--   it is possible to use open source tools for transcribing audio messages and the quality is reasonably good also in the case of messages such as Prigozhin's filled with slang and expletives (adding automatic translation, the contents are still mostly readable, but the quality is noticeably degraded)
+-   it is possible to use open source tools for transcribing audio messages locally and the quality is reasonably good also in the case of messages such as Prigozhin's filled with slang and expletives (adding automatic translation, the contents are still mostly readable, but the quality is noticeably degraded)
 
 -   exploring mixed-media contents published on Telegram channels may be challenging, but feasible
 
 -   just looking at [Changes in the frequency of posting] it is possible to observe Prigozhin's radicalisation journey
 
--   a full dataset with all of Prigozhin's audio messages transcribed is [available for download](/datasets/prigozhin_audio_files), or to consult in a single page [in Russian](./prigozhin_transcribed_ru.html) or with [automatic translation in English](./prigozhin_transcribed_en.html)
+-   a full dataset with all of Prigozhin's audio messages transcribed is [available for download](/datasets/prigozhin_audio_files), or to consult in a single page [in Russian](./prigozhin_transcribed_ru.qmd) or with [automatic translation in English](./prigozhin_transcribed_en.qmd)
 :::
 
-## ![](giocomai_many_words_and_cyrillic_text_coming_out_of_a_computer__9b5d514f-3065-408e-9d47-3c1c15020429.webp) Context {#top-left-img}
+## ![](giocomai_visual_representation_of_an_audio_wave_file_an_audio_m_5ae21a9b-dd21-4a79-95bb-1a9e35d1eaf4.webp) Context {#top-left-img}
 
 ```{r setup, eval=TRUE, include = FALSE}
 knitr::opts_chunk$set(echo = FALSE)
@@ -66,9 +66,13 @@ As the Kremlin tightened its control of narratives and news that feature in main
 
 In many ways, mainstream media and Telegram channels seem to be two parallel information spaces, with debates and news that are dominant on Telegram (where re-posts among popular channels are common) may be completely ignored by major broadcast media. Indeed, the invisible line tightly separating these spaces is punctured only occasionally, and figures that are prominent on Telegram or even Western discourse about the war would be almost unknown to people who relied strictly on federal TV channels to get their news.
 
-In the full web archive of news of Russia's *Pervy Kanal*, there is literally only a handful of mentions of Evgeny Prigozhin until June 2023, all of them related to questions Putin has received in interviews in earlier years and that refer to Prigozhin's involvement with the so-called "troll factory" based in Saint Petersburg. But there is no reference to his role in Ukraine, not even during the months-long battle of Bakhmut; not even a hint or passing reference to the growing tensions between Prigozhin and the Ministry of Defence that marked the months preceding Prigozhin's mutiny.\[\^ This applies only to the online news archive of 1tv.ru, which does not include full transcripts of all broadcasts. Even if Prigozhin's role may have emerged in debates during talk shows, his complete absence from standard news reporting remains telling.\] And yet, most respondents to opinion polls seemed [to know enough about Prigozhin to have an opinion about him](https://www.levada.ru/2023/06/29/padenie-avtoriteta-evgeniya-prigozhina-i-otnoshenie-k-ispolzovaniyu-nayomnikov-i-zaklyuchyonnyh-v-voennyh-dejstviyah/). For a brief period before the mutiny, he was one of the public figures [most frequently mentioned approvingly by survey respondents](https://www.levada.ru/2023/05/31/odobrenie-institutov-rejtingi-politikov-maj-2023-goda/), at one point even [the most frequently mentioned after president Putin](https://theins.ru/obshestvo/263313), even if this is likely more the result of a relatively small number of strong supporters rather than of widespread support.
+In the full web archive of news of Russia's *Pervy Kanal*, there is literally only a handful of mentions of Evgeny Prigozhin until June 2023, all of them related to questions Putin has received in interviews in earlier years and that refer to Prigozhin's involvement with the so-called "troll factory" based in Saint Petersburg. But there is no reference to his role in Ukraine, not even during the months-long battle of Bakhmut; not even a hint or passing reference to the growing tensions between Prigozhin and the Ministry of Defence that marked the months preceding Prigozhin's mutiny.[^1] And yet, most respondents to opinion polls seemed [to know enough about Prigozhin to have an opinion about him](https://www.levada.ru/2023/06/29/padenie-avtoriteta-evgeniya-prigozhina-i-otnoshenie-k-ispolzovaniyu-nayomnikov-i-zaklyuchyonnyh-v-voennyh-dejstviyah/). For a brief period before the mutiny, he was one of the public figures [most frequently mentioned approvingly by survey respondents](https://www.levada.ru/2023/05/31/odobrenie-institutov-rejtingi-politikov-maj-2023-goda/), at one point even [the most frequently mentioned after president Putin](https://theins.ru/obshestvo/263313), even if this is likely more the result of a relatively small number of strong supporters rather than of widespread support.
 
-Either way, it seems clear that contents spread through Telegram reach a substantial part of the Russian population. Telegram channels is also the primary way used by figures such as Prigozhin to share their opinions and messages. In brief, there is plenty of good reasons for scholars interested in the spread of information and narratives related to Russia's invasion of Ukraine to dedicate some attention to Russian-language Telegram channels. Indeed, there have been some efforts that outline the [prevalence of pro-Kremlin Telgram channels](https://medium.com/dfrlab/pro-kremlin-telegram-channels-in-russia-outperforming-channels-critical-of-russia-f2076ebef3ea); for the curious about where to start, the website [tgstat.ru](https://tgstat.ru/en) collects statistics about popular Telegram channels in each language.
+[^1]: This applies only to the online news archive of 1tv.ru, which does not include full transcripts of all broadcasts. Even if Prigozhin's role may have emerged in debates during talk shows, his complete absence from standard news reporting remains telling.
+
+Either way, it seems clear that contents spread through Telegram reach a substantial part of the Russian population. Telegram channels is also the primary way used by figures such as Prigozhin to share their opinions and messages. In brief, there is plenty of good reasons for scholars interested in the spread of information and narratives related to Russia's invasion of Ukraine to dedicate some attention to Russian-language Telegram channels. Indeed, there have been some efforts in this space that outline the [prevalence of pro-Kremlin channels on Telegram](https://medium.com/dfrlab/pro-kremlin-telegram-channels-in-russia-outperforming-channels-critical-of-russia-f2076ebef3ea).[^2]
+
+[^2]: For those unfamiliar with Telegram channels and curious about where to start, the website [tgstat.ru](https://tgstat.ru/en) collects statistics about popular Telegram channels in each language.
 
 Rather than dealing with a large number of Telegram channels and their interactions, this post focuses on the task of analysing the contents published by a single figure - Evgeny Prigozhin. It is an interesting case not only because of its obvious relevance in relation to the war, but also technically, because of the variety of formats it employs as well as the peculiarity of each format for conveying different messages. Indeed, as will become apparent by the end of this post, in the case of Prigozhin the switch from written text to audio messages has effectively characterised the radicalisation journey of Prigozhin's public persona.
 
@@ -90,7 +94,7 @@ First, there is no official website to take as a point of reference. The officia
 
 The Telegram channel itself was opened only in November 2022, with message #897. Previous messages were probably published first on VKontakte (now not reachable), and presumably reposted from there in other Telegram channels.
 
-Telegram channel "[Prigozhin's hat](https://t.me/Prigozhin_hat/)", for example, has over 500.000 subscribers and was opened [in February 2019](https://t.me/Prigozhin_hat/3). Even earlier posts look exactly the same as ones published on the official channel, and [it appears they are](https://t.me/Prigozhin_hat/3823) effectively just (partially automated) re-posts. However, unfortunately, they do not include the same numeric id used in official posts. Besides, there are some more contents published here that do not feature on the official channel, including a few posts published *after* the mutiny. These are mostly forwarded from other Prigozhin-related channels such as "[Razgruzka Vagnera](https://t.me/razgruzka_vagnera/)" or "[SOMB - 'Tourists in Africa](https://t.me/officersunion)" (related to Wagner's presence in Africa).
+Telegram channel "[Prigozhin's hat](https://t.me/Prigozhin_hat/)", for example, has over 500.000 subscribers and was opened [in February 2019](https://t.me/Prigozhin_hat/3). Even earlier posts look exactly the same as ones published on the official channel, and [it appears they are](https://t.me/Prigozhin_hat/3823) effectively just (partially automated) re-posts. However, unfortunately, they do not include the same numeric id used in official posts. Besides, there are some more contents published on *Prigozhin's hat* that do not feature on the official channel, including a few posts published *after* the mutiny. These are mostly forwarded from other Prigozhin-related channels such as "[Razgruzka Vagnera](https://t.me/razgruzka_vagnera/)" or "[SOMB - 'Tourists in Africa](https://t.me/officersunion)" (related to Wagner's presence in Africa).
 
 "[Prigozhin's hat](https://t.me/Prigozhin_hat/)" may at this stage be the easiest source for earlier posts issued by Prigozhin, while [\@concordgroup_official](https://t.me/concordgroup_official/) is the most consistent source for recent months. As will appear from the following sections, it is really starting from early 2023 the Prigozhin stepped-up his virulent rhetoric expressed through audio messages, so in many respects it makes sense to focus on more recent contents and look at previous contents only as a term of reference.
 
@@ -111,6 +115,33 @@ From Telegram Desktop, it easy to export the full archive of Telegram channel in
 messages_df <- process_telegram_json(fs::path(base_folder, "result.json"))
 prigozhin_hat_messages_df <- process_telegram_json(fs::path(prigozhin_hat_folder, "result.json"))
 
+transcribed_ru_df <- read_transcriptions(path = "telegram_concordgroup_official_audio_transcribed_large") |> 
+  dplyr::arrange(id)
+
+total_audio_files <- transcribed_ru_df |> dplyr::distinct(id) |> nrow()
+
+duration_df <- transcribed_ru_df |> 
+  dplyr::group_by(id) |> 
+  dplyr::slice_max(to, with_ties = FALSE) 
+
+duration_stats_df <- duration_df |> 
+    dplyr::select(id, to) |> 
+  tidyr::separate(to, into = c("minutes", "seconds"),sep = ":", convert = TRUE) |> 
+  dplyr::mutate(duration = sum(lubridate::dminutes(minutes), lubridate::dseconds(seconds))) |> 
+  dplyr::ungroup() |> 
+  dplyr::summarise(median = round(median(duration)), mean = round(mean(duration)))
+  
+
+duration_summary_df <- duration_df |> 
+  dplyr::ungroup() |> 
+  dplyr::select(to) |> 
+  tidyr::separate(to, into = c("minutes", "seconds"),sep = ":", convert = TRUE) |> 
+  dplyr::summarise(dplyr::across(.cols = dplyr::everything(), .fns = sum))
+
+total_audio_duration <- sum(lubridate::dminutes(duration_summary_df$minutes), lubridate::dseconds(duration_summary_df$seconds)) |> lubridate::as.duration()
+
+
+ 
 ```
 
 First, let's have a look at some basic information about the dataset we have:
@@ -120,6 +151,18 @@ First, let's have a look at some basic information about the dataset we have:
 **Latest post**: `r max(messages_df$date)`
 
 **Total number of posts**: `r scales::number(nrow(messages_df))`
+
+**Total number of audio files**: `r scales::number(total_audio_files)`
+
+**Earliest post with audio file**: `r min(transcribed_ru_df$date)`
+
+**Latest post with audio file**: `r max(transcribed_ru_df$date)`
+
+**Total duration of audio files**: `r as.character(round(total_audio_duration))`
+
+**Average duration of audio files (in seconds)**: `r duration_stats_df$mean`
+
+**Median duration of audio files (in seconds)**: `r duration_stats_df$median`
 
 ```{r prigozhin_barchart_by_month, echo=FALSE}
 #| out-width: 100%
@@ -138,8 +181,8 @@ messages_df |>
   tidyr::drop_na() |> 
   ggplot(mapping = aes(x = month, y = n)) +
   geom_col() +
-  scale_x_discrete("") +
-  scale_y_continuous("") +
+  scale_x_discrete(name = NULL) +
+  scale_y_continuous(name = NULL) +
   facet_wrap(~ year, nrow = 1) +
   labs(
     title = "Number of posts per month published on Prigozhin's official Telegram channel",
@@ -161,14 +204,13 @@ messages_df |>
 
 For reference, it may be useful to look at "Prigozhin's hat" to look at the frequency of posts in earlier months.
 
-```{r ph_barchart_by_month, echo = FALSE}
+```{r ph_barchart_by_month, echo = FALSE, fig.width=8}
 #| out-width: 100%
+#| column: page
 
 ph_folder <- readLines("prigozhin_hat_folder.txt") 
 
 ph_messages_df <- process_telegram_json(path = fs::path(ph_folder, "result.json"))
-
-
 
 
 ph_messages_df |> 
@@ -185,8 +227,8 @@ ph_messages_df |>
   tidyr::drop_na() |> 
   ggplot(mapping = aes(x = month, y = n)) +
   geom_col() +
-  scale_x_discrete("") +
-  scale_y_continuous("") +
+  scale_x_discrete(name = NULL) +
+  scale_y_continuous(name = NULL) +
   facet_wrap(~ year, nrow = 1) +
   labs(
     title = glue::glue("Number of posts per month published on {sQuote(\"@Prigozhin's hat\")} Telegram channel"),
@@ -206,7 +248,7 @@ ph_messages_df |>
 
 It appears there is a distinct *crescendo* in the number of posts published by this channel (presumably reflecting Prigozhin's overall post frequency also on its currently unavailable official channels), from just a handful of posts per month until September 2020, then mostly between 40 and 80 monthly posts until September 2022, going up to more than 200 post per month until the end of June 2023, when the channel fell silent post-Mutiny, after averaging close to 10 posts per day in the previous weeks
 
-Even these basic descriptive statistics reflect some of the things we know about Prigozhin: the big increase in posts in October 2022 can easily be explained by the fact that it is only then, more precisely on 26 September 2022, that [Prigozhin publicly admitted its ties to Wagner](https://www.reuters.com/world/europe/russias-prigozhin-admits-link-wagner-mercenaries-first-time-2022-09-26/). Two years earlier, on 23 September 2020, [the US treasury significantly expanded its sanctions](https://www.reuters.com/world/europe/russias-prigozhin-admits-link-wagner-mercenaries-first-time-2022-09-26/) against entities linked to Prigozhin, which may be related to him taking a more public role.
+Even these basic descriptive statistics reflect some of the things we know about Prigozhin: the big increase in posts in October 2022 can easily be explained by the fact that it is only then, more precisely on 26 September 2022, that [Prigozhin publicly admitted its ties to Wagner](https://www.reuters.com/world/europe/russias-prigozhin-admits-link-wagner-mercenaries-first-time-2022-09-26/). Two days earlier, on 23 September 2020, [the US treasury significantly expanded its sanctions](https://home.treasury.gov/news/press-releases/sm1133) against entities linked to Prigozhin, which may be related to him taking a more public role.
 
 Since the very beginning of its online presence, Prigozhin's press team published the questions it received as a screenshot, and added Prigozhin's own reply either in the text of the message or as an additional screenshot with text. As emerges from the following graph, it is basically only starting with 2023 that Prigozhin started to respond with audio messages - often, angry rants - that quickly became a trademark element of its communication.
 
@@ -227,8 +269,8 @@ messages_df |>
 
   ggplot(mapping = aes(x = month, y = n)) +
   geom_col() +
-  scale_x_discrete("") +
-  scale_y_continuous("") +
+  scale_x_discrete(name = NULL) +
+  scale_y_continuous(name = NULL) +
   facet_wrap(~ year, nrow = 1) +
   labs(title = paste0("Number of audio files per month posted on the Telegram channel ", sQuote("Prigozhin's hat")),
              subtitle = stringr::str_c(
@@ -247,7 +289,7 @@ messages_df |>
 
 ## Step 2: An overview of the kind of posts published
 
-Posts published on "Prigozhin's hat" Telegram channel including older posts by Prigozhin are mostly based on a combination of formats; sometimes the contents are repeated in more than one format, sometimes they are not.
+Posts published on the official Telegram channel of the Prigozhin's press service as well as on "Prigozhin's hat" Telegram channel including older posts by Prigozhin are mostly based on a combination of formats; sometimes the contents are repeated in more than one format, sometimes they are not.
 
 For example, [this post](https://t.me/Prigozhin_hat/3796) shows a question asked by a media organisation as a screenshot:
 
@@ -259,6 +301,7 @@ Conveniently, this is accompanied by [another post](https://t.me/Prigozhin_hat/3
 ```{=html}
 <script async src="https://telegram.org/js/telegram-widget.js?22" data-telegram-post="Prigozhin_hat/3795" data-width="100%"></script>
 ```
+
 In this case, everything seems easy: we can in principle ignore both the screenshotted picture and the audio-file, as the very same contents are presented also in textual format.
 
 But then, in other occasions there are only audio-files or voice messages with no context whatsoever. This was the case, for example, for most messages posted during the mutiny on 24 June, including [the one that announced its end](https://t.me/concordgroup_official/1303):
@@ -269,26 +312,26 @@ But then, in other occasions there are only audio-files or voice messages with n
 In others still, the content of the question previously-screenshotted is transcribed, but Prigozhin's comments are conveyed only in audio format.
 
 ```{=html}
-<script async src="https://telegram.org/js/telegram-widget.js?22" data-telegram-post="Prigozhin_hat/3618" data-width="100%"></script>
+<script async src="https://telegram.org/js/telegram-widget.js?22" data-telegram-post="concordgroup_official/1303" data-width="100%"></script>
 ```
 Finally, there are occasional posts including some documents or video files:
 
 ```{=html}
-<script async src="https://telegram.org/js/telegram-widget.js?22" data-telegram-post="Prigozhin_hat/3811" data-width="100%"></script>
+<script async src="https://telegram.org/js/telegram-widget.js?22" data-telegram-post="concordgroup_official/1297" data-width="100%"></script>
 ```
-Video files often include spoken comments, or depict meetings. They are only very occasionally central to Prigozhin's communication, and even when they are, mostly not for the spoken content. Video files should not be dismissed, however, and they may actually be an important part of the communication of other Telegram channels, all the way from Strelkov to the "military bloggers" who produce video contents.
+Video files often include spoken comments, or depict meetings. They are only very occasionally central to Prigozhin's communication, and even when they are, mostly not for the spoken content. Video files should not be dismissed, however, and they may actually be an important part of the communication of other Telegram channels, all the way from Strelkov to the "military bloggers" who produce video contents. In the rest of this post, I will leave out video clips, both for facilitating consistency in the processing of results and because including them introduces further ethical questions (they include, among other things, the voice of Ukrainians prisoners of war).
 
-In the following steps, I will proceed with turning both images and audio messages into text format that can be searched and processed further.
+In the following steps, I will proceed with turning images into text (only briefly) and then really focus on turning audio messages into text format that can be searched and processed further.
 
 ## Step 3: OCR images
 
-As screenshots of text have become less common on Prigozhin's official channel in recent months, and as they are broadly a format less frequently found on Telegram in comparison to video and audio files, I will go through the image part quickly, and then focus more on audio messages. Given the prevalence of textual screenshots in earlier posts, this section will take messages from "Prigozhin's hat" Telegram channel, rather than the official one; the vast majority of posts are reflected, but, as mentioned before, "Prigozhin's hat" has a lot more of the early posts.
+As screenshots of text have become less common on Prigozhin's official channel in recent months, and as they are broadly a format less frequently found on Telegram in comparison to video and audio files, I will go through the image part quickly, and then focus more on audio messages. Given the prevalence of textual screenshots in earlier posts, this section will take messages from "Prigozhin's hat" Telegram channel, rather than the official one; the vast majority of posts are exactly the same on both channels, but, as mentioned before, "Prigozhin's hat" has a lot more of the early posts.
 
 OCR techniques to recognised text from images are well established. In this specific case, the quality of results is hindered mainly by two aspects:
 
 -   low resolution of the images
 -   the fact that many of these are screenshots of emails, and they may include some email metadata at the top, or some signature text at the bottom of the email
--   the fact that there are sometimes more than one language in the same image, either because there's some clutter from the email screenshots, or because questions are asked in English and the response given in Russian (in the vast majority of cases, however, both questions and answers are given in Russian)
+-   the fact that there are sometimes more than one language in the same image, either because there's some clutter in the email screenshots, or because questions are asked in English and the response given in Russian (in the vast majority of cases, however, both questions and answers are given in Russian)
 
 ```{r ocr_extract_images, echo = FALSE, eval = FALSE}
 
@@ -372,7 +415,7 @@ saveRDS(object = prigozhin_hat_text_photo_df, file = prigozhin_hat_photo_transcr
 
 ```
 
-The following is a quick attempt to extract the text of the images via OCR, with no particular effort dedicated to polishing the results, and even as it is, it allows to quick search among transcribed text. For example, if you look for "Wagner" ("Вагнер") in the search box for the `text_photo` column, only posts where "Wagner" is mentioned in the screenshotted text will be kept. For the records, this shows that out of `r scales::number(nrow(prigozhin_hat_text_photo_df))` posts with valid text extracted from the images, `r prigozhin_hat_text_photo_df |> dplyr::filter(stringr::str_detect(text_photo, stringr::fixed("вагнер", ignore_case = TRUE))) |> nrow() |> scales::number()` mention "Wagner", all the way from the early days of the channel back in 2019 when Prigozhin was still vehemently denying any association with it.
+The following is a quick attempt to extract the text of the images via OCR, with no particular effort dedicated to polishing the results. Even so, the process allows to conduct quick searches among transcribed text. For example, if you look for "Wagner" ("Вагнер") in the search box for the `text_photo` column, only posts where "Wagner" is mentioned in the screenshotted text will be kept. For the records, this shows that out of `r scales::number(nrow(prigozhin_hat_text_photo_df))` posts with valid text extracted from the images, `r prigozhin_hat_text_photo_df |> dplyr::filter(stringr::str_detect(text_photo, stringr::fixed("вагнер", ignore_case = TRUE))) |> nrow() |> scales::number()` mention "Wagner", all the way from the early days of the channel back in 2019 when Prigozhin was still vehemently denying any association with it.
 
 Some information about the following table:
 
@@ -427,11 +470,13 @@ There are a variety of online services that offer speech-to-text as a service fo
 
 Terms of service may offer some assurances, but processing data offline makes such points moot.
 
+### Speech-to-text: some details on the technicalities
+
 Some details about the technicalities: uninterested readers may skip to the next section.
 
-To transcribe these audio-messages I used OpenAI's ["Whisper" Automatic Speech Recognition model](https://github.com/openai/whisper). For ease of use and consistency with my R-based workflow, I did this through the [`audio.whisper`](https://github.com/bnosac/audio.whisper) R package, which is a wrapper around the [whisper.cpp C++ library](https://github.com/ggerganov/whisper.cpp). This may sound convoluted, but it is rather straightforward in practice, as it deals with many of that complexities that users of libraries based on machine-learning models often encounter. Especially for users with poweful GPUs, this may lead to significant inefficiency. For others, this should really be just about as efficient as running the original library if `audio.whisper` is installed with the right flags (see the package's readme) and if the software is run naively, with no specific customisation or optimisations. Notice that `whisper` can process audio using one of a set of models ranging from "tiny" to "large", with "tiny" being the quickest and least accurate and "large" the slowest but more accurate. Notice that if use the original library, you have a decent GPU and set it up correctly, you can have *very* noticeable speed boosts, *if* the model fits into the VRAM of your GPU. Unless you really care about these things, even higher-end laptops mostly have GPUs with 4GB of VRAM or less, meaning you would probably be able to run only the "small" model ("large" requirest \~10 GB of VRAM, see [the project's repository for details](https://github.com/openai/whisper)).
+To transcribe these audio-messages I used OpenAI's ["Whisper" Automatic Speech Recognition model](https://github.com/openai/whisper). For ease of use and consistency with my R-based workflow, I did this through the [`audio.whisper`](https://github.com/bnosac/audio.whisper) R package, which is a wrapper around the [whisper.cpp C++ library](https://github.com/ggerganov/whisper.cpp). This may sound convoluted, but it is rather straightforward in practice, as it deals with many of that complexities that users of libraries based on machine-learning models often encounter. Especially for users with poweful GPUs, this may lead to significant inefficiency. For others, this should really be just about as efficient as running the original library if `audio.whisper` is installed with the right flags (see the package's readme) and if the software is run naively, with no specific customisation or optimisations. Notice that `whisper` can process audio using one of a set of models ranging from "tiny" to "large", with "tiny" being the quickest and least accurate and "large" the slowest but more accurate. Notice that if you use the original library, you have a decent GPU and set it up correctly, you can have *very* noticeable speed boosts, *if* the model fits into the VRAM of your GPU. Unless you really care about these things, even higher-end laptops mostly have GPUs with 4GB of VRAM or less, meaning you would probably be able to run only the "small" model ("large" requires \~10 GB of VRAM, see [the project's repository for details](https://github.com/openai/whisper)).
 
-After some testing, I found that when the quality of the audio is very good, e.g. a TV news segment where words are spelled out clearly, even smaller models perform relatively well, and "medium" is already almost flawless. However, with audio messages filled with slang and often with less than ideal audio quality such as the one posted by Prigozhin, the "large" model seems to be really needed to get reasonably reliable results. It is however, time consuming, as transcribing a minute of audio using the `large` language model on a modern laptop takes a few minutes (it would be much quicker with enough GPU vRAM for the `large` model, but most consumer laptops won't have the right hardware); transcribing all of Prigozhin's audio files implies quite a few days of processing.
+After some testing, I found that when the quality of the audio is very good, e.g. a TV news segment where words are spelled out clearly, even smaller models perform relatively well, and "medium" is already almost flawless. However, with audio messages filled with slang and often with less than ideal audio quality such as the one posted by Prigozhin, the "large" model seems to be really needed to get reasonably reliable results. It is however, time consuming, as transcribing a minute of audio using the `large` language model on a modern laptop takes a few minutes (it would be much quicker with enough GPU vRAM for the `large` model, but, again, most consumer laptops won't have the right hardware); transcribing all of Prigozhin's audio files implies quite a few days of processing.
 
 Before proceeding with transcribing, here are some summary statistics about what we're looking at.
 
@@ -486,7 +531,7 @@ media_df |>
                                          name = "minutes",
                                          breaks = seq.int(from = 0, to = 60, by = 10))
                      ) +
-  scale_x_date(name = "", date_breaks = "2 months") +
+  scale_x_date(name = NULL, date_breaks = "2 months") +
   scale_colour_brewer(palette = "Set2") +
   theme(legend.position = "bottom", legend.title = element_blank()) +
   labs(title = glue::glue("Date and duration of posts including audio or video posted on Prigozhin's official Telegram channel"),
@@ -512,7 +557,7 @@ media_df |>
                                          name = "minutes",
                                          breaks = seq.int(from = 0, to = 60, by = 10))
                      ) +
-  scale_x_date(name = "", limits = c(earliest_audio_date-1, NA), date_breaks = "1 month") +
+  scale_x_date(name = NULL, limits = c(earliest_audio_date-1, NA), date_breaks = "1 month") +
   scale_colour_brewer(palette = "Set2") +
   theme(legend.position = "bottom", legend.title = element_blank()) +
   labs(title = glue::glue("Date and duration of posts including audio or video by {sQuote(\"Prigozhin's hat\")} Telegram channel"),
@@ -522,7 +567,7 @@ media_df |>
 
 ### Changes in the frequency of posting
 
-Prigozhin's audio messages basically identify "Prigozhin's spring", from the "battle of Bakhmut" to his "march of justice". Indeed, just looking at the plain number of audio messages posted each day and using a dedicated function to automatically identify change points in time series, we obtain a visual depiction as well as some key dates marking the escalation.
+Prigozhin's audio messages basically identify "Prigozhin's spring", from the "battle of Bakhmut" to his "march of justice". Indeed, just looking at the plain number of audio messages posted each day and using a [dedicated function](https://cran.r-project.org/web/packages/changepoint/index.html) to automatically identify change points in time series, we obtain a visual depiction as well as some key dates marking the escalation.
 
 ```{r changepoint_gg}
 audio_count_by_day_pre_df <- media_df |> 
@@ -597,24 +642,24 @@ Without even looking at the contents of these messages, we can tentatively look 
 
 1.  (before the beginning of this graph) since the day Prigozhin admitted he's Wagner's owner and leader on 26 September 2022 to 26 December 2022, when his first audio message was posted
 2.  between then and 19 February 2023, when audio messages were only occasional, but his criticism of the Ministry of Defence (MoD) became more open
-3.  Since late February, audio messages became more frequent; on 6 March, Prigozhin denounced explicitly the behaviour of the MoD as betrayal
+3.  Since late February, audio messages became more frequent; on 6 March, Prigozhin denounced explicitly the behaviour of the MoD as betrayal, but did not mention by name either Shoigu or Gerasimov
 4.  Starting with April, it became routine for Prigozhin to post three audio messages per day or more
-5.  On 5 May, in a video of himself surrounded by dead bodies, [Prigozhin threatened to pull out of Bakhmut](https://www.themoscowtimes.com/2023/05/05/wagner-chief-says-pulling-out-of-bakhmut-after-blasting-russian-military-top-brass-a81045). In the weeks that followed, his denunciations became more vocal and his audio messages more frequent, averaging over 4 messages per day.
+5.  On 5 May, in a video of himself surrounded by dead bodies, [Prigozhin threatened to pull out of Bakhmut](https://www.themoscowtimes.com/2023/05/05/wagner-chief-says-pulling-out-of-bakhmut-after-blasting-russian-military-top-brass-a81045). In the weeks that followed, in particular after 9 May (the highly celebrated Victory Day in Russia) his denunciations became more vocal and his audio messages more frequent, averaging over 4 messages per day; it is only at this point that Prigozhin started to openly attack Shoigu and Gerasimov by name
 6.  The high frequency of posts broadly remained in place until the mutiny on 26 June 2023, then they stopped abruptly.
 
 For reference, see [the Moscow Times timeline](https://www.themoscowtimes.com/2023/06/24/timeline-prigozhins-escalating-standoff-with-russias-military-a81621) of Prigozhin's standoff with the Ministry of Defence.
 
 ### The contents: Prigozhin's audio messages, transcribed
 
-I include below in tabular format a transcription of all audio messages posted by Prigozhin, first in English, then in Russian. Each line includes a timestamp and a link to the original message. The tabel can be used for quick searches.
+I include below in tabular format a transcription of all audio messages posted by Prigozhin, first in English, then in Russian. Each line includes a timestamp and a link to the original message. The table can be used for quick searches.
 
 However, for convenience, I am sharing all of the transcribed audio files also as a downloadable dataset, and in a dedicated page where they can be conveniently browsed.
 
--   full dataset with all of Prigozhin's audio messages transcribed is [available for download](/datasets/prigozhin_audio_files)
--   all audio files transcribed [in Russian and available in a single page](./prigozhin_transcribed_ru.html)
--   all audio files transcribed and translated [in English and available in a single page](./prigozhin_transcribed_en.html) (automatic translation, more error-prone)
+In both cases, be mindful of the errors in both transcription and translation.
 
-A separate post analysing the contents may follow.
+-   full dataset with all of Prigozhin's audio messages transcribed is [available for download](/datasets/prigozhin_audio_files)
+-   all audio files transcribed [in Russian and available in a single page](./prigozhin_transcribed_ru.qmd)
+-   all audio files transcribed and translated [in English and available in a single page](./prigozhin_transcribed_en.qmd) (automatic translation, more error-prone)
 
 ```{r transcribe_original, eval = FALSE, echo = FALSE}
 transcribe_audio(messages_df = messages_df,
@@ -677,3 +722,102 @@ transcribed_en_df |>
     filter = list(position = "top"))
 
 ```
+
+```{r prigozhin_en_transcribed_ru}
+#| column: screen-inset
+
+transcribed_ru_df |> 
+    dplyr::group_by(id) |> 
+  dplyr::mutate(datetime = stringr::str_c("<a href='https://t.me/concordgroup_official/", id, "'>", as.character(datetime), "</a>")) |> 
+  dplyr::ungroup() |> 
+  DT::datatable(
+    escape = FALSE,
+    rownames = FALSE,
+    list(
+      paging = TRUE,
+      pageLength =  5,
+      columnDefs = list(
+        list(width = "5%", targets = 0),
+        list(width = "10%", targets = 1),
+        list(width = "5%", targets = 2),
+        list(width = "5%", targets = 3),
+        list(width = "65%", targets = 4)),
+      dom = 'pti'
+    ),
+    filter = list(position = "top"))
+
+```
+
+For reference, here is a graph showing mentions of Minister of Defence Shoigu and and Chief of Staff of the armed forces Gerasimov. It clearly shows how Prigozhin started making their name only after 9 May (Victory Day in Russia). As shown in the graphs above, at the same time, the average number of daily audio messages has also increased. Explicitly mentioning Shoigu and Gerasimov was a clear sign of escalation from Prigozhin's side. The fact that he was not rebuffed or criticised by the Kremlin at the time was probably instrumental in opening the way for the further escalation that led to Prigozhin's mutiny on 26 June.
+
+```{r mentions_ggplot_tts, warning = FALSE}
+mentions_df <- bind_rows(
+  .id = "subject", 
+  Shoigu = transcribed_ru_df |> 
+    dplyr::filter(stringr::str_detect(string = text,
+                                      pattern = stringr::regex("Ш(о|а)(й|и)гу",
+                                                               ignore_case = TRUE))),
+  Gerasimov = transcribed_ru_df |> 
+    dplyr::filter(stringr::str_detect(string = text,
+                                      pattern = stringr::regex("Герасимов|Генерал Асимов", ignore_case = TRUE)))
+  # ,
+  # Lapin = transcribed_ru_df |> 
+  #   dplyr::filter(stringr::str_detect(string = text,
+  #                                     pattern = stringr::fixed("Лапин",
+  #                                                              ignore_case = TRUE)))
+  )
+
+mentions_df |> 
+ggplot() +
+  geom_jitter(mapping = aes(x = datetime, y = subject), size = 5, alpha = 0.7, height = 0.15) +
+  scale_x_datetime(name = NULL, limits = c(min(transcribed_ru_df$datetime), max(transcribed_ru_df$datetime)), date_breaks = "1 month") +
+  scale_y_discrete(name = NULL) +
+    geom_vline(xintercept = lubridate::as_datetime(x = "2023-05-09"),
+             linetype = 2) +
+  labs(title = "Mentions of Shoigu and Gerasimov in Prigozhin's audio files", 
+       subtitle = "Vertical line marks Russia's Victory Day (9 May) for reference")
+```
+
+It is worth adding that these messages report Prigozhin's own words. Text included in the Telegram posts themselves often included both answer and reply, and quite often only the question asked. As it appears from the following graph pointing at mentions of Gerasimov and Shoigu in the text messages of Telegram posts, it easy to notice more earlier mentions. However, they all appear in the questions included in the post: even if journalists were actively asking about Shoigu and Gerasimov, Prigozhin himself never mentioned their name in his responses.
+
+```{r mentions_ggplot_original_posts, warning = FALSE}
+mentions_text_df <- bind_rows(
+  .id = "subject", 
+  Shoigu = messages_df |> 
+    dplyr::filter(stringr::str_detect(string = text,
+                                      pattern = stringr::regex("Ш(о|а)(й|и)гу",
+                                                               ignore_case = TRUE))),
+  Gerasimov = messages_df |> 
+    dplyr::filter(stringr::str_detect(string = text,
+                                      pattern = stringr::regex("Герасимов|Генерал Асимов", ignore_case = TRUE)))
+  # ,
+  # Lapin = transcribed_ru_df |> 
+  #   dplyr::filter(stringr::str_detect(string = text,
+  #                                     pattern = stringr::fixed("Лапин",
+  #                                                              ignore_case = TRUE)))
+  )
+
+mentions_text_df |> 
+ggplot() +
+  geom_jitter(mapping = aes(x = datetime, y = subject), size = 5, alpha = 0.7, height = 0.15) +
+  scale_x_datetime(name = NULL, limits = c(min(transcribed_ru_df$datetime), max(transcribed_ru_df$datetime)), date_breaks = "1 month") +
+  scale_y_discrete(name = NULL) +
+    geom_vline(xintercept = lubridate::as_datetime(x = "2023-05-09"),
+             linetype = 2) +
+  labs(title = "Mentions of Shoigu and Gerasimov on Prigozhin's press service Telegram channel\nWritten text only\nN.B. Earlier mentions appear in questions, not in Prigozhin's responses", 
+       subtitle = "Vertical line marks Russia's Victory Day (9 May) for reference")
+```
+
+A separate post with further analysis of the contents may follow.
+
+## Methodological conclusions
+
+Audio messages, in the case of Prigozhin, and video messages in the case of many other influential voices commenting the war for local audiences in Russia have become an important part of the public conversation about the war, including topics and perspectives that do not appear on traditional media and may be scarcely mentioned in written text.
+
+This post ([full code available on this website's repository](https://github.com/giocomai/tadadit/tree/main/posts/2023-08-telegram_prigozhin)) demonstrated how audio messages - including audio messages in Russian, with often less than ideal audio quality and frequent use of slang - can be turned into written text using freely available tools. The speech-to-text process can be run fully offline without relying on third parties and is fully reproducible. It takes however a considerable amount of processing time even on relatively powerful copmuters: if many hours of audio need to be processed, then this is probably not a viable solution at this stage and other options (mostly, relying on commercial vendors) should probably be preferred.
+
+The quality of the transcribed text even using *Whisper*'s `large` model is not perfect, but is of surprising accuracy. The text thus generated can easily be parsed to look for specific information or for quantitative analysis, as long as the some issues are kept in consideration, in particular varying spelling for names of people and places (e.g. Shoigu can also be Shaigu). When looking for specific patterns this is mostly rather easy to work around after some tentative exploration.
+
+The quality of the text transcribed and translated in a single step (a feature offered by *Whisper*) is not as good, and includes some more errors and inaccuracies. Indeed, you may prefer going through Prigozhin's [transcribed messages relying on the Russian version](./prigozhin_transcribed_ru.qmd) and running it through tools such as Google Translate rather than [the automatically transcribed and translated version resulting from *Whisper*](./prigozhin_transcribed_en.qmd). Yet, the quality is really not that bad, and text can mostly be read and processed, even if being mindful of the fact that there are issues with the text. Indeed, I recommend reading the transcription of Prigozhin's audio messages during the mutiny and the weeks that preceded it to see just how unhinged his criticism of Shoigu and Gerasimov had become; if one is allowed to criticise so very publicly the leadership of the army without as much as a rebuff, he may be (figuratively) excused from thinking that the country's leadership is really on his side.
+
+As multi-media and multi-format contents become more central to public discourse in Russia and elsewhere, and online spaces where spoken words may be more prominent than written words become more important for public discourse, researchers should expand their analytical toolbox to better account for such sources, even if just in order to define subsets of materials to be analysed qualitatively or explored through complementary approaches.

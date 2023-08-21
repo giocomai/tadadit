@@ -30,9 +30,8 @@ Prigozhin started to post audio messages on his official Telegram channel - the 
 
 The same contents available here for download can more conveniently be consulted at the following pages:
 
-- [**Read all transcripts in English**](/posts/2023-08-telegram_prigozhin/prigozhin_transcribed_en.qmd)
-- [**Read all transcripts in Russian**](/posts/2023-08-telegram_prigozhin/prigozhin_transcribed_ru.qmd)
-
+-   [**Read all transcripts in English**](/posts/2023-08-telegram_prigozhin/prigozhin_transcribed_en.qmd)
+-   [**Read all transcripts in Russian**](/posts/2023-08-telegram_prigozhin/prigozhin_transcribed_ru.qmd)
 
 ## Accuracy of the dataset
 
@@ -41,8 +40,7 @@ Contents presented here are the result of automatic transcription / translation.
 ::: callout-warning
 ## Work-in-progress
 
-**Not all audio messages have been transcribed yet. Currently this page shows some of the earliest and some of the most recent posts. A total of 408 audio messages will be included when the processing will be completed; this warning will then be removed. **
-
+**Not all audio messages have been transcribed yet. Currently this page shows some of the earliest and some of the most recent posts. A total of 408 audio messages will be included when the processing will be completed; this warning will then be removed.**
 :::
 
 ## Summary statistics
@@ -63,8 +61,8 @@ cat("<br />")
 
 ## Downloads
 
-- Russian version: [prigozhin_audio_files_ru.csv](prigozhin_audio_files_ru.csv)
-- English version: [prigozhin_audio_files_en.csv](prigozhin_audio_files_en.csv)
+-   Russian version: [prigozhin_audio_files_ru.csv](prigozhin_audio_files_ru.csv)
+-   English version: [prigozhin_audio_files_en.csv](prigozhin_audio_files_en.csv)
 
 ### About the identifier
 

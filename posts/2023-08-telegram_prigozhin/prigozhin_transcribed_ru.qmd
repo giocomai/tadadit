@@ -126,9 +126,21 @@ for (i in id_with_audio_files) {
   
 
   
+  
+
+  if (current_message$text=="") {
   cat("<p>")
   cat(stringr::str_c("__Text in the original post__: ", ifelse(current_message$text=="", "[empty]", current_message$text)))
-  cat("</p>")
+  cat("</p>")  
+  } else {
+      cat("<p>")
+          cat("<details>")
+            cat("<summary>Text in the original post:</summary>")
+      cat(stringr::str_c("__Text in the original post__: ", ifelse(current_message$text=="", "[empty]", current_message$text)))
+    cat("</details>")
+      cat("</p>")  
+  }
+  
   
 
   if (reply_message_exists) {
