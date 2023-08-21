@@ -5,7 +5,7 @@ author: Giorgio Comai
 date: 2023-05-16
 last-modified: 2023-05-16
 categories: [russia]
-image: "giocomai_many_words_and_cyrillic_text_coming_out_of_a_computer__9b5d514f-3065-408e-9d47-3c1c15020429.webp"
+image: "giocomai_audio_file_spectrum_with_Russian_military_in_the_bakgr_6dbd5883-e633-4acc-a2c5-344b60a33b90.webp"
 bibliography: references.bib
 execute: 
   cache: false
@@ -15,7 +15,7 @@ execute:
 
 **N.B. This post is actually in draft form and a work in progress, it has not reached its final version**
 
-## ![](giocomai_many_words_and_cyrillic_text_coming_out_of_a_computer__9b5d514f-3065-408e-9d47-3c1c15020429.webp) Context {#top-left-img}
+## ![](giocomai_audio_file_spectrum_with_Russian_military_in_the_bakgr_6dbd5883-e633-4acc-a2c5-344b60a33b90.webp) Context {#top-left-img}
 
 ```{r setup, echo = FALSE}
 knitr::opts_chunk$set(echo = FALSE,
@@ -81,11 +81,9 @@ kremlin.ru_en_values_df <- kremlin.ru_en |>
 kremlin.ru_en_metadata_l <- cas_generate_metadata(corpus = kremlin.ru_en)
 ```
 
-
-
 English-language version of Kremlin.ru has `r scales::number(kremlin.ru_en_metadata_l$total_items)` items in total published between `r kremlin.ru_en_metadata_l$start_date |> format("%d %B %Y")` and `r kremlin.ru_en_metadata_l$end_date |> format("%d %B %Y")`. If we count sentences, rather than items published, we have `r scales::number(nrow(kremlin.ru_en))` sentences in total in our corpus. Among them, `r scales::number(nrow(kremlin.ru_en_values_df))` make reference to "values".[^1]
 
-[^1]: It is not easy to remove completely all references to values that actually express a totally different meaning of the word, e.g. when it is used as a verb. To reduce their number, sentences such as "Russia greatly values" or "Russia values" (e.g. "Russia values its reputation as a reliable, proven partner..."), which are the most common such cases, have been removed from the dataset from the outset. 
+[^1]: It is not easy to remove completely all references to values that actually express a totally different meaning of the word, e.g. when it is used as a verb. To reduce their number, sentences such as "Russia greatly values" or "Russia values" (e.g. "Russia values its reputation as a reliable, proven partner..."), which are the most common such cases, have been removed from the dataset from the outset.
 
 Let's look at their distribution.
 
@@ -164,7 +162,6 @@ An argument could possibly be made that the increased number of publications on 
 
 [^2]: Excluding all press releases and focusing exclusiely on transcripts does not change significantly the broad trends that emerge from these graphs.
 
-
 Ultimately, however, it is not the number of references to "values" per se that is most relevant: what type of values have been talked about at different points in time may be more revealing.
 
 ```{r eval = FALSE}
@@ -177,7 +174,7 @@ values_en_summary_wide_df |>
 
 ```
 
-## First, what "values" are we talking about?
+## First, what "values" are we talking about? {#first-what-values-are-we-talking-about}
 
 ```{r}
 #kremlin.ru_en |> dplyr::slice_head(n = 10) |> dplyr::collect() |> View()
@@ -339,7 +336,7 @@ matches_df |>
 
 I will now proceed to different ways of looking at these data. First, here are all references to values found in transcripts, statements, and press releases published on the Kremlin's website between `r kremlin.ru_en_metadata_l$start_date |> format.Date("%d %B %Y")` and `r kremlin.ru_en_metadata_l$end_date |> format.Date("%d %B %Y")`. Look at both tabs to see the quotes in either English or Russian.
 
-For easier reference, keywords such as "[<strong>values</strong>]{style="background-color:`r types_colour_df$h_colour[types_colour_df$type=="values"]`;"}", and different types of values are highlighted and colour-coded - [traditional]{style="background-color:`r types_colour_df$h_colour[types_colour_df$type=="traditional"]`;"}, [Western]{style="background-color:`r types_colour_df$h_colour[types_colour_df$type=="Western"]`;"}, [universal]{style="background-color:`r types_colour_df$h_colour[types_colour_df$type=="universal"]`;"}, [common]{style="background-color:`r types_colour_df$h_colour[types_colour_df$type=="common"]`;"}, and [negative]{style="background-color:`r types_colour_df$h_colour[types_colour_df$type=="negative"]`;"}.
+For easier reference, keywords such as "\[<strong>values</strong>\]{style="background-color:`r types_colour_df$h_colour[types_colour_df$type=="values"]`;"}", and different types of values are highlighted and colour-coded - \[traditional\]{style="background-color:`r types_colour_df$h_colour[types_colour_df$type=="traditional"]`;"}, \[Western\]{style="background-color:`r types_colour_df$h_colour[types_colour_df$type=="Western"]`;"}, \[universal\]{style="background-color:`r types_colour_df$h_colour[types_colour_df$type=="universal"]`;"}, \[common\]{style="background-color:`r types_colour_df$h_colour[types_colour_df$type=="common"]`;"}, and \[negative\]{style="background-color:`r types_colour_df$h_colour[types_colour_df$type=="negative"]`;"}.
 
 ::: column-screen-inset
 ::: panel-tabset
@@ -974,8 +971,6 @@ cas_read_corpus(project = "Russian media",
                 token = "sentences",
                 partition = "year")
 ```
-
-
 
 ## Leftovers
 
