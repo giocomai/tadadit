@@ -100,6 +100,23 @@ for (i in id_with_audio_files) {
   current_message <- messages_df |> 
     dplyr::filter(id == i)
   
+  if (stringr::str_starts(string = current_message$text, pattern = "#")) {
+    prigozhin_id <- stringr::str_extract(string = current_message$text, pattern = "#[[:digit:]]+")
+  } else {
+    prigozhin_id <- "NA"
+  }
+  
+  
+  id_string <- stringr::str_c("Telegram_id: ", i, "/ Prigozhin_id: ", prigozhin_id)
+  
+  
+  section_id_string <- stringr::str_remove_all(id_string, "#|:|/") |> 
+    stringr::str_replace_all(pattern = " ", replacement = "-") |> 
+    stringr::str_to_lower()
+  
+  section_link <- stringr::str_c("./prigozhin_transcribed_ru.qmd#", section_id_string)
+  
+  
   current_reply_to_message <- messages_df |> 
     dplyr::filter(id == current_message$reply_to_message_id)
   
@@ -112,6 +129,9 @@ for (i in id_with_audio_files) {
     dplyr::filter(id == i) 
   
   #cat(stringr::str_c('<script async src="https://telegram.org/js/telegram-widget.js?22" data-telegram-post="concordgroup_official/', i, '" data-width="100%"></script>'))
+  cat(stringr::str_c("##### ", id_string))  
+    cat("\n &nbsp;  \n")  
+
     cat(stringr::str_c("__Time posted__: ", current_message$datetime))
   cat("\n &nbsp;  \n")
   
@@ -176,6 +196,10 @@ for (i in id_with_audio_files) {
     cat("<br />")
     cat(current_transcribed_en |> dplyr::pull(text) |> stringr::str_c(collapse = "<br />"))
     cat("</p>")
+    cat("<p>")
+      cat(stringr::str_c("*[See this post transcribed in Russian](", section_link, ")*"))
+   cat("<br />")
+   cat("</p>")
     cat("<hr style='height: 10px;'/>")
   }
 }

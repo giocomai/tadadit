@@ -4,11 +4,9 @@ description: "Prigozhin's press service actively responds via Telegram to questi
 author: Giorgio Comai
 date: 2023-08-22
 last-modified: 2023-08-22
-categories: [tutorials, russia, prigozhin]
+categories: [tutorials, russia, prigozhin, telegram]
 image: "giocomai_visual_representation_of_an_audio_wave_file_an_audio_m_5ae21a9b-dd21-4a79-95bb-1a9e35d1eaf4.webp"
 ---
-
-{{< include ./../../litreview/_early_disclaimer.qmd >}}
 
 ::: callout-note
 ## Summary of key results
@@ -17,7 +15,7 @@ image: "giocomai_visual_representation_of_an_audio_wave_file_an_audio_m_5ae21a9b
 
 -   exploring mixed-media contents published on Telegram channels may be challenging, but feasible
 
--   just looking at [Changes in the frequency of posting] it is possible to observe Prigozhin's radicalisation journey
+-   just looking at [changes in the frequency of posting] it is possible to observe Prigozhin's radicalisation journey
 
 -   a full dataset with all of Prigozhin's audio messages transcribed is [available for download](/datasets/prigozhin_audio_files), or to consult in a single page [in Russian](./prigozhin_transcribed_ru.qmd) or with [automatic translation in English](./prigozhin_transcribed_en.qmd)
 :::
@@ -94,9 +92,9 @@ First, there is no official website to take as a point of reference. The officia
 
 The Telegram channel itself was opened only in November 2022, with message #897. Previous messages were probably published first on VKontakte (now not reachable), and presumably reposted from there in other Telegram channels.
 
-Telegram channel "[Prigozhin's hat](https://t.me/Prigozhin_hat/)", for example, has over 500.000 subscribers and was opened [in February 2019](https://t.me/Prigozhin_hat/3). Even earlier posts look exactly the same as ones published on the official channel, and [it appears they are](https://t.me/Prigozhin_hat/3823) effectively just (partially automated) re-posts. However, unfortunately, they do not include the same numeric id used in official posts. Besides, there are some more contents published on *Prigozhin's hat* that do not feature on the official channel, including a few posts published *after* the mutiny. These are mostly forwarded from other Prigozhin-related channels such as "[Razgruzka Vagnera](https://t.me/razgruzka_vagnera/)" or "[SOMB - 'Tourists in Africa](https://t.me/officersunion)" (related to Wagner's presence in Africa).
+Telegram channel "[Prigozhin's hat](https://t.me/Prigozhin_hat/)", for example, has over 500.000 subscribers and was opened [in February 2019](https://t.me/Prigozhin_hat/3). Even earlier posts look exactly the same as ones published on the official channel, and [it appears they are](https://t.me/Prigozhin_hat/3823) effectively just (partially automated) re-posts. However, unfortunately, they do not include the same numeric id used in official posts. Besides, there are some more contents published on *Prigozhin's hat* that do not feature on the official channel, including a few posts published *after* the mutiny. These are mostly forwarded from other Prigozhin-related channels such as "[Razgruzka Vagnera](https://t.me/razgruzka_vagnera/)" or "[SOMB - 'Tourists in Africa](https://t.me/officersunion)" (related to Wagner's presence in Africa). On 21 August 2023, for example, [a new video post by Prigozhin](https://t.me/Prigozhin_hat/3828) aimed at recruiting personnel for Wagner missions in Africa appeared; an audio message posted as a response to a question supposedly by an African media posted as a screenshot in French [has appeared on the same day](https://t.me/Prigozhin_hat/3830). A new chapter in Prigozhin's communication efforts may be beginning.
 
-"[Prigozhin's hat](https://t.me/Prigozhin_hat/)" may at this stage be the easiest source for earlier posts issued by Prigozhin, while [\@concordgroup_official](https://t.me/concordgroup_official/) is the most consistent source for recent months. As will appear from the following sections, it is really starting from early 2023 the Prigozhin stepped-up his virulent rhetoric expressed through audio messages, so in many respects it makes sense to focus on more recent contents and look at previous contents only as a term of reference.
+"[Prigozhin's hat](https://t.me/Prigozhin_hat/)" may at this stage be the easiest source for earlier posts issued by Prigozhin (as well as possibly for the post-mutiny period)\^\[Others sources may well be available; I welcome suggestions about full archives if available.\], while [\@concordgroup_official](https://t.me/concordgroup_official/) is the most consistent source for recent months. As will appear from the following sections, it is really starting from early 2023 the Prigozhin stepped-up his virulent rhetoric expressed through audio messages, so in many respects it makes sense to focus on more recent contents and look at previous contents only as a term of reference.
 
 To summarise, contents posted by Prigozhin's press service are a combination of:
 
@@ -301,7 +299,6 @@ Conveniently, this is accompanied by [another post](https://t.me/Prigozhin_hat/3
 ```{=html}
 <script async src="https://telegram.org/js/telegram-widget.js?22" data-telegram-post="Prigozhin_hat/3795" data-width="100%"></script>
 ```
-
 In this case, everything seems easy: we can in principle ignore both the screenshotted picture and the audio-file, as the very same contents are presented also in textual format.
 
 But then, in other occasions there are only audio-files or voice messages with no context whatsoever. This was the case, for example, for most messages posted during the mutiny on 24 June, including [the one that announced its end](https://t.me/concordgroup_official/1303):
@@ -810,7 +807,7 @@ ggplot() +
 
 A separate post with further analysis of the contents may follow.
 
-## Methodological conclusions
+## Conclusions
 
 Audio messages, in the case of Prigozhin, and video messages in the case of many other influential voices commenting the war for local audiences in Russia have become an important part of the public conversation about the war, including topics and perspectives that do not appear on traditional media and may be scarcely mentioned in written text.
 
@@ -818,6 +815,8 @@ This post ([full code available on this website's repository](https://github.com
 
 The quality of the transcribed text even using *Whisper*'s `large` model is not perfect, but is of surprising accuracy. The text thus generated can easily be parsed to look for specific information or for quantitative analysis, as long as the some issues are kept in consideration, in particular varying spelling for names of people and places (e.g. Shoigu can also be Shaigu). When looking for specific patterns this is mostly rather easy to work around after some tentative exploration.
 
-The quality of the text transcribed and translated in a single step (a feature offered by *Whisper*) is not as good, and includes some more errors and inaccuracies. Indeed, you may prefer going through Prigozhin's [transcribed messages relying on the Russian version](./prigozhin_transcribed_ru.qmd) and running it through tools such as Google Translate rather than [the automatically transcribed and translated version resulting from *Whisper*](./prigozhin_transcribed_en.qmd). Yet, the quality is really not that bad, and text can mostly be read and processed, even if being mindful of the fact that there are issues with the text. Indeed, I recommend reading the transcription of Prigozhin's audio messages during the mutiny and the weeks that preceded it to see just how unhinged his criticism of Shoigu and Gerasimov had become; if one is allowed to criticise so very publicly the leadership of the army without as much as a rebuff, he may be (figuratively) excused from thinking that the country's leadership is really on his side.
+The quality of the text transcribed and translated in a single step (a feature offered by *Whisper*) is not as good, and includes some more errors and inaccuracies. Indeed, you may prefer going through Prigozhin's [transcribed messages relying on the Russian version](./prigozhin_transcribed_ru.qmd) and running it through tools such as Google Translate rather than [the automatically transcribed and translated version resulting from *Whisper*](./prigozhin_transcribed_en.qmd). Yet, the quality is really not that bad, and text can mostly be read and processed, even if being mindful of the fact that there are issues with the text.
+
+Indeed, I recommend reading the transcription of Prigozhin's audio messages during the mutiny and the weeks that preceded it to see just how unhinged his criticism of Shoigu and Gerasimov had become; if one is allowed to criticise so very publicly the leadership of the army without being rebuffed, he may be (figuratively) excused from thinking that the country's leadership is really on his side.
 
 As multi-media and multi-format contents become more central to public discourse in Russia and elsewhere, and online spaces where spoken words may be more prominent than written words become more important for public discourse, researchers should expand their analytical toolbox to better account for such sources, even if just in order to define subsets of materials to be analysed qualitatively or explored through complementary approaches.
