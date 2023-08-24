@@ -152,9 +152,9 @@ First, let's have a look at some basic information about the dataset we have:
 
 **Total number of audio files**: `r scales::number(total_audio_files)`
 
-**Earliest post with audio file**: `r min(transcribed_ru_df$date)`
+**Earliest post with audio file**: `r min(transcribed_ru_df$datetime) |> lubridate::as_date()`
 
-**Latest post with audio file**: `r max(transcribed_ru_df$date)`
+**Latest post with audio file**: `r max(transcribed_ru_df$datetime) |> lubridate::as_date()`
 
 **Total duration of audio files**: `r as.character(round(total_audio_duration))`
 
@@ -676,10 +676,22 @@ transcribe_audio(messages_df = messages_df,
 ```
 
 ```{r prigozhin_transcribed_read, echo = FALSE, eval = TRUE}
+messages_with_prigozhin_id <- messages_df |> 
+  dplyr::mutate(prigozhin_id = dplyr::if_else(
+    condition = stringr::str_starts(string = text, pattern = "#"),
+    true = stringr::str_extract(string = text, pattern = "#[[:digit:]]+"),
+    false = NA_character_,
+    missing = NA_character_
+  )) |> 
+  dplyr::select(id, prigozhin_id)
 
-transcribed_ru_df <- read_transcriptions(path = "telegram_concordgroup_official_audio_transcribed_large")
+transcribed_ru_df <- read_transcriptions(path = "telegram_concordgroup_official_audio_transcribed_large")  |> 
+  dplyr::left_join(messages_with_prigozhin_id, by = "id") |> 
+  dplyr::relocate(id, prigozhin_id)
 
-transcribed_en_df <- read_transcriptions(path = "telegram_concordgroup_official_audio_transcribed_translated_large")
+transcribed_en_df <- read_transcriptions(path = "telegram_concordgroup_official_audio_transcribed_translated_large")  |> 
+  dplyr::left_join(messages_with_prigozhin_id, by = "id") |> 
+  dplyr::relocate(id, prigozhin_id)
 
 # transcribed_ru_df |> 
 #   dplyr::left_join(y = messages_df |> 
@@ -710,10 +722,11 @@ transcribed_en_df |>
       pageLength =  5,
       columnDefs = list(
         list(width = "5%", targets = 0),
-        list(width = "10%", targets = 1),
-        list(width = "5%", targets = 2),
+        list(width = "5%", targets = 1),
+        list(width = "10%", targets = 2),
         list(width = "5%", targets = 3),
-        list(width = "65%", targets = 4)),
+        list(width = "5%", targets = 4),
+        list(width = "60%", targets = 5)),
       dom = 'pti'
     ),
     filter = list(position = "top"))
@@ -735,10 +748,11 @@ transcribed_ru_df |>
       pageLength =  5,
       columnDefs = list(
         list(width = "5%", targets = 0),
-        list(width = "10%", targets = 1),
-        list(width = "5%", targets = 2),
+        list(width = "5%", targets = 1),
+        list(width = "10%", targets = 2),
         list(width = "5%", targets = 3),
-        list(width = "65%", targets = 4)),
+        list(width = "5%", targets = 4),
+        list(width = "60%", targets = 5)),
       dom = 'pti'
     ),
     filter = list(position = "top"))

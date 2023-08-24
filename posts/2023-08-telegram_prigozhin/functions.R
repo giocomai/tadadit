@@ -211,7 +211,12 @@ transcribe_audio <- function(messages_df,
     dplyr::select(c("id", "file")) |> 
     dplyr::filter(is.na(file)==FALSE) |> 
     dplyr::mutate(extension = fs::path_ext(file)) |> 
-    # dplyr::distinct(extension)
+    dplyr::mutate(extension = dplyr::if_else(condition = extension == "",
+                                             true = stringr::str_extract(file, "\\.[[:alnum:]]+$") |> 
+                                               stringr::str_remove(pattern = "\\."), 
+                                             false = extension) |> 
+                    stringr::str_to_lower()) |> 
+    #dplyr::distinct(extension)
     dplyr::filter(extension %in% ext_l[[type[1]]]) |> 
     purrr::transpose()
   

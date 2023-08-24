@@ -2,8 +2,8 @@
 title: "Prigozhin's audio files, transcribed and translated"
 description: "N.B. Automatic transcription and translation, not checked for accuracy"
 author: Giorgio Comai
-date: 2023-08-08
-last-modified: 2023-08-09
+date: 2023-08-22
+last-modified: 2023-08-23
 categories: [russia, prigozhin, transcription]
 ---
 
@@ -35,24 +35,6 @@ id_with_audio_files <- transcribed_en_df |>
   dplyr::pull(id)
 ```
 
-::: callout-warning
-## Work-in-progress
-
-**Not all audio messages have been transcribed yet. Currently this page shows some of the earliest and some of the most recent posts. Posts are shown in order of publication.**
-
-```{r results='asis'}
-cat("__Total number of posts including audio messages__: ")
-cat(scales::number(nrow(audio_messages_df)))
-cat("<br />")
-if (current_language == "ru") {
-  cat("__Number of posts processed__: ")
-  cat(scales::number(nrow(transcribed_ru_df |> dplyr::distinct(id))))
-} else if (current_language == "en") {
-  cat("__Number of posts processed and included in this document__: ")
-  cat(scales::number(nrow(transcribed_en_df  |> dplyr::distinct(id))))
-}
-```
-:::
 
 ::: callout-note
 ## Basic information about this document
