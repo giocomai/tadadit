@@ -105,16 +105,18 @@ corpus_df |>
 
 ```{r piggyback, eval = FALSE}
 
+castarter::cas_write_corpus(corpus = corpus_df,
+                            partition = "year")
 
 data_path <- fs::path(fs::path_home_r(), 
                       "R",
                       "castarter_tadadit_data")
 
+fs::dir_create(data_path)
 release_file <- fs::path(data_path, 
                          "kremlin.ru_en.csv.gz")
 
-cas_read_db_contents_data() %>% 
-  dplyr::collect() %>% 
+corpus_df %>% 
   readr::write_csv(file = release_file)
 
 data_df <- readr::read_csv(release_file)

@@ -1,0 +1,110 @@
+---
+title: "Mainstreaming structured analysis of web contents in post-Soviet area studies"
+subtitle: "Find the needle, characterise the haystack, and build community"
+author: Giorgio Comai ([OBCT](https://www.balcanicaucaso.org/)/[CCI](https://www.cci.tn.it/))
+#bibliography: references.bib
+format:
+  revealjs: 
+    theme: beige
+    slide-number: true
+    controls: true
+    chalkboard: false
+    include-in-header: append-title-slide.html
+    preview-links: true
+css: style.css
+execute: 
+  cache: true
+---
+
+```{r setup, echo=FALSE}
+#remotes::install_github("giocomai/castarter")
+library("castarter")
+
+```
+
+## The project: Text as data & data in the text
+
+**Studying conflicts in post-Soviet spaces through structured analysis of textual contents available on-line**
+
+[**tadadit.xyz**](https://tadadit.xyz){preview-link="true"}
+
+### Funding and disclaimers
+
+::: r-fit-text
+This project is **carried out with the support of the Italian Ministry of Foreign Affairs and International Cooperation** under art. 23 bis, D.P.R. 18/1967. All opinions expressed within the scope of this project represent the opinion of their author and not those of the Ministry.
+
+> "*Le posizioni contenute nel presente report sono espressione esclusivamente degli autori e non rappresentano necessariamente le posizioni del Ministero degli Affari Esteri e della Cooperazione Internazionale"*
+:::
+
+# Starting point
+
+In post-Soviet area studies:
+
+-   so much of our research process is based on online sources
+-   our encounter with online sources is overwhelmingly serendipitous
+-   it's all fine, but we're missing out
+
+## What are the benefits of a structured approach?
+
+-   find the needle
+-   characterise the haystack (or put the needle in context)
+-   validate, dismiss, correct assumptions more efficiently
+-   case selection, timeframe selection
+-   be in the position to describe what you did, and, if you didn't find what you were looking for, *move on*
+
+# Structured ≠ quantitative
+
+-   "structured" does not imply quantitative approaches
+-   "structured" does not imply epistemological re-thinking
+
+## Examples
+
+-   **discoursive:**
+    -   has Crimea been prominent in official or media discourse before 2014?
+    -   when did this obsession with Russophobia, denazification, etc. start?
+-   **finding data/evidence:**
+    -   all sentences in Transnistria's news that include "pension" AND either digits, percent, or rouble
+
+## Who's using structured approaches?
+
+-   Mostly people for whom the method is central to their research:
+    -   quantitatively-oriented researchers (text as data)
+    -   media analysts
+-   but their methods are often difficult to access for researchers with a different background
+
+## What are the obstacles?
+
+-   technical complexity
+-   costs
+-   licensing issues
+-   limited availability of ready-to-use corpora
+
+## How can we overcome these obstacles?
+
+-   technical complexity -> community
+-   costs -> community
+-   licensing issues -> community
+-   limited availability of ready-to-use corpora -> community
+
+## Easier access
+
+- [interactive interfaces](https://explore.tadadit.xyz/kremlin_en/){preview-link="true"} / [video](img/kremlin_en_example.webm){preview-link="true"}
+
+### Pre-processed corpora
+
+- [https://tadadit.xyz/datasets/](https://tadadit.xyz/datasets/){preview-link="true"}
+- [https://discuss-data.net/](https://discuss-data.net/)
+
+### Licensing
+
+1. interface: just a custom search engine?
+2. share it within research networks?
+3. share recipe to replicate
+
+# Why bother?
+
+- maybe it's not really useful
+- obviously, there's not a sensible incentive structure
+- why bother, really?
+- if we think of ourselves as a __community__ of scholars, maybe this can work and enhance our research workflows
+
