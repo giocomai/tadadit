@@ -1,7 +1,7 @@
 ---
 title: "Mainstreaming structured analysis of web contents in post-Soviet area studies"
-subtitle: "Find the needle, characterise the haystack, and build community"
-author: Giorgio Comai ([OBCT](https://www.balcanicaucaso.org/)/[CCI](https://www.cci.tn.it/))
+subtitle: "*Find the needle, characterise the haystack, and build community*"
+author: __Giorgio Comai ([OBCT](https://www.balcanicaucaso.org/)/[CCI](https://www.cci.tn.it/))__
 #bibliography: references.bib
 format:
   revealjs: 
@@ -21,6 +21,8 @@ execute:
 library("castarter")
 
 ```
+
+
 
 ## The project: Text as data & data in the text
 
@@ -68,11 +70,14 @@ In post-Soviet area studies:
 ## Who's using structured approaches?
 
 -   Mostly people for whom the method is central to their research:
+    -   content analysis
+    -   often discourse analysis
     -   quantitatively-oriented researchers (text as data)
-    -   media analysts
--   but their methods are often difficult to access for researchers with a different background
 
-## What are the obstacles?
+-   their methods are often difficult to access for researchers with a different background
+
+
+## What are the obstacles to wider uptake?
 
 -   technical complexity
 -   costs
@@ -100,6 +105,18 @@ In post-Soviet area studies:
 1. interface: just a custom search engine?
 2. share it within research networks?
 3. share recipe to replicate
+
+## Finally, if you do the fancy structured analysis thing, think of the readers who usually don't
+
+
+- "I did the fancy thing"
+- "if you're also able to do fancy things, here's how you can replicate what I did"
+
+### Better:
+
+- with one click and no technical skills, you can see what I found in its original context ([example](https://tadadit.xyz/posts/2023-05-conservative-traditional-values-russia/){preview-link="true"})
+- even better, you can test alternative hypotheses yourself
+
 
 # Why bother?
 
