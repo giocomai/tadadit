@@ -64,7 +64,7 @@ total_items <- nrow(corpus_df)
 ```{r results='asis'}
 body_text <- stringr::str_c(
   "**Dataset name**: ng.ru_ru",
-  "**Dataset description**: all artciles published on *Nezavisimaya Gazeta* starting with 2018",
+  "**Dataset description**: all articles published on *Nezavisimaya Gazeta* starting with 2018",
   paste("**Start date**:", min_date),
   paste("**End date**:", max_date),
   paste("**Total items**:", scales::number(total_items)),
@@ -103,7 +103,7 @@ corpus_df |>
 words_per_day_df <- corpus_df |> 
   cas_count_total_words(pattern = "[\\w]+") |> 
   mutate(date = lubridate::as_date(date),
-         string = "total words")
+         pattern = "total words")
 
 words_per_day_df |> 
   cas_summarise(period = "year", auto_convert = TRUE) |>
