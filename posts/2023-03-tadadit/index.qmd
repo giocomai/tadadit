@@ -2,8 +2,8 @@
 title: "Introducing 'tadadit.xyz'"
 description: "A short introduction to the core principles and ideas at the basis of this initiative."
 author: Giorgio Comai
-date: 2023-03-15
-last-modified: 2023-03-15
+date: 2023-03-12
+last-modified: 2023-03-12
 categories: [tadadit]
 image: "giocomai_computer_screen_with_text_as_data_in_cyrillic_ddd3f932-3357-43b4-865b-ab2ca8e5a048.webp"
 ---

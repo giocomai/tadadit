@@ -963,23 +963,4 @@ pervy1tv.ru_ru_values_last_word_df |>
   ggplot2::theme(legend.title = ggplot2::element_blank())
 ```
 
-## Tsargrad
 
-```{r}
-cas_read_corpus(project = "Russian media",
-                website = "tsargrad.tv_ru",
-                token = "sentences",
-                partition = "year")
-```
-
-## Leftovers
-
-This approach gives hints about trends, but is not fully satisfying as some expressions that such as democracy and freedom that were used with positive connotations in the early years under analysis, are then used to express criticism of the West, e.g.:
-
-> "They can also continue to rob everyone under the guise of democracy and freedoms, to impose neoliberal and essentially totalitarian values" - [Source](http://en.kremlin.ru/events/president/transcripts/70565)
-
-> "New Western values that are in vogue have been brought to the point of absurdity." - [Source](http://en.kremlin.ru/events/councils/70046)
-
-Against:
-
-"pseudo-values" "moral, religious, and family values" "patriotic values"

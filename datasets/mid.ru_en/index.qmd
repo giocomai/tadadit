@@ -49,13 +49,16 @@ total_items <- nrow(corpus_df)
 ```
 
 ```{r results='asis'}
-body_text <- stringr::str_c("**Dataset name**: mid.ru_en",
-                            "**Dataset description**: All English-language news items published on the website of the Russian MFA",
-                            paste("**Start date**:", min_date),
-                            paste("**End date**:", max_date),
-                            paste("**Total items**:", scales::number(total_items)),
-                            paste("**Available columns**:", colnames(corpus_df) %>% 
-                                    stringr::str_c(collapse = "; ")),
+body_text <- stringr::str_c(
+  "**Dataset name**: mid.ru_en",
+  "**Dataset description**: All English-language news items published on the website of the Russian MFA",
+  paste("**Start date**:", min_date),
+  paste("**End date**:", max_date),
+  paste("**Total items**:", scales::number(total_items)),
+  paste("**Available columns**:", colnames(corpus_df) %>% 
+  stringr::str_c(collapse = "; ")),
+    paste("**License**:", "[Materials on the website of the Russian Ministry of Foreign Affairs are generally accessible and open for non-commercial use (personal, family, education, research, etc.).](https://mid.ru/ru/ob_ispolzovanii_informatsii_sayta/"),
+    paste("**Link for download**: [mid.ru_en](https://github.com/giocomai/tadadit/releases/tag/mid.ru_en)"),
                             sep = "\n\n")
 
 cat(body_text)
