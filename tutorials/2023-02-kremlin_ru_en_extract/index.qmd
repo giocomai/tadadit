@@ -3,7 +3,7 @@ title: "Extracting textual contents from the Kremlin's website with `castarter`"
 description: "A first introduction to extracting textual contents for further analysis"
 author: Giorgio Comai
 date: 2023-02-27
-last-modified: 2023-03-14
+last-modified: 2023-10-26
 categories: [tutorials, russia]
 image: "giocomai_many_words_and_cyrillic_text_coming_out_of_a_computer__9b5d514f-3065-408e-9d47-3c1c15020429.webp"
 bibliography: references.bib
@@ -490,7 +490,7 @@ We see a slight increase in the number of posts since 2008, a slump in 2020 (cov
 words_per_day_df <- corpus_df |> 
   cas_count_total_words() |> 
   mutate(date = lubridate::as_date(date),
-         string = "total words")
+         pattern = "total words")
 
 words_per_day_df |> 
   cas_summarise(period = "year", auto_convert = TRUE) |>
@@ -577,10 +577,10 @@ aggsummary <- daiquiri:::summarise_aggregated_data(aggregated_data)
 
 daiquiri:::plot_overview_combo_static(
   agg_fields = aggregated_data$aggregated_fields,
-  agg_fun = "n",
+  aggregation_function = "n",
   lineplot_field_name = aggregated_data$timepoint_field_name,
-  lineplot_fill_colour = "pink",
-  heatmap_fill_colour = "darkred",
+  # lineplot_fill_colour = "pink",
+  # heatmap_fill_colour = "darkred",
   title = paste("Records per", aggregated_data$aggregation_timeunit)
 )
 ```
@@ -591,10 +591,10 @@ daiquiri:::plot_overview_combo_static(
 #| message: false
 daiquiri:::plot_overview_combo_static(
   agg_fields = aggregated_data$aggregated_fields,
-  agg_fun = "missing_n",
+  aggregation_function = "missing_n",
   lineplot_field_name = "[ALL_FIELDS_COMBINED]",
-  lineplot_fill_colour = "lightblue",
-  heatmap_fill_colour = "darkblue",
+  # lineplot_fill_colour = "lightblue",
+  # heatmap_fill_colour = "darkblue",
   title = paste(
     "Total missing values per",
     aggregated_data$aggregation_timeunit
@@ -635,7 +635,7 @@ Here's just a couple of quick examples for reference. But here is where this tut
 
 ```{r}
 corpus_df |> 
-  cas_count(string = "Ukrain") |> 
+  cas_count(pattern = "Ukrain") |> 
   cas_summarise(period = "year",
                 auto_convert = TRUE) |> 
   rename(year = date) |> 
@@ -657,7 +657,7 @@ corpus_df |>
 
 ```{r}
 corpus_df |> 
-  cas_count(string = "Collective West") |> 
+  cas_count(pattern = "Collective West") |> 
   cas_summarise(period = "year",
                 auto_convert = TRUE) |> 
   rename(year = date) |> 
