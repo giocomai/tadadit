@@ -1,0 +1,11 @@
+/*-- scss:defaults --*/
+
+$presentation-heading-letter-spacing: normal;
+
+/*-- scss:rules --*/
+
+
+.reveal .slides h2 {
+  letter-spacing: 1.5 !important;
+}
+

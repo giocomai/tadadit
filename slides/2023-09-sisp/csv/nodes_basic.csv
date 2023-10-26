@@ -1,0 +1,6 @@
+id,text,classifier
+1,Download index pages,
+2,Extract links to content pages,
+3,Download content pages,
+4,Extract text and metadata,
+5,Textual corpus built,

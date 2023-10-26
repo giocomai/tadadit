@@ -4,6 +4,7 @@ description: "In order to analyse text, one needs to have text in a structured f
 author: "Giorgio Comai"
 date: "2022-11-07"
 categories: [overview, castarter, rstats]
+embed-resources: true
 image: "giocomai_text_as_data_on_a_computer_screen_on_a_desk_sketch_in__7464326f-d3d9-4670-b32f-a3641e0f8322.webp"
 ---
 

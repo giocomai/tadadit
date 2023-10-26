@@ -11,6 +11,8 @@ format:
     chalkboard: false
     include-in-header: append-title-slide.html
     preview-links: true
+    pdf-max-pages-per-slide: 1
+    embed-resources: true
 css: style.css
 execute: 
   cache: true

@@ -1,0 +1,915 @@
+---
+title: "Who said it first?"
+subtitle: "Investigating the diffusion of the Kremlin's buzzwords before they entered the mainstream"
+author: Giorgio Comai ([OBCT](https://www.balcanicaucaso.org/)/[CCI](https://www.cci.tn.it/))
+bibliography: references.bib
+format:
+  revealjs: 
+    theme: beige
+    slide-number: true
+    controls: true
+    chalkboard: false
+    include-in-header: append-title-slide.html
+    preview-links: true
+    pdf-max-pages-per-slide: 1
+    embed-resources: true
+execute: 
+  cache: true
+---
+
+```{r setup, echo=FALSE}
+#remotes::install_github("giocomai/castarter")
+library("castarter")
+source("functions.R")
+source("datasets.R")
+
+```
+
+## The project: Text as data & data in the text
+
+**Studying conflicts in post-Soviet spaces through structured analysis of textual contents available on-line**
+
+[**tadadit.xyz**](https://tadadit.xyz){preview-link="true"}
+
+### Funding and disclaimers
+
+::: r-fit-text
+This project is **carried out with the support of the Italian Ministry of Foreign Affairs and International Cooperation** under art. 23 bis, D.P.R. 18/1967. All opinions expressed within the scope of this project represent the opinion of their author and not those of the Ministry.
+
+> "*Le posizioni contenute nel presente report sono espressione esclusivamente degli autori e non rappresentano necessariamente le posizioni del Ministero degli Affari Esteri e della Cooperazione Internazionale"*
+:::
+
+# Context
+
+## Starting point
+
+-   There are some expressions that seem to have gained prominence starting with Russia's invasion of Ukraine.
+-   They have become shorthands to define the war, its purpose, and the enemy
+-   Using text-mining techniques it may possible to find out more about who used them first
+
+⇨ gain some insights on cultural points of reference of the Kremlin and on the radicalisation journey of public discourse in Russia.
+
+## How did these expressions enter the mainstream?
+
+-   **Preliminary question**: did they really gain prominence only with the invasion?
+
+-   Were they introduced by the Kremlin, and then picked up by the media?
+
+-   Or were they first popularised by the media, and only later entered the official discourse?
+
+-   Or were they used only by *some* media earlier, and if so, which ones?
+
+## In dialogue with the literature
+
+::: smaller
+-   "Russian world" [@oloughlin2017; @starodubtseva2022; @kosienkowski2021]
+-   "Novorossiya" [@oloughlin2016; @laruelle2016; @suslov2017]
+-   "conservative/traditional values" [@laruelle2016a]
+-   "collective West" [@chimiris2022; @comai2023]
+-   "russophobia" [@feklyunina2012; @comai2021]
+-   "denazification" [@smart2022; @knott2023]
+-   reframing of history [@mcglynn2020].
+:::
+
+## Preliminary results \[1/2\]
+
+-   some of these buzzwords entered the official and media mainstream only in 2022, others starting with 2014
+
+-   mainstream media pick up on these buzzwords *after* they appear in official discourse
+
+-   key buzzwords that accompanied the invasion were already established in at least one fringe nationalist publication (namely, *Zavtra*).
+
+## Preliminary results \[2/2\]
+
+⇨ keywords previously used only in marginal nationalist circles have appeared in the Kremlin's official discourse in recent years, most distinctly starting with Russia's invasion of Ukraine, without obvious intermediary steps
+
+⇨ these may be evidence of Vladimir Putin's own radicalisation journey, or at least that speech writers and communication professionals working for the Kremlin took inspiration from this previously marginal cultural space
+
+## Case selection: which buzzwords?
+
+Expressions immediately associated with the war
+
+-   special military operation
+
+-   denazification
+
+Expressions used to put war in context
+
+-   collective West
+
+-   anglosaxons
+
+-   russophobia
+
+-   ~~traditional values~~
+
+## Case selection: which sources? \[1/2\]
+
+**Russian institutions**:
+
+-   Kremlin
+-   Duma
+-   MFA
+
+**Russian mainstream media**:
+
+-   1tv.ru (mainstream pro-government TV)
+-   rg.ru (government-owned newspaper)
+-   kp.ru (tabloid / only politics section)
+-   ng.ru (more analytical / opinion)
+
+## Case selection: which sources? \[2/2\]
+
+**Russian fringe nationalist media**:
+
+-   Tsargrad (nationalist TV, new, wider reach)
+
+-   Zavtra.ru (nationalist weekly, publishing since the 1990s)
+
+# The tech
+
+## `castarter`
+
+**Content Analysis Starter Toolkit for the R programming language** - <https://github.com/giocomai/castarter>
+
+::: {style="display: inline;"}
+::: {style="float: right; width: 30%;"}
+[![](img/castarter_logo_transparent.webp){fig-align="right"}](https://github.com/giocomai/castarter)
+:::
+
+::: {style="float: left; width: 70%;"}
+-   streamlined text-mining
+-   keep records on the download process
+-   facilitate file management and caching
+-   support memory-efficient processing
+-   facilitate corpus updates
+-   explore and share data via web interfaces
+:::
+:::
+
+## A basic workflow
+
+```{r basic diagram, echo=FALSE, include=TRUE}
+library("readr")
+library("nomnomlgraph")
+
+edges_basic <- read_csv(
+  file = "csv/edges_basic.csv",
+  col_types = cols(
+    from = col_character(),
+    to = col_character(),
+    association = col_character()
+  )) 
+
+nodes_basic <- read_csv(
+  file = "csv/nodes_basic.csv",
+  col_types = cols(
+    id = col_character(),
+    text = col_character(),
+    classifier = col_character()
+  )) 
+
+nn_graph(nodes = nodes_basic, 
+         edges = edges_basic,
+         svg = FALSE,
+         font = "Roboto Condensed",
+         height = 500)
+
+```
+
+## 
+
+```{r full diagram, echo=FALSE, include=TRUE}
+library("readr", warn.conflicts = FALSE)
+edges_full <- read_csv(
+  file = "csv/edges_full.csv",
+  col_types = cols(
+    from = col_character(),
+    to = col_character(),
+    association = col_character()
+  )) 
+
+nodes_full <- read_csv(
+  file = "csv/nodes_full.csv",
+  col_types = cols(
+    id = col_character(),
+    text = col_character(),
+    classifier = col_character()
+  )) 
+
+nn_graph(nodes = nodes_full, 
+         edges = edges_full,
+         svg = FALSE,
+         font = "Roboto Condensed",
+         height = 600)
+
+
+```
+
+## Output
+
+-   a corpus in a tabular format with text and metadata
+
+-   a selection of these corpora are publicly available for download, when the license allows for it - [https://tadadit.xyz/datasets/](https://tadadit.xyz/datasets/){preview-link="true"}
+
+-   an interactive interface will be made available for some of them
+
+-   extensive or full list of keywords in context can be shared in documentation or posts accompanying the article
+
+# One buzzword at a time
+
+## Caveats on the graphs that follow
+
+-   figures presented in absolute numbers for clarity, even if number of publications not constant (substantially, in most cases, not a big issue)
+-   different sources are available for different time frames
+-   everything is based only on contents available online (a significant issue, in particular for TV channels)
+
+# Special Military Operation
+
+*A brand new concept*
+
+## Special Military Operation - Official
+
+::: panel-tabset
+### Kremlin
+
+```{r kremlin_svo_barchart, dev.args=list(bg="transparent")}
+#| cache = TRUE
+create_barchart(corpus = kremlin.ru_ru_a,
+                pattern = "специальн[[:alpha:]]+ военн[[:alpha:]]+ операц[[:alpha:]]+",
+                website = "kremlin.ru",
+                language = "Russian",
+                metadata = kremlin.ru_ru_metadata, 
+                collect = TRUE)
+```
+
+### MFA
+
+```{r mid_svo_barchart, dev.args=list(bg="transparent")}
+#| cache = TRUE
+create_barchart(corpus = mid.ru_ru_a,
+                pattern = "специальн[[:alpha:]]+ военн[[:alpha:]]+ операц[[:alpha:]]+",
+                website = "mid.ru",
+                language = "Russian",
+                metadata = mid.ru_ru_metadata,
+                collect = TRUE)
+```
+
+### Duma
+
+```{r duma_svo_barchart, dev.args=list(bg="transparent")}
+#| cache = TRUE
+create_barchart(corpus = duma.gov.ru_ru_a,
+                pattern = "специальн[[:alpha:]]+ военн[[:alpha:]]+ операц[[:alpha:]]+",
+                website = "duma.gov.ru",
+                language = "Russian",
+                metadata = duma.gov.ru_ru_metadata,
+                collect = TRUE)
+```
+:::
+
+## Special Military Operation - Mainstream media
+
+::: panel-tabset
+### 1tv.ru
+
+```{r 1tv_svo_barchart, dev.args=list(bg="transparent")}
+#| cache = TRUE
+create_barchart(corpus = `1tv.ru_ru_a`,
+                pattern = "специальн[[:alpha:]]+ военн[[:alpha:]]+ операц[[:alpha:]]+",
+                website = "Pervy Kanal",
+                language = "Russian",
+                metadata = `1tv.ru_ru_metadata`, 
+                collect = TRUE)
+```
+
+### rg.ru
+
+```{r rg_svo_barchart, dev.args=list(bg="transparent")}
+#| cache = TRUE
+create_barchart(corpus = `rg.ru_ru_a`,
+                pattern = "специальн[[:alpha:]]+ военн[[:alpha:]]+ операц[[:alpha:]]+",
+                website = "Rossikskaya Gazeta",
+                language = "Russian",
+                metadata = `rg.ru_ru_metadata`, 
+                collect = TRUE)
+```
+
+### ng.ru
+
+```{r ng_svo_barchart, eval = TRUE, dev.args=list(bg="transparent")}
+#| cache = TRUE
+create_barchart(corpus = `ng.ru_ru_a`,
+                pattern = "специальн[[:alpha:]]+ военн[[:alpha:]]+ операц[[:alpha:]]+",
+                website = "Nezavisimaya Gazeta",
+                language = "Russian",
+                metadata = `ng.ru_ru_metadata`, 
+                collect = TRUE)
+```
+
+### kp.ru
+
+```{r kp_svo_barchart, eval = TRUE, dev.args=list(bg="transparent")}
+#| cache = TRUE
+create_barchart(corpus = `kp.ru_ru_a`,
+                pattern = "специальн[[:alpha:]]+ военн[[:alpha:]]+ операц[[:alpha:]]+",
+                website = "Komsomolskaya Pravda",
+                language = "Russian",
+                metadata = `kp.ru_ru_metadata`,
+                collect = TRUE)
+```
+:::
+
+## Special Military Operation - Nationalist media
+
+::: panel-tabset
+### Tsargrad.tv
+
+```{r tsargrad_svo_barchart, eval = TRUE, dev.args=list(bg="transparent")}
+#| cache = TRUE
+create_barchart(corpus = `tsargrad.tv_ru_a`,
+                pattern = "специальн[[:alpha:]]+ военн[[:alpha:]]+ операц[[:alpha:]]+",
+                website = "Tsargrad.tv",
+                language = "Russian",
+                metadata = `tsargrad.tv_ru_metadata`, 
+                collect = TRUE)
+```
+
+### Zavtra.ru
+
+```{r zavtra_svo_barchart, eval = TRUE, dev.args=list(bg="transparent")}
+#| cache = TRUE
+create_barchart(corpus = `zavtra.ru_ru_a`,
+                pattern = "специальн[[:alpha:]]+ военн[[:alpha:]]+ операц[[:alpha:]]+",
+                website = "Zavtra",
+                language = "Russian",
+                metadata = `zavtra.ru_ru_metadata`,
+                collect = TRUE)
+```
+:::
+
+# Denazification
+
+*Few but significant early mentions on Zavtra*
+
+## Denazification - Official
+
+::: panel-tabset
+### Kremlin
+
+```{r kremlin_denazification_barchart, dev.args=list(bg="transparent")}
+create_barchart(corpus = kremlin.ru_ru_a,
+                pattern = "денацификац",
+                website = "kremlin.ru",
+                language = "Russian",
+                metadata = kremlin.ru_ru_metadata)
+```
+
+### MFA
+
+```{r mid_denazification_barchart, dev.args=list(bg="transparent")}
+#| cache = TRUE
+create_barchart(corpus = mid.ru_ru_a,
+                pattern = "денацификац",
+                website = "mid.ru",
+                language = "Russian",
+                metadata = mid.ru_ru_metadata,
+                collect = TRUE)
+```
+
+### Duma
+
+```{r duma_denazification_barchart, dev.args=list(bg="transparent")}
+create_barchart(corpus = duma.gov.ru_ru_a,
+                pattern = "денацификац",
+                website = "duma.gov.ru",
+                language = "Russian",
+                metadata = duma.gov.ru_ru_metadata)
+```
+
+### Duma transcripts
+
+```{r duma_transcripts_denazification_barchart, dev.args=list(bg="transparent")}
+#| cache = TRUE
+create_barchart(corpus = transcript.duma.gov.ru_ru_a,
+                pattern = "денацификац",
+                website = "transcript.duma.gov.ru_ru",
+                language = "Russian",
+                metadata = transcript.duma.gov.ru_ru_metadata, 
+                collect = FALSE)
+```
+:::
+
+## Denazification - Mainstream media
+
+::: panel-tabset
+### 1tv.ru
+
+```{r dev.args=list(bg="transparent")}
+create_barchart(corpus = `1tv.ru_ru_a`,
+                pattern = "денацификац",
+                website = "Pervy Kanal",
+                language = "Russian",
+                metadata = `1tv.ru_ru_metadata`)
+```
+
+### rg.ru
+
+```{r dev.args=list(bg="transparent")}
+create_barchart(corpus = `rg.ru_ru_a`,
+                pattern = "денацификац",
+                website = "Rossikskaya Gazeta",
+                language = "Russian",
+                metadata = `rg.ru_ru_metadata`)
+```
+
+### ng.ru
+
+```{r eval = TRUE, dev.args=list(bg="transparent")}
+create_barchart(corpus = `ng.ru_ru_a`,
+                pattern = "денацификац",
+                website = "Nezavisimaya Gazeta",
+                language = "Russian",
+                metadata = `ng.ru_ru_metadata`)
+```
+
+### kp.ru
+
+```{r eval = TRUE, dev.args=list(bg="transparent")}
+create_barchart(corpus = `kp.ru_ru_a`,
+                pattern = "денацификац",
+                website = "Komsomolskaya Pravda",
+                language = "Russian",
+                metadata = `kp.ru_ru_metadata`)
+```
+:::
+
+## Denazification - Nationalist media
+
+::: panel-tabset
+### Tsargrad.tv
+
+```{r eval = TRUE, dev.args=list(bg="transparent")}
+create_barchart(corpus = `tsargrad.tv_ru_a`,
+                pattern = "денацификац",
+                website = "Tsargrad.tv",
+                language = "Russian",
+                metadata = `tsargrad.tv_ru_metadata`)
+```
+
+### Zavtra.ru
+
+```{r eval = TRUE, dev.args=list(bg="transparent")}
+create_barchart(corpus = `zavtra.ru_ru_a`,
+                pattern = "денацификац",
+                website = "Zavtra",
+                language = "Russian",
+                metadata = `zavtra.ru_ru_metadata`)
+```
+:::
+
+## Quoting and paraphrasing from *Zavtra* (2014)
+
+> "Russia must declare as its goal the denazification of Ukraine."
+
+> To achieve all of this, a real mobilisation is needed: "a victory against Ukraine is not imaginable without a cardinal change of the current quasi-liberal course".
+
+> Russia itself needs to be cleansed, getting rid of all the liberals that are part of the state apparatus.
+
+Mikhail Delyagin, 21 August 2014, "Nakanune", [*Zavtra.ru*](https://zavtra.ru/blogs/nakanune-4)
+
+# The collective West
+
+*Aboundant and significant earlier mentions only on Zavtra*
+
+## Collective West - Official
+
+::: panel-tabset
+### Kremlin
+
+```{r kremlin_collective_west_barchart, dev.args=list(bg="transparent")}
+#| cache = TRUE
+create_barchart(corpus = kremlin.ru_ru_a,
+                pattern = "коллективн[[:alpha:]]+ запад",
+                website = "kremlin.ru",
+                language = "Russian",
+                metadata = kremlin.ru_ru_metadata, 
+                collect = TRUE)
+```
+
+### MFA
+
+```{r mid_collective_west_barchart, dev.args=list(bg="transparent")}
+#| cache = TRUE
+create_barchart(corpus = mid.ru_ru_a,
+                pattern = "коллективн[[:alpha:]]+ запад",
+                website = "mid.ru",
+                language = "Russian",
+                metadata = mid.ru_ru_metadata,
+                collect = TRUE)
+```
+
+### Duma
+
+```{r duma_collective_west_barchart, dev.args=list(bg="transparent")}
+#| cache = TRUE
+create_barchart(corpus = duma.gov.ru_ru_a,
+                pattern = "коллективн[[:alpha:]]+ запад",
+                website = "duma.gov.ru",
+                language = "Russian",
+                metadata = duma.gov.ru_ru_metadata, 
+                collect = TRUE)
+```
+
+### Duma transcripts
+
+```{r duma_transcripts_collective_west_barchart, dev.args=list(bg="transparent")}
+#| cache = TRUE
+create_barchart(corpus = transcript.duma.gov.ru_ru_a,
+                pattern = "коллективн[[:alpha:]]+ запад",
+                website = "transcript.duma.gov.ru_ru",
+                language = "Russian",
+                metadata = transcript.duma.gov.ru_ru_metadata, 
+                collect = TRUE)
+```
+:::
+
+## Collective West - Mainstream media
+
+::: panel-tabset
+### 1tv.ru
+
+```{r 1tv_collective_west_barchart, dev.args=list(bg="transparent")}
+#| cache = TRUE
+create_barchart(corpus = `1tv.ru_ru_a`,
+                pattern = "коллективн[[:alpha:]]+ запад",
+                website = "Pervy Kanal",
+                language = "Russian",
+                metadata = `1tv.ru_ru_metadata`,
+                collect = TRUE)
+```
+
+### rg.ru
+
+```{r rg_collective_west_barchart, dev.args=list(bg="transparent")}
+#| cache = TRUE
+create_barchart(corpus = `rg.ru_ru_a`,
+                pattern = "коллективн[[:alpha:]]+ запад",
+                website = "Rossikskaya Gazeta",
+                language = "Russian",
+                metadata = `rg.ru_ru_metadata`,
+                collect = TRUE)
+```
+
+### ng.ru
+
+```{r ng_collective_west_barchart, eval = TRUE, dev.args=list(bg="transparent")}
+#| cache = TRUE
+create_barchart(corpus = `ng.ru_ru_a`,
+                pattern = "коллективн[[:alpha:]]+ запад",
+                website = "Nezavisimaya Gazeta",
+                language = "Russian",
+                metadata = `ng.ru_ru_metadata`,
+                collect = TRUE)
+```
+
+### kp.ru
+
+```{r kp_collective_west_barchart, eval = TRUE, dev.args=list(bg="transparent")}
+#| cache = TRUE
+create_barchart(corpus = `kp.ru_ru_a`,
+                pattern = "коллективн[[:alpha:]]+ запад",
+                website = "Komsomolskaya Pravda",
+                language = "Russian",
+                metadata = `kp.ru_ru_metadata`,
+                collect = TRUE)
+```
+:::
+
+## Collective West - Nationalist media
+
+::: panel-tabset
+### Tsargrad.tv
+
+```{r tsargrad_collective_west_barchart, eval = TRUE, dev.args=list(bg="transparent")}
+#| cache = TRUE
+create_barchart(corpus = `tsargrad.tv_ru_a`,
+                pattern = "коллективн[[:alpha:]]+ запад",
+                website = "Tsargrad.tv",
+                language = "Russian",
+                metadata = `tsargrad.tv_ru_metadata`, 
+                collect = TRUE)
+```
+
+### Zavtra.ru
+
+```{r zavtra_collective_west_barchart, eval = TRUE, dev.args=list(bg="transparent")}
+#| cache = TRUE
+create_barchart(corpus = `zavtra.ru_ru_a`,
+                pattern = "коллективн[[:alpha:]]+ запад",
+                website = "Zavtra",
+                language = "Russian",
+                metadata = `zavtra.ru_ru_metadata`, 
+                collect = TRUE)
+```
+:::
+
+## Collective West: conclusions
+
+-   Before 2021, the expression "collective West" has never been used, not a single time, in any of the tens of thousands of statements published on Kremlin's website since 2000. Since then, the expression has featured routinely, both in official discourse and mainstream media.
+-   On *Zavtra*, the expression has been used regularly starting with 2014.
+-   It has been used also in other media, but only very rarely until 2018, and somewhat more regularly only after 2021.
+
+# Anglosaxons
+
+*Unclear trends, inconsistent use across different sources (e.g. reference to anglo-saxon legal system), kept for reference.*
+
+## Anglosaxons - Official
+
+::: panel-tabset
+### Kremlin
+
+```{r kremlin_anglosaxons_barchart, dev.args=list(bg="transparent")}
+create_barchart(corpus = kremlin.ru_ru_a,
+                pattern = "англосакс|англо-сакс",
+                website = "kremlin.ru",
+                language = "Russian",
+                metadata = kremlin.ru_ru_metadata,
+                collect = TRUE)
+```
+
+### MFA
+
+```{r mid_anglosaxons_barchart, dev.args=list(bg="transparent")}
+#| cache = TRUE
+create_barchart(corpus = mid.ru_ru_a,
+                pattern = "англосакс|англо-сакс",
+                website = "mid.ru",
+                language = "Russian",
+                metadata = mid.ru_ru_metadata,
+                collect = TRUE)
+```
+
+### Duma
+
+```{r duma_anglosaxons_barchart, dev.args=list(bg="transparent")}
+create_barchart(corpus = duma.gov.ru_ru_a,
+                pattern = "англосакс|англо-сакс",
+                website = "duma.gov.ru",
+                language = "Russian",
+                metadata = duma.gov.ru_ru_metadata,
+                collect = TRUE)
+```
+
+### Duma transcripts
+
+```{r duma_transcripts_anglosaxons_barchart, dev.args=list(bg="transparent")}
+#| cache = TRUE
+create_barchart(corpus = transcript.duma.gov.ru_ru_a,
+                pattern = "англосакс|англо-сакс",
+                website = "transcript.duma.gov.ru_ru",
+                language = "Russian",
+                metadata = transcript.duma.gov.ru_ru_metadata, 
+                collect = TRUE)
+```
+:::
+
+## Anglosaxons - Mainstream media
+
+::: panel-tabset
+### 1tv.ru
+
+```{r dev.args=list(bg="transparent")}
+create_barchart(corpus = `1tv.ru_ru_a`,
+                pattern = "англосакс|англо-сакс",
+                website = "Pervy Kanal",
+                language = "Russian",
+                metadata = `1tv.ru_ru_metadata`,
+                collect = TRUE)
+```
+
+### rg.ru
+
+```{r dev.args=list(bg="transparent")}
+create_barchart(corpus = `rg.ru_ru_a`,
+                pattern = "англосакс|англо-сакс",
+                website = "Rossikskaya Gazeta",
+                language = "Russian",
+                metadata = `rg.ru_ru_metadata`,
+                collect = TRUE)
+```
+
+### ng.ru
+
+```{r eval = TRUE, dev.args=list(bg="transparent")}
+create_barchart(corpus = `ng.ru_ru_a`,
+                pattern = "англосакс|англо-сакс",
+                website = "Nezavisimaya Gazeta",
+                language = "Russian",
+                metadata = `ng.ru_ru_metadata`,
+                collect = TRUE)
+```
+
+### kp.ru
+
+```{r eval = TRUE, dev.args=list(bg="transparent")}
+create_barchart(corpus = `kp.ru_ru_a`,
+                pattern = "англосакс|англо-сакс",
+                website = "Komsomolskaya Pravda",
+                language = "Russian",
+                metadata = `kp.ru_ru_metadata`,
+                collect = TRUE)
+```
+:::
+
+## Anglosaxons - Nationalist media
+
+::: panel-tabset
+### Tsargrad.tv
+
+```{r eval = TRUE, dev.args=list(bg="transparent")}
+create_barchart(corpus = `tsargrad.tv_ru_a`,
+                pattern = "англосакс|англо-сакс",
+                website = "Tsargrad.tv",
+                language = "Russian",
+                metadata = `tsargrad.tv_ru_metadata`,
+                collect = TRUE)
+```
+
+### Zavtra.ru
+
+```{r eval = TRUE, dev.args=list(bg="transparent")}
+create_barchart(corpus = `zavtra.ru_ru_a`,
+                pattern = "англосакс|англо-сакс",
+                website = "Zavtra",
+                language = "Russian",
+                metadata = `zavtra.ru_ru_metadata`,
+                collect = TRUE)
+```
+:::
+
+# Russophobia
+
+*Increasingly found across all sources starting with 2014; somwhat used in other media earlier, most consistently on Zavtra.*
+
+## Russophobia - Official
+
+::: panel-tabset
+### Kremlin
+
+```{r kremlin_russophobia_barchart, dev.args=list(bg="transparent")}
+create_barchart(corpus = kremlin.ru_ru_a,
+                pattern = "русофоб",
+                website = "kremlin.ru",
+                language = "Russian",
+                metadata = kremlin.ru_ru_metadata)
+```
+
+### MFA
+
+```{r mid_russophobia_barchart, dev.args=list(bg="transparent")}
+#| cache = TRUE
+create_barchart(corpus = mid.ru_ru_a,
+                pattern = "русофоб",
+                website = "mid.ru",
+                language = "Russian",
+                metadata = mid.ru_ru_metadata,
+                collect = TRUE)
+```
+
+### Duma
+
+```{r duma_russophobia_barchart, dev.args=list(bg="transparent")}
+create_barchart(corpus = duma.gov.ru_ru_a,
+                pattern = "русофоб",
+                website = "duma.gov.ru",
+                language = "Russian",
+                metadata = duma.gov.ru_ru_metadata)
+```
+
+### Duma transcripts
+
+```{r duma_transcripts_russophobia_barchart, dev.args=list(bg="transparent")}
+#| cache = TRUE
+create_barchart(corpus = transcript.duma.gov.ru_ru_a,
+                pattern = "русофоб",
+                website = "transcript.duma.gov.ru_ru",
+                language = "Russian",
+                metadata = transcript.duma.gov.ru_ru_metadata, 
+                collect = FALSE)
+```
+:::
+
+## Russophobia - Mainstream media
+
+::: panel-tabset
+### 1tv.ru
+
+```{r dev.args=list(bg="transparent")}
+create_barchart(corpus = `1tv.ru_ru_a`,
+                pattern = "русофоб",
+                website = "Pervy Kanal",
+                language = "Russian",
+                metadata = `1tv.ru_ru_metadata`)
+```
+
+### rg.ru
+
+```{r dev.args=list(bg="transparent")}
+create_barchart(corpus = `rg.ru_ru_a`,
+                pattern = "русофоб",
+                website = "Rossikskaya Gazeta",
+                language = "Russian",
+                metadata = `rg.ru_ru_metadata`)
+```
+
+### ng.ru
+
+```{r eval = TRUE, dev.args=list(bg="transparent")}
+create_barchart(corpus = `ng.ru_ru_a`,
+                pattern = "русофоб",
+                website = "Nezavisimaya Gazeta",
+                language = "Russian",
+                metadata = `ng.ru_ru_metadata`)
+```
+
+### kp.ru
+
+```{r eval = TRUE, dev.args=list(bg="transparent")}
+create_barchart(corpus = `kp.ru_ru_a`,
+                pattern = "русофоб",
+                website = "Komsomolskaya Pravda",
+                language = "Russian",
+                metadata = `kp.ru_ru_metadata`)
+```
+:::
+
+## Russophobia - Nationalist media
+
+::: panel-tabset
+### Tsargrad.tv
+
+```{r eval = TRUE, dev.args=list(bg="transparent")}
+create_barchart(corpus = `tsargrad.tv_ru_a`,
+                pattern = "русофоб",
+                website = "Tsargrad.tv",
+                language = "Russian",
+                metadata = `tsargrad.tv_ru_metadata`)
+```
+
+### Zavtra.ru
+
+```{r eval = TRUE, dev.args=list(bg="transparent")}
+create_barchart(corpus = `zavtra.ru_ru_a`,
+                pattern = "русофоб",
+                website = "Zavtra",
+                language = "Russian",
+                metadata = `zavtra.ru_ru_metadata`)
+```
+:::
+
+# Zavtra?
+
+## Zavtra? \[1/2\]
+
+-   *Zavtra* has been published as a weekly printed broadsheet newspaper since the 1993.
+
+-   *Zavtra*'s ideology is a version of Russian nationalism that celebrates Russia's Tsarist past, its Stalinist glory, and Russia's inevitable future rise to victory.
+
+-   [they also boast](https://zavtra.ru/about) to have created trends that have entered the mainstream:
+
+## Zavtra? \[2/2\]
+
+> "Over the years, we at Zavtra have created several ideologies, several powerful trends that have entered and continue to enter the public consciousness."
+
+⇨ *Zavtra* itself is unlikely to be influential; but its brand of nationalism and worldview, politically marginal until recently, has obviously entered the mainstream from the front door (i.e. through the Kremlin)
+
+# Conclusions
+
+## Conclusions \[1/3\]
+
+-   some buzzwords - "**collective West**", "**denazification**" (in reference to Ukraine) - were already well established in nationalist magazine *Zavtra*, but used very little or not at all elsewhere
+-   some buzzwords - "**russophobia**", "**anglo-saxons**" had been used across different media at different points in time; *Zavtra* has used them more consistently, and with a more consistent increase starting with 2014
+-   some buzzwords - "**special military operation**" - were effectively introduced by the Kremlin starting with the invasion
+
+## Conclusions \[2/3\]
+
+-   some of the buzzwords chosen by the Kremlin to accompany the invasion were well established in (previously) fringe nationalist circles, as emerges from their consistent use in *Zavtra*.
+-   before they were embraced and promoted by the Kremlin with the launch of the invasion, they remained out of the mainstream
+
+## Conclusions \[3/3\]
+
+-   these may be evidence of Vladimir Putin's own radicalisation journey (by 2022, Kremlin sounded like *Zavtra* in 2014; in 2014, Kremlin did not sound like *Zavtra* )
+-   or at least that speech writers and communication professionals working for the Kremlin took inspiration from this previously marginal cultural space
+-   example of top-down radicalisation in authoritarian contexts
+
+## Stay tuned
+
+::: smaller
+-   some of the corpora [available for download in full](../../datasets) (a more formal release will follow, see e.g. [`kremlin_en`](https://discuss-data.net/dataset/5eb1481e-ae89-45bf-9c88-03574910730a/))
+-   Interactive web interfaces forthcoming
+-   Detailed posts with full list of keywords in context and links to sources, on [**Russophobia**](https://testzone.giorgiocomai.eu/2021-08-01-russophobia/), the [**Collective West**](https://tadadit.xyz/posts/2023-03-who-says-it-first-nationalist-media-kremlin/), and [**traditional values**](https://tadadit.xyz/posts/2023-05-conservative-traditional-values-russia/)
+-   for R users, R package [`castarter`](https://github.com/giocomai/castarter) already functional, better documentation and features forthcoming
+:::
+
+## References

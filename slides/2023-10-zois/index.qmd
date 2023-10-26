@@ -1,0 +1,355 @@
+---
+title: "De  facto  stats"
+subtitle: "*Finding and contextualising socio-economic indicators about post-Soviet de facto states*"
+date: "2023-10-17"
+date-format: "[ZOiS, Berlin -] DD MMMM YYYY"
+institute: "([OBCT](https://www.balcanicaucaso.org/)/[CCI](https://www.cci.tn.it/))"
+author: __Giorgio Comai__
+#bibliography: references.bib
+format:
+  revealjs: 
+    theme: [sky, custom.scss]
+    slide-number: true
+    controls: true
+    chalkboard: false
+    include-in-header: append-title-slide.html
+    preview-links: true
+    pdf-max-pages-per-slide: 1
+    embed-resources: true
+css: style.css
+execute: 
+  cache: true
+---
+
+```{r echo = FALSE}
+ggplot2::theme_set(new = ggplot2::theme_minimal(base_family = "Roboto Condensed"))
+```
+
+## Theoretical starting point
+
+Similarly to other **small dependent jurisdictions**, post-Soviet de facto states...
+
+1.  receive a large share of their **budget incomes from external sources**
+2.  have an unusually high amount of residents whose income depends directly on the (de facto) state (e.g. **pensioners, public sector employees, military**)
+3.  have an economy strongly influenced by **migration and remittances**
+
+::: footer
+Comai, Giorgio. 2018. 'Conceptualising Post-Soviet de Facto States as Small Dependent Jurisdictions'. *Ethnopolitics* 17 (2): 181--200. https://doi.org/10.1080/17449057.2017.1393210.
+:::
+
+## As a consequence...
+
+Even if a lot of subsistence and informal economy goes unrecorded, a sizeable part of the economy is fully formalised **in a way that leaves some record**:
+
+-   external assistance from the patron is largely **officially recorded in budgets**
+-   pensions and salaries for some categories are either **public or publicly object of debate**
+-   relevant indicators are often **publicly discussed** (e.g. number of pensioners, number of teachers, health sector workers, etc.)
+
+# Socio-economic indicators in post-Soviet de facto states
+
+## Why do we care?
+
+-   questions of political economy
+-   degree of external dependency
+-   economic opportunities structure
+-   but also, more pragmatic:
+    -   salaries & migration choices
+    -   possibly, political or even status preferences
+    -   e.g. how much does Transnistria need if assistance through gas is cut?
+
+------------------------------------------------------------------------
+
+### Getting the data
+
+-   sometimes, readily available
+-   sometimes, it's really many needles scattered around many haystacks
+
+### Trusting the data
+
+-   to what extent should we trust them
+-   or, which data can we trust, and what's excluded
+
+### Making the data comparable:
+
+-   exchange rates, inflation, etc.
+-   "per capita" and demography
+
+# The (relatively) easy part
+
+-   when data is mostly readily available
+-   but still needs to be adjusted for exchange rate and inflation
+-   per capita and purchasing power parity
+
+## Budget assistance (in RUB)
+
+![](img/russianAssistance_byType_both_RUB_including_pensions.png){fig-align="center"}
+
+## Budget assistance (in USD)
+
+![](img/russianAssistance_byType_both_USD_including_pensions.png){fig-align="center"}
+
+## Exchange rates matter
+
+![](img/exchange_rate_change_RUB_USD_percent.png){fig-align="center"}
+
+## Exchange rates matter
+
+```{r, eval=TRUE, message=FALSE, warning=FALSE, include=TRUE}
+  start_date <- as.Date("1998-01-01")
+  end_date <- as.Date("2023-10-12")
+  
+if (fs::file_exists("rub_usd.csv")==FALSE) {
+
+  ### Source: Russian Central Bank
+  rub_usd_url <- stringr::str_c(
+    "http://www.cbr.ru/currency_base/dynamics/?UniDbQuery.Posted=True&UniDbQuery.so=1&UniDbQuery.mode=1&UniDbQuery.date_req1=&UniDbQuery.date_req2=&UniDbQuery.VAL_NM_RQ=R01235&UniDbQuery.From=",
+    format(start_date, "%d.%m.%Y"),
+    "&UniDbQuery.To=",
+    format(end_date, "%d.%m.%Y")
+  )
+  # browseURL(rub_usd_url)
+  
+  raw <- rvest::read_html(rub_usd_url)
+  
+  rates_df <- rvest::html_table(x = raw, header = FALSE)[[1]] |> 
+    dplyr::slice(-1:-2) |> 
+    dplyr::select(-2)
+  colnames(rates_df) <- c("date", "rate")
+  
+  rates_df <- rates_df |> 
+    dplyr::mutate(date=lubridate::dmy(date), 
+                  rate = as.numeric(stringr::str_replace(string = rate, 
+                                                         pattern = ",",
+                                                         replacement = ".")))
+  rates_df <- rates_df |> 
+    #dplyr::filter(is.na(rate)) 
+    dplyr::filter(date>=start_date, 
+                  date<=end_date) |> 
+    dplyr::right_join(tibble::tibble(date = seq.Date(from = start_date,
+                                                     to = end_date,
+                                                     by = "day")),
+                      by = "date")  |>  # Make sure all days are included
+    dplyr::arrange(date) |>  # Make sure data are ordered by date
+    tidyr:::fill(rate, .direction = "down") # Replace each NA with the most recent non-NA prior to it."
+    
+  readr::write_csv(x = rates_df, file = "rub_usd.csv")
+}
+
+rub_usd_df <- readr::read_csv("rub_usd.csv")
+
+rub_usd_df |> 
+  ggplot2::ggplot(mapping = ggplot2::aes(x = date, y = rate)) +
+  ggplot2::geom_line() +
+  ggplot2::scale_x_date(name = NULL, date_breaks = "4 years") +
+  ggplot2::scale_y_continuous(name = NULL, n.breaks = 10, limits = c(0, NA)) +
+  ggplot2::labs(title = "Daily RUB-USD exchange rate", 
+                subtitle = stringr::str_c("Daily exchange rate between ",
+                                          format(start_date, "%d %B %Y"),
+                                          " and ",
+                                          format(end_date, "%d %B %Y")),
+                caption = "Source: Russian Central Bank")
+
+```
+
+But there's more...
+
+------------------------------------------------------------------------
+
+### Inflation-adjusted and "per capita"
+
+For established economies, it's easy to find data in constant LCU or constant USD. Alternatives here?
+
+-   statistics on inflation released or made public by de facto authorities
+-   data from the patron or neighbouring region
+-   find historical prices for selected goods (e.g. electricity, diesel at the pump, etc.)
+-   **demography is an even bigger issue**
+
+### This matters both for domestic dynamics and comparison
+
+## Plus, local peculiarities
+
+e.g. Transnistria
+
+-   we know how much gas Transnistria receives
+-   we know how much that would cost, if Moldova were to pay for it
+-   but what is actually its value for the Transnistrian economy?
+-   and how is that value distributed, besides the budget?
+
+## In brief
+
+-   getting data that is good enough for analysis or comparison may require extra work but may still be feasible, **depending on the research question**
+-   **depending on the research question**, we may instead prefer looking for disaggregated data
+    -   about some sectors of the economy
+    -   about some groups of people whose incomes we may realistically know and compare
+
+# Some bottom-up stats
+
+A part of the story, of varying size
+
+## Salary of teachers in Abkhazia {background-image="img/teacherWage_Abkhazia.png" background-position="bottom" background-size="55%"}
+
+
+## For different reasons, mostly reliable data {background-image="img/abkhazia_russia_salary_workers.png" background-position="bottom" background-size="55%"}
+
+### (even if partial)
+
+---
+
+::: columns
+::: {.column width="40%"}
+### Workers by sector in South Ossetia
+
+-   Which data do we trust?
+-   Is the data we can trust really so different from what we'd see in comparable jurisdictions?
+:::
+
+::: {.column width="60%"}
+![Workers in South Ossetia in 2016](img/kto_kem_so.png)
+:::
+:::
+
+::: footer
+https://sputnik-ossetia.ru/infographics/20160425/1782970.html
+:::
+
+## Of course, there's life beyond the formal economy, but isn't it the case also elsewhere? {background-image="img/share_of_employees.png" background-position="bottom" background-size="60%"}
+
+
+# Finding the needles in the haystacks
+
+# First, get the haystacks
+
+Corpora of relevant online sources
+
+## Textual datasets of relevant online sources
+
+-   websites of de facto authorities
+-   local news websites
+-   possibly, websites of selected commercial activities
+-   selected sources in the patron state
+
+## From website to corpus
+
+```{r results='asis'}
+library("castarter")
+cas_set_options(
+  base_folder = fs::path(fs::path_home_r(), 
+                         "R",
+                         "castarter_tadadit"),
+  project = "Transnistria media",
+  website = "novostipmr.com_ru" 
+)
+
+corpus_df <- cas_read_db_contents_data() %>% 
+  #dplyr::collect() |> 
+  dplyr::filter(is.na(date)==FALSE)
+
+max_date <- max(as.Date(corpus_df |> dplyr::pull(date)))
+
+min_date <- min(as.Date(corpus_df |> dplyr::pull(date)))
+
+total_items <- corpus_df |> dplyr::count() |> dplyr::pull(n) 
+body_text <- stringr::str_c(
+  "**Dataset name**: novostipmr.com_ru",
+  "**Dataset description**: All items published on the website of Transnistria's news agency Novosti PMR",
+  paste("**Start date**:", min_date),
+  paste("**End date**:", max_date),
+  paste("**Total items**:", scales::number(total_items)),
+  paste("**Available columns**:", colnames(corpus_df) %>% 
+          stringr::str_c(collapse = "; ")),
+  sep = "\n\n")
+
+cat(body_text)
+```
+
+# Then, parse them for the needles
+
+Structured analysis of online contents
+
+## For example {background-image="img/transnistria_castarter_screenshot.png" background-position="bottom" background-size="70% 70%"}
+
+
+### Data about pensioners in Transnistria
+
+## For example {background-image="img/transnistria_castarter_screenshot2.png" background-size="70% 70%" background-position="bottom"}
+
+### Data about pensioners in Transnistria
+
+## For example {background-image="img/transnistria_blokad.png" background-size="70% 70%" background-position="bottom"}
+
+### When a given issue received attention
+
+
+
+# This technique can be used to...
+
+-   get data, across a wide range of issues
+-   triangulate
+-   put in context
+-   reality check
+
+# By the way... is it OK do this?
+
+-   "Text and data mining for the purposes of scientific research" is explicitly allowed by a 2019 EU directive
+-   even beyond research, same conditions as would apply e.g. to search engines remain valid
+-   full corpus can be publicly shared only when license allows for it
+
+# Taking care of the haystacks:
+
+-   keeping them updated
+-   but also, long time preservation
+-   consider what can be shared
+
+## Even established online sources disappear
+
+- new president deletes statements of previous presidents (e.g. Georgia, Ukraine, etc.)
+- institutions, organisations, or entities change or disappear
+- selective removal of old contents (less common, but recorded e.g. in [Transnistria post-Shevchuk](https://www.balcanicaucaso.org/eng/Areas/Transnistria/After-a-new-president-came-to-power-what-happened-to-Transnistria-s-media-188493))
+- old contents are not moved to new websites
+- some things may remain on the [Internet Archive's Wayback Machine](https://web.archive.org/), many (most?) are likely lost
+
+## Some may remain in personal archives, but are effectively lost (or, are they?) {background-image="img/novosti_pmr_collage.png" background-size="66% 66%" background-position="bottom"}
+
+# How much can we trust these data points?
+
+## Context and corroboration
+
+-   overall statistics may be problematic, but local data more likely to be accurate
+-   formal or informal corroboration from multiple sources, online and offline (fieldwork still matters)
+-   hacked and dumped materials can be used for triangulation (e.g. #SurkovLeaks), but consider ethics
+-   **acknowledge uncertainty**
+-   but don't be overwhelmed by it: official stats from around the world are often a (misleading) mess
+
+
+
+## An example
+
+![](img/cg_top.png)
+
+-   inflation-adjusted estimates
+-   demographic estimates corroborated with local administrative documents
+-   geolocation and data retrieved through structured analysis of online contents
+
+## Some things I have not discussed
+
+-   trade
+    -   much of the above applies
+-   military assistance and spending
+    -   this is difficult, both conceptually and practically
+
+## What's next
+
+-   more easily accessible socio-economic indicators
+    -   we can get better at sharing them
+-   more easily accessible textual datasets
+    -   publicly (not without obstacles)
+    -   among peers (formal or informal data sharing)
+-   (not discussed here)
+    -   land-use change satellite data
+    -   geocoding and named entity recognition
+
+**Lots can be done as a community of scholars**
+
+```{r eval = FALSE, include = FALSE, echo=FALSE}
+pagedown::chrome_print("index.html")
+```
