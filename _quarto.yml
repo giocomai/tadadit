@@ -28,6 +28,7 @@ format:
       light: lux
     toc: true
     html-math-method: plain
+    embed-resources: false
     include-in-header:
       - plausible.html
 

@@ -7,8 +7,7 @@ last-modified: 2023-05-16
 categories: [russia]
 image: "giocomai_audio_file_spectrum_with_Russian_military_in_the_bakgr_6dbd5883-e633-4acc-a2c5-344b60a33b90.webp"
 bibliography: references.bib
-execute: 
-  cache: false
+embed-resources: true
 ---
 
 {{< include ./../_early_disclaimer.qmd >}}
@@ -37,6 +36,8 @@ cas_set_options(
   base_folder = fs::path(fs::path_home_r(), 
                          "R",
                          "castarter_tadadit"))
+
+library("htmlwidgets")
 ```
 
 "Traditional values" have emerged in Russia's public discourse with new vigour starting with 2011-2012 [see e.g. @duquenoy2018, p. 94.] and have soon become prevalent in Russian official and public discourse. With Putin's return to the presidency in 2012, conservatism has become "official state posture" [@laruelle2016, p. 287] in Russia. Increased reliance on conservative ideology may have been conceived largely instrumentally [@rodkiewicz2015], as a discursive turn useful to reconsolidate after the wave of protests of 2011-2012 [@sharafutdinova2014], but in the following years it has solidified as a central component of the Kremlin's narrative about Russia itself, as well as its contrapposition with the West. These values have been called "traditional", "conservative", "Christian" - all expressions which would suggest they may not be specifically Russian. And yet, they were also unique, something that made Russia a "distinct civilisation" [@tsygankov2016].
@@ -312,6 +313,8 @@ matches_df <- matches_df |>
 There are many different types of "values" that appear in the Kremlin's statements. Here is a rather comprehensive list of the most common qualifiers or expressions used to characterise the values. They are categorised and colour-coded in order to make it easier to spot them in the quotes below. The categories are indicative and may be adjusted (suggestions welcome).
 
 ```{r value_types_table}
+library("htmlwidgets")
+
 matches_df |> 
   dplyr::mutate(dplyr::across(c("pattern_ru", "pattern_en"), ~ stringr::str_replace_all(string = .x, pattern = stringr::fixed("[[:alpha:]]+"), replacement = "*"))) |> 
   dplyr::mutate(pre_colour = "<span style='background-color:",
@@ -403,6 +406,8 @@ kremlin_ru_h_df |>
 :::
 :::
 
+
+
 As will be immediately evident, different types of qualifiers can be present in the same sentence. Some of them are very generic; for example, talk of common values is common when meeting foreign delegations, no matter the country involved ("based on our common values..."). In a few instances, they are not even used as qualifiers to values, but in the overwhelming majority of cases there is a clear connection.
 
 I will now proceed to count the frequency of different types of "values" at different point in times. The reader is however advised to have a quick look in the table above at some of the references in the early years as well as to those in recent months. Even if references to "spiritual values" are present in both, I would argue that a change in tone is evident to the human reader. This, of course, will not emerge from the numbers.
@@ -424,9 +429,8 @@ Both of these quotes are counted as intances of "values" associated with multipl
 kremlin.ru_en_values_type_count_df <- create_values_type_count(values_df = kremlin.ru_en_values_df,
                                                                language = "en")
 
-kremlin.ru_en_values_type_count_df |> 
-  reactable::reactable()
-
+htmlwidgets:::print.htmlwidget(kremlin.ru_en_values_type_count_df |> 
+  reactable::reactable())
 
 ```
 
@@ -792,7 +796,7 @@ ggplot2::ggplot(mapping = ggplot2::aes(x = year, y = values)) +
 
 ## Tabular data
 
-```{r values_en_summary_wide_df_kable}
+```{r values_en_summary_wide_df_kable, warning = FALSE, message=FALSE}
 values_en_summary_wide_df |> 
   dplyr::mutate(`without_values` = all - values) |> 
   dplyr::rename(with_values = values) |> 
@@ -805,6 +809,7 @@ values_en_summary_wide_df |>
 ```{r pervy1tv.ru_ru_values_type_count_df}
 #| column: body
 pervy1tv.ru_ru_values_type_count_df <- create_values_type_count(values_df = pervy1tv.ru_ru_values_df)
+
 
 pervy1tv.ru_ru_values_type_count_df |> 
   reactable::reactable()
