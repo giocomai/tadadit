@@ -5,7 +5,7 @@ listing:
   type: table
   image-align: right
   categories: true
-  sort-ui: TRUE
+  sort-ui: true
   filter-ui: true
   feed: true  
   fields: [title, description, categories]

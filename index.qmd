@@ -39,6 +39,8 @@ listing:
     filter-ui: true
     feed: true  
     fields: [title, description, categories]
+    exclude:
+      title: "Datasets"
   - id: tutorials
     contents: tutorials
     sort: "date desc"
@@ -48,6 +50,8 @@ listing:
     sort-ui: false
     filter-ui: false
     feed: true
+    exclude:
+      title: "Tutorials"
 ---
 
 *A project led by [Giorgio Comai](https://giorgiocomai.eu/), researcher and data analyst at [OBCT](https://www.balcanicaucaso.org/)/[CCI](https://www.cci.tn.it/), carried out with the support of the Italian MFA (see below for details and disclaimers).*
