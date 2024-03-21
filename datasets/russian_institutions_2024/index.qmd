@@ -1,0 +1,84 @@
+---
+title: "Russian institutions 2024"
+listing:
+  sort: "title asc"
+  type: table
+  image-align: right
+  categories: true
+  sort-ui: true
+  filter-ui: true
+  feed: true  
+  fields: [title, description, categories]
+editor: source
+---
+
+This is a collection of textual datasets based on websites of Russian institutions.
+
+This is a stable release.
+
+- all datasets do not include materials publised after 31 December 2023
+- download urls and links to metadata pages are expected to remain available
+- a formal release in an established repository is forthcoming - relevant links will be added here
+- context and use cases will be described in a dedicated book chapter [forthcoming] 
+
+The name of each corpus is composed of the bare domain name, a two letter code of the main language of the contents, and the year of release of the dataset, separated by an underscore, e.g. `kremlin.ru_ru_2024`.
+
+```{r echo=FALSE, eval = TRUE, message=FALSE, warning=FALSE}
+library("piggyback")
+options(piggyback.verbose = FALSE)
+base_folder <- fs::dir_create(fs::path(fs::path_home_r(), "R", "ru_institutions_2024"))
+
+get_corpus <- function(corpus_name) {
+  pb_download(dest = base_folder, 
+            repo = "giocomai/tadadit",
+            tag = corpus_name, 
+            file = stringr::str_c(corpus_name, ".csv.gz", collapse = ""))
+  invisible(fs::path(base_folder, stringr::str_c(corpus_name, ".csv.gz", collapse = "")))
+}
+
+```
+
+## Summary statistics
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+#| column: page
+
+available_df <- tibble::tribble(
+  ~institution, ~corpus_name, 
+  "Russia's president", "kremlin.ru_en_2024", 
+  "Russia's president", "kremlin.ru_ru_2024",
+  "Russia's MFA", "mid.ru_ru_2024",
+  "Russia's MFA", "mid.ru_en_2024",
+  "Russia's government (archived version)", "archive.government.gov.ru_ru_2024",
+  "Russia's prime minister (archived version)", "archive.premier.gov.ru_ru_2024"
+  )
+
+summary_stats_df <- purrr::map(
+  .x = purrr::transpose(available_df),
+  .f = \(x) {
+
+    corpus_df <- invisible(readr::read_csv(file = get_corpus(corpus_name = x[["corpus_name"]])))
+    
+    earliest <- min(corpus_df[["date"]])
+    
+    total <- nrow(corpus_df)
+    
+    tibble::tibble(
+      institution = x[["institution"]],
+      website = stringr::str_remove(string = x[["corpus_name"]],
+                                   pattern = "_[[:alpha:]]{2}_[[:digit:]]{4}$"), 
+                   language = stringr::str_remove(string = x[["corpus_name"]],
+                                   pattern = "_[[:digit:]]{4}$") |> 
+      stringr::str_extract(pattern = "[[:alpha:]]{2}$"), 
+      `start date` = min(corpus_df[["date"]]), 
+      `end date` = max(corpus_df[["date"]]), 
+      n_items = nrow(corpus_df)
+      )
+  }) |> 
+  purrr::list_rbind()
+
+summary_stats_df |> 
+  knitr::kable(format.args = list(big.mark = " "))
+```
+
+## List of available datasets
