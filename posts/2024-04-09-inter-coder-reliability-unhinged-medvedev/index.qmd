@@ -1,6 +1,6 @@
 ---
 title: "How unhinged has Medvedev become? Testing inter-coder reliability of open Large Language Models (LLM)"
-description: "This post offers a preview of some results of early testing with using locally-deployed LLMs as coders"
+description: "Testing the feasibility of using locally-deployed LLMs as coders of Russian-lanuage text"
 author: Giorgio Comai
 date: 2024-04-09
 last-modified: 2024-04-09
@@ -25,16 +25,18 @@ According to LLMs, many of Medvedev's post deserve a high "unhinged" rating. Hum
 
 ### Summary of main results
 
-- processing of Telegram posts of various length takes about one hour per 100 posts with a reasonably performing model such as Mistral-7b on my own laptop (without going into details, nvidia graphic card, and relatively recent i7 intel processor)
+- processing of Telegram posts of various length takes about one hour per 100 posts with a model giving meaningful results such as Mistral-7b on my own laptop (without going into details, basic nvidia graphic card, and relatively recent i7 intel processor)
 - 7b models such as Mistral and Llama deal rather nicely with original text in Russian and provide meaningful text annotation (in this case, rating on a scale from 1 to 10) with reasonably good consistency; repeated runs of the same model provide highly consistent results, while combining different models provide somewhat lower consistency (but poor definition of the annotation task may be to blame)
 - smaller 2b models are much quicker (just a couple of minutes for 100 posts) but results seem to be of unacceptably low quality
 - considering more adequate prompts and a clearly defined annotation task, it seems plausible that this approach would offer reasonably useful results, and could plausibly be applied to corpora with thousands of items (dedicated hardware, either hosted on premises or via third party vendors, or external APIs would be needed for categorising larger corpora)
-- these preliminary results appear to be rather encouraging, suggesting there may be valid use cases for this approach; more testing with more carefully designed prompts, perhaps replicating previous research and after more thorough exploration of the relevant literature, should be attempted.
-
-[All ratings are available for download as a csv file](medvedev_unhinged_rating.csv). All code used to generate this analysis is [available on GitHub](https://github.com/giocomai/tadadit/tree/main/posts/2024-04-09-inter-coder-reliability-unhinged-medvedev).
+- these preliminary results appear to be rather encouraging, suggesting there may be valid use cases for this approach; more testing with more carefully designed prompts, perhaps replicating previous research should be attempted after more thorough exploration of the relevant literature.
 
 
-## ![](giocomai_TEXT_AS_DATA__DATA_IN_THE_TEXT_pastel_colours_comics_s_ef58faff-dd90-41b5-a4dc-ff4f5e25aede.webp) Context {#top-left-img}
+All ratings are available for download [as a csv file](medvedev_unhinged_rating.csv). All code used to generate this analysis is [available on GitHub](https://github.com/giocomai/tadadit/tree/main/posts/2024-04-09-inter-coder-reliability-unhinged-medvedev).
+
+See at the bottom of this page for example ratings and responses given by one of the LLMs.
+
+## Context
 
 ```{r setup, echo = FALSE, message=FALSE, warning=FALSE}
 knitr::opts_chunk$set(echo = FALSE,
@@ -67,7 +69,7 @@ Indeed, in his seminal book on content analysis, Krippendorf highlights from the
 
 If you are reading this post in 2024, you know all the buzz lately is about so-called "AI" and you know where this is going: could all these Large Language Models (LLM) and Generative Pre-trained Transformers (GPT) do this kind of work?
 
-If it does, this could not only reduce the countless hours of repetitive, unrewarding and often unpaid work dedicated to this kind of activities in research, but could also add more flexibility, transparency and reproducibility to this strand of research. Reproducibility, for example, is often possibile in theory (when both codebook and original contents are made publicly available), but the disproportionate time ncessary for re-analysis makes this highly unlikely in practice.
+If it does, this could not only reduce the countless hours of repetitive, unrewarding and often unpaid work dedicated to this kind of activities in research, but could also add more flexibility, transparency and reproducibility to this strand of research. Reproducibility, for example, is often possible in theory (when both codebook and original contents are made publicly available), but the disproportionate time necessary for re-analysis makes this highly unlikely in practice.
 
 If this approach worked, then it would be relatively straightforward to test alternative hypotheses, define different categories or rating criteria, or adjust the codebook to reflect insights that have emerged since a given research project has been initiated: this all would not only enable reproducibility, but a more active and thorough engagement with research results and possibly more helpful critique.
 
@@ -87,9 +89,9 @@ Rather than relying on commercial vendors (e.g. ChatGPT), the analysis included 
 
 There is growing availability of openly licensed LLM models; the models chosen for this preliminary analysis, admittedly selected on the basis of name recognition rather than more cogent criteria, are the following: 
 
-    -   **LLama2**, namely [`llama2:7b`](https://ollama.com/library/llama2:7b), released by [Meta](https://arxiv.org/abs/2307.09288)
-    -   **Mistral**, namely [`Mistral-7B-Instruct-v0.2`](https://ollama.com/library/mistral:instruct), released by [Mistral AI](https://mistral.ai/news/announcing-mistral-7b/)
-    -   **gemma**, namely [`gemma:2b-instruct`](https://ollama.com/library/gemma:2b-instruct), released by [Google Deep Mind](https://ai.google.dev/gemma/docs/model_card)
+- **LLama2**, namely [`llama2:7b`](https://ollama.com/library/llama2:7b), released by [Meta](https://arxiv.org/abs/2307.09288)
+- **Mistral**, namely [`Mistral-7B-Instruct-v0.2`](https://ollama.com/library/mistral:instruct), released by [Mistral AI](https://mistral.ai/news/announcing-mistral-7b/)
+- **gemma**, namely [`gemma:2b-instruct`](https://ollama.com/library/gemma:2b-instruct), released by [Google Deep Mind](https://ai.google.dev/gemma/docs/model_card)
 
 Another stringent limitation defining the selection relates to hardware: as larger models cannot be run efficiently on my laptop, I limited the choice to two 7b models and one 2b model: smaller models runs much more quickly, but are expected to give lower-quality results under most circumstances. 
 
@@ -100,7 +102,7 @@ There are many ways to run these models locally. I went with [`ollama`](https://
 ### The text to be analysed: Dmitri Medvedev's Telegram channel
 
 
-When choosing a corpus of texts to be analysed, I was looking for a small-sized dataset that could be used for some quick testing. Rather than immediately delve into some replication attempt or look for some standardised test, I settled for something that was easy to parse, with a few hundred items (big enough to have somewhat meaningful results, but not as big as to waste too much processing time on it), and, importantly to me, something that was originally in Russian, to match more closely scenarios I'd find in my own research. Eventually, I decided to analyse all posts by former president of the Russian Federation, and currently Deputy Chairman of the Security Council of the Russian Federation, Dmitri Medvedev: Telegram makes it easy to export all of the channel in machiner readable formats, and as of 1 April 2024 Medvedev posted `{r} nrow(ratings_df |> dplyr::distinct(message_id))` of them in total. Some of these included video or spoken contents, but I decided to leave these out of the analysis for pragmatic reasons (to be clear, it is not particularly complex to convert speech-to-text, as I explored [transcribing Prigozhin's audio messages posted on Telegram](../2023-08-telegram_prigozhin)).
+When choosing a corpus of texts to be analysed, I was looking for a small-sized dataset that could be used for some quick testing. Rather than immediately delve into some replication attempt or look for some standardised test, I settled for something that was easy to parse, with a few hundred items (big enough to have somewhat meaningful results, but not as big as to waste too much processing time on it), and, importantly to me, something that was originally in Russian, to match more closely scenarios I'd find in my own research. Eventually, I decided to analyse all posts by former president of the Russian Federation, and currently Deputy Chairman of the Security Council of the Russian Federation, Dmitri Medvedev: Telegram makes it easy to export all of the channel in machine readable formats, and as of 1 April 2024 Medvedev posted `{r} nrow(ratings_df |> dplyr::distinct(message_id))` of them in total. Some of these included video or spoken contents, but I decided to leave these out of the analysis for pragmatic reasons (to be clear, it is not particularly complex to convert speech-to-text, as I explored [transcribing Prigozhin's audio messages posted on Telegram](../2023-08-telegram_prigozhin)).
 
 ::: callout-tip
 ## About the source
@@ -112,11 +114,11 @@ As of April 2024, it boasts about 1,3 million followers.
 
 ### The question to be asked: how unhinged has Medvedev's online posting become?
 
-As none of this is being conducted with enough attention to technicalities to be considered a serious endeavour, I decided to settle on the first issue that comes to mind when going through Medevedev's posts online, i.e. how incredibly unhinged these posts have become.
+As none of this is being conducted with enough attention to technicalities to be considered a serious endeavour, I decided to settle on the first issue that comes to mind when going through Medvedev's posts online, i.e. how incredibly unhinged these posts have become.
 
 Rather than place each post into categories (e.g. "unhinged" or "not unhinged"), I requested the LLMs to rate the posts, giving it a score between 1 and 10 expressing how unhinged the post is. 
 
-This choice is oviously ridiculous, as even [dictionary definitions](https://www.merriam-webster.com/dictionary/unhinged) of "unhinged" ("highly disturbed, unstable, or distraught") would hardly allow for a clear rating. Human coders would very likely often disagree on such ratings. Still, the question can clearly be expressed in human language and the results can broadly be assessed by human readers. Even this less-than-serious question can offer some insights on how the whole process could, at least in principle, work, and the results can then be passed through standard procedures to evaluate inter-coder reliability.
+This choice is obviously ridiculous, as even [dictionary definitions](https://www.merriam-webster.com/dictionary/unhinged) of "unhinged" ("highly disturbed, unstable, or distraught") would hardly allow for a clear rating. Human coders would very likely often disagree on such ratings. Still, the question can clearly be expressed in human language and the results can broadly be assessed by human readers. Even this less-than-serious question can offer some insights on how the whole process could, at least in principle, work, and the results can then be passed through standard procedures to evaluate inter-coder reliability.
 
 ### Prompting strategies
 
@@ -127,7 +129,7 @@ Based on these simple considerations, for this quick experiment I decided to tes
 - **Prompt 1**: "You rate texts. The original language of texts is Russian. You must rate on a scale from 1 to 10 the degree to which the given text is unhinged. Your rating of the unhinged level must be expressed in digits at the very end of your response. Each response must end with 'the rating is:' and then the rating in digits. There must be no mistake, your response must finish with the rating."
 - **Prompt 2**: "You rate texts. The original language of texts is Russian. You must rate on a scale from 1 to 10 the degree to which the given text is unhinged. Your rating of the unhinged level must be expressed in the following format: 'the unhinged level is: \<digit\>'. This is all that must be in your response, there must be no mistake: 'the unhinged level is: \<digit\>'"
 
-In spite of the strong language used in the prompt, the LLMs I've tested where not very impressed by my insistence on precision, and they included their rating in all sorts of forms. Perhaps, a more concise request and an example response would have helped. Other LLMs, or these same models with different tunings, could be probably be pushed to offer a more consistent, rather than a creative response. However, it was still possible to retrieve the rating consistently, as the digit (or the combination of digits) that came immediately after one of the following expressions:
+In spite of the strong language used in the prompt, the LLMs I've tested where not very impressed by my insistence on precision, and they included their rating in all sorts of forms. Perhaps, a more concise request and an example response would have helped. Other LLMs, or these same models with different tuning, could be probably be pushed to offer a more consistent, rather than a creative response. However, it was still possible to retrieve the rating consistently, as the digit (or the combination of digits) that came immediately after one of the following expressions:
 
 ```{r results='asis', echo = FALSE}
 cat("> ")
@@ -158,7 +160,6 @@ timing_df <- ratings_df |>
                    by = "instruction")
 
 
-  # dplyr::mutate(instruction = stringr::str_replace_all(instruction, pattern = instruction_v[1], replacement = names(instruction_v[1]))) |> 
  timing_df |>  
    dplyr::select(instruction_name, model,coder_id, duration) |> 
    knitr::kable()
@@ -166,7 +167,6 @@ timing_df <- ratings_df |>
 
 ```{r posts_df}
 posts_df <- ratings_df |>
-  #dplyr::filter(nchar(text)>=10) |> 
   dplyr::left_join(tibble::enframe(instruction_v) |> 
                      dplyr::rename(instruction = value, instruction_name = name),
                    by = "instruction") |> 
@@ -223,7 +223,7 @@ posts_10_df |>
 There are various questions that can be asked in reference to inter-coder reliability:
 
 - are models consistent in the rating? i.e.: if a model is given the same input and the same query, will it give consistent ratings?
-- are models subscettible to changes in the way the instruction is given?
+- are models susceptible to changes in the way the instruction is given?
 - do different models provide consistent ratings?
 
 
@@ -303,7 +303,7 @@ knitr::kable()
 ```
 
 
-It appears that when combining raters with different phrasing of the query, but grouping by model, it appear there is a somewhat acceptable degree of agreement only for Mistral 7b:
+It appears that when combining raters with different phrasing of the query, but grouping by model, it appears there is a somewhat acceptable degree of agreement only for Mistral 7b:
 
 
 
@@ -501,7 +501,7 @@ In cases when the rating is low, this is mostly related to either the fact that 
 
 The legalistic turns of phrases that occasionally still emerge in Medvedev's writings also lead to low scores:
 
->  the unhinged level is: 2 This text appears to be a statement about diplomatic tensions between Russia and certain Western countries, and Russia's response to this situation. It does not contain any overtly unhinged or irrational content. The author expresses concern about hostile actions taken against Russian citizens and property, but also mentions plans for cooperation with these countries in the migration sphere. There is no indication of delusional thinking or disconnected ideas in the text. -- Mistral, rating [this post](https://t.me/medvedev_telegram/62
+>  the unhinged level is: 2 This text appears to be a statement about diplomatic tensions between Russia and certain Western countries, and Russia's response to this situation. It does not contain any overtly unhinged or irrational content. The author expresses concern about hostile actions taken against Russian citizens and property, but also mentions plans for cooperation with these countries in the migration sphere. There is no indication of delusional thinking or disconnected ideas in the text. -- Mistral, rating [this post](https://t.me/medvedev_telegram/62)
 
 
 
