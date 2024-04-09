@@ -4,7 +4,7 @@ description: "Russia's government website (Russian version, 2008-2013)"
 author: Giorgio Comai
 date: 2024-03-20
 last-modified: 2024-03-20
-categories: [dataset, Russian institutions, Russian government, Russian language]
+categories: [dataset, Russian institutions, "Russia's government", Russian language]
 editor: source
 ---
 
@@ -72,33 +72,20 @@ corpus_pre_df <- corpus_df
 corpus_df <- corpus_df |> 
   dplyr::filter(is.na(date)==FALSE) 
   
-check <- assertthat::assert_that(nrow(corpus_original_df)==nrow(corpus_df), 
-                        msg = "rows dropped due to missing dates")
+# check <- assertthat::assert_that(nrow(corpus_original_df)==nrow(corpus_df), 
+#                         msg = "rows dropped due to missing dates")
 
 ## close dataset at end date
 corpus_df <- corpus_df |> 
   dplyr::filter(date<=end_date) 
-
-## deduplicate consistently by section order
-
-section_order_v <- c("stens", 
-                     "docs", 
-                     "telegrams")
-
-corpus_df <- tibble::tibble(section = section_order_v) |> 
-  dplyr::left_join(corpus_df,
-                   by = "section") 
-
-corpus_df <- corpus_df |> 
-  dplyr::distinct(date, title, text, .keep_all = TRUE)
 
 corpus_df <- corpus_df |> 
   dplyr::select(-id) |> 
   dplyr::rowwise() |> 
   dplyr::mutate(doc_id = stringr::str_c(website_name, "_", internal_id)) |> 
   dplyr::ungroup() |> 
-  dplyr::relocate(doc_id, text, internal_id) |> 
-  dplyr::arrange(date, internal_id)
+  dplyr::relocate(doc_id, text, date, time, title, place, tags) |> 
+  dplyr::arrange(date, time, internal_id)
 
 ```
 
@@ -106,7 +93,7 @@ corpus_df <- corpus_df |>
 ## Summary statistics
 
 ```{r results='asis'}
-body_text <- stringr::str_c(
+summary_stats_text <- stringr::str_c(
   stringr::str_c("**Dataset name**: ", website_name),
   "**Dataset description**: all items published on archive.government.ru",
   paste("**Start date**:", min(corpus_df$date)),
@@ -118,7 +105,7 @@ body_text <- stringr::str_c(
   stringr::str_c("**Link for download**: [", corpus_name, "](https://github.com/giocomai/tadadit/releases/tag/", corpus_name, ")"),
   sep = "\n\n")
 
-cat(body_text)
+summary_stats_text()
 
 ```
 
@@ -189,7 +176,7 @@ corpus_df |>
 
 piggyback::pb_release_create(repo = "giocomai/tadadit",
                              tag = corpus_name,
-                             body = body_text)
+                             body = summary_stats_text)
 
 piggyback::pb_upload(file = release_file,
                      repo = "giocomai/tadadit",
@@ -203,6 +190,11 @@ readODS::write_ods(x = corpus_df, path = ods_file)
 piggyback::pb_upload(file = ods_file,
           repo = "giocomai/tadadit",
           tag = corpus_name)
+
+cas_write_corpus(corpus = corpus_df,
+                 partition = "year",
+                 tif_compliant = FALSE,
+                 path = fs::path(corpus_path, corpus_name))
 ```
 
 

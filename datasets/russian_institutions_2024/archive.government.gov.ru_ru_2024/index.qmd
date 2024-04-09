@@ -100,7 +100,7 @@ corpus_df <- corpus_df |>
 ## Summary statistics
 
 ```{r results='asis'}
-body_text <- stringr::str_c(
+summary_stats_text <- stringr::str_c(
   stringr::str_c("**Dataset name**: ", website_name),
   "**Dataset description**: all items published on archive.government.gov.ru",
   paste("**Start date**:", min(corpus_df$date)),
@@ -112,7 +112,7 @@ body_text <- stringr::str_c(
   stringr::str_c("**Link for download**: [", corpus_name, "](https://github.com/giocomai/tadadit/releases/tag/", corpus_name, ")"),
   sep = "\n\n")
 
-cat(body_text)
+summary_stats_text()
 
 ```
 
@@ -183,7 +183,7 @@ corpus_df |>
 
 piggyback::pb_release_create(repo = "giocomai/tadadit",
                              tag = corpus_name,
-                             body = body_text)
+                             body = summary_stats_text)
 
 piggyback::pb_upload(file = release_file,
                      repo = "giocomai/tadadit",

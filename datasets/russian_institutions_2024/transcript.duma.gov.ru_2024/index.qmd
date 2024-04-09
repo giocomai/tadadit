@@ -1,90 +1,40 @@
 ---
-title: "mid.ru_ru_2024"
-description: "Russia's MFA (in Russian, 2003-2023)"
+title: "transcript.duma.gov.ru_2024"
+description: "Russia's Duma transcripts (in Russian, 2006-2023)"
 author: Giorgio Comai
-date: 2024-03-20
-last-modified: 2024-03-20
-categories: [dataset, Russian institutions, Russian MFA, Russian language]
+date: 2024-03-22
+last-modified: 2024-03-22
+categories: [dataset, Russian institutions, Duma, transcripts, Russian language]
 editor: source
 ---
 
+::: callout-tip
+## Alternative dataset suggestion
 
-```{r setup, echo = FALSE}
+dekoder.org (2021): Duma Speeches: A Term Frequency Analysis, v. 1.0, Discuss Data, <doi:10.48320/FB52DAC2-66E3-47A3-86C5-B2A3DADF41BF>. 
+:::
+
+
+```{r, echo = FALSE}
 source(fs::path("..", "dataset_setup_2024.R"))
+
 
 cas_set_options(
   base_folder = fs::path(fs::path_home_r(), 
                          "R",
                          "castarter_2024"),
   project = "Russian institutions",
-  website = "mid.ru_ru" 
+  website = "transcript.duma.gov.ru_ru" 
 )
 
-corpus_original_df <- cas_read_db_contents_data() |> 
-  dplyr::collect()
-
-corpus_df <- corpus_original_df
 
 website_name <- cas_get_options()[["website"]]
 corpus_name <- stringr::str_c(website_name, "_2024")
 ```
 
-## Scope of this dataset
 
-[TODO]
-
-## Narrative explanation of how this textual dataset was built
-
-[TODO]
-
-## Metadata
-
-[TODO]
-
-## License information
-
-At the time contents were retrieved, the [page on the conditions for the use of website contents](https://mid.ru/ru/ob_ispolzovanii_informatsii_sayta/) makes clear that contents can be used for research purposes and can be re-published, as long as reference is always made to the website of the MFA.
-
-> Материалы сайта МИД России являются общедоступными и открытыми для использования в некоммерческих (личных, ознакомительных, образовательных, исследовательских и аналогичных) целях.
-
-> Их перепечатка, а также цитирование в СМИ допускается только при условии ссылки на сайт МИД России как источник информации
-
-No specific license is however mentioned.
-
-The contents of this dataset - “mid.ru_ru” - are distributed within the remits of this license. To the extent that it is possible, the dataset itself is also distributed by its creator, Giorgio Comai, at the same conditions, as well as under the Open Data Commons Attribution license (ODC-BY).
-
-
-## Dataset cleaning steps
-
-
-[TODO]
-
-
-```{r cleaning}
-corpus_df <- corpus_original_df
-
-corpus_pre_df <- corpus_df 
-
-## ensure dates always present
-corpus_df <- corpus_df |> 
-  dplyr::filter(is.na(date)==FALSE) 
-  
-# check <- assertthat::assert_that(nrow(corpus_original_df)==nrow(corpus_df), 
-#                         msg = "rows dropped due to missing dates")
-
-## close dataset at end date
-corpus_df <- corpus_df |> 
-  dplyr::filter(date<=end_date) 
-
-
-corpus_df <- corpus_df |> 
-  dplyr::select(-id) |> 
-  dplyr::rowwise() |> 
-  dplyr::mutate(doc_id = stringr::str_c(website_name, "_", url_id)) |> 
-  dplyr::ungroup() |> 
-  dplyr::relocate(doc_id, text, date, datetime, title, internal_id, url_id) |> 
-  dplyr::arrange(datetime, internal_id)
-
+```{r, echo = FALSE, message=FALSE, warning=FALSE}
+corpus_df <- invisible(readr::read_csv(file = get_corpus(corpus_name = corpus_name)))
 ```
 
 
@@ -94,7 +44,7 @@ corpus_df <- corpus_df |>
 ```{r results='asis'}
 summary_stats_text <- stringr::str_c(
   stringr::str_c("**Dataset name**: ", website_name),
-  "**Dataset description**: all items published on the Russian-language version of the website of Russia's MFA",
+  "**Dataset description**: all session transcripts published in Russian on the website of Russia's Duma",
   paste("**Start date**:", min(corpus_df$date)),
   paste("**End date**:", max(corpus_df$date)),
   paste("**Total items**:", scales::number(nrow(corpus_df))),
@@ -120,7 +70,7 @@ corpus_df |>
   scale_y_continuous(name = "", labels = scales::number) +
   scale_x_continuous(name = "", breaks = scales::pretty_breaks(n = 10)) +
   labs(
-    title = "Number of items per year published on the Russian-language version of mid.ru",
+    title = "Number of items per year published on the website of Russia's Duma (transcripts)",
     subtitle = stringr::str_c(
       "Based on ",
       scales::number(nrow(corpus_df)),
@@ -145,7 +95,7 @@ words_per_day_df |>
   geom_col() +
   scale_y_continuous(name = "", labels = scales::number) +
   scale_x_continuous(name = "", breaks = scales::pretty_breaks(n = 10)) +
-  labs(title = "Number of words per year published on the Russian-language version of mid.ru",
+  labs(title = "Number of words per year published on the website of Russia's Duma(transcripts)",
        subtitle = stringr::str_c("Based on ",
                                  scales::number(nrow(corpus_df)),
                                  " items published between ",
@@ -154,6 +104,79 @@ words_per_day_df |>
                                  format.Date(x = max(corpus_df$date), "%d %B %Y")),
        caption = "Source: Giorgio Comai / tadadit.xyz")
 ```
+
+
+
+```{r setup, echo = FALSE}
+
+corpus_original_df <- cas_read_db_contents_data() |> 
+  dplyr::collect()
+
+corpus_df <- corpus_original_df
+
+```
+
+
+
+
+## Scope of this dataset
+
+[TODO]
+
+## Narrative explanation of how this textual dataset was built
+
+[TODO]
+
+## Metadata
+
+[TODO]
+
+## License information
+
+At the time contents were retrieved, the [page on the conditions for the use of website contents](http://duma.gov.ru/about/info/) makes clear that contents can be used for research purposes and can be re-published, as long as reference is always made to the original source.
+
+> Все материалы официального сайта Государственной Думы Федерального Собрания Российской Федерации могут быть воспроизведены в любых средствах массовой информации, на серверах сети Интернет или на любых иных носителях без каких‑либо ограничений по объему и срокам публикации.
+
+> Это разрешение в равной степени распространяется на газеты, журналы, радиостанции, телеканалы, сайты и страницы сети Интернет. Единственным условием перепечатки и ретрансляции является ссылка на первоисточник. Никакого предварительного согласия на перепечатку со стороны Аппарата Государственной Думы не требуется.
+
+No specific license is however mentioned.
+
+The contents of this dataset - “duma.gov.ru” - are distributed within the remits of this license. To the extent that it is possible, the dataset itself is also distributed by its creator, Giorgio Comai, at the same conditions, as well as under the Open Data Commons Attribution license (ODC-BY).
+
+
+## Dataset cleaning steps
+
+
+[TODO]
+
+
+```{r cleaning}
+corpus_df <- corpus_original_df
+
+corpus_pre_df <- corpus_df 
+
+## ensure dates always present
+corpus_df <- corpus_df |> 
+  dplyr::filter(is.na(date)==FALSE) 
+  
+# check <- assertthat::assert_that(nrow(corpus_original_df)==nrow(corpus_df),
+#                         msg = "rows dropped due to missing dates")
+
+## close dataset at end date
+corpus_df <- corpus_df |> 
+  dplyr::filter(date<=end_date) 
+
+
+corpus_df <- corpus_df |> 
+  dplyr::select(-id) |> 
+  dplyr::rowwise() |> 
+  dplyr::mutate(doc_id = stringr::str_c(website_name, "_", url_id)) |> 
+  dplyr::ungroup() |> 
+  dplyr::relocate(doc_id, text, date, title, url, url_id) |> 
+  dplyr::arrange(date, url_id)
+
+```
+
 
 
 

@@ -12,12 +12,12 @@ listing:
 editor: source
 ---
 
-This is a collection of textual datasets based on websites of Russian institutions.
+This is a collection of text datasets based on contents extracted from the websites of Russian institutions.
 
 This is a stable release.
 
-- all datasets do not include materials publised after 31 December 2023
-- download urls and links to metadata pages are expected to remain available
+- all datasets do not include materials published after 31 December 2023
+- download urls and links to metadata pages are expected to remain available at their current location; updates with new contents may be announced here, but will be published separately; any quality adjustment introduced after final publication will be documented
 - a formal release in an established repository is forthcoming - relevant links will be added here
 - context and use cases will be described in a dedicated book chapter [forthcoming] 
 
@@ -38,10 +38,29 @@ get_corpus <- function(corpus_name) {
 
 ```
 
+## Dataset format
+
+Datasets are published as compressed csv files (.csv.gz), as well as in .ods format. 
+
+In line with the [`tif` standard](https://docs.ropensci.org/tif/), each corpus has a few standard columns, as well as additional metadata depending on availability:
+
+- the first column is always `doc_id`, and is composed of the bare corpus name (based on base domain of the source and language) and a numeric id, separated by an underscore. For the Russian version of Kremlin's website, such id would look as follows: `kremlin.ru_ru_12345` (where 12345 is the numeric id associated with the given item). Numeric identifiers have no inherent meaning; their order may be substantially meaningless. If the original source website includes in the url a unique numeric id, this is maintained in the doc_id; otherwise an id is given at database creation (and the order numbering may depend on the way the extraction process was implemented). This format allows to combine datasets, ensuring `doc_id` is still unique.
+- the second column is always `text`: this is the main text included in the source page
+- the third colums is always `title`
+- the fourth colums is always `date`
+- other time-related fields, such as `time` and `datetime`, may follow if available (time and date refer to the original publication timezone; in this release, this is always Moscow's time)
+- additional columns include fields and metadata, depending on availability of contents: this may include substantive text contents (e.g. a separate `lede` or `description` field), categories, tags, location, author, additional identifiers, etc.
+- finally, `url` is always the last column
+
+`doc_id` and `url` are unique and always present. In all of these datasets, also `date` is always present.
+
+
 ## Summary statistics
 
+*Click on the corpus name for more information and download links*
+
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
-#| column: page
+#| column: screen
 
 available_df <- tibble::tribble(
   ~institution, ~corpus_name, 
@@ -49,8 +68,12 @@ available_df <- tibble::tribble(
   "Russia's president", "kremlin.ru_ru_2024",
   "Russia's MFA", "mid.ru_ru_2024",
   "Russia's MFA", "mid.ru_en_2024",
+  "Russia's government", "government.ru_ru_2024",
   "Russia's government (archived version)", "archive.government.gov.ru_ru_2024",
-  "Russia's prime minister (archived version)", "archive.premier.gov.ru_ru_2024"
+  "Russia's prime minister (archived version)", "archive.premier.gov.ru_ru_2024",
+  "Russia's Duma", "duma.gov.ru_ru_2024",
+  "Russia's Duma (transcripts)", "transcript.duma.gov.ru_ru_2024"
+  
   )
 
 summary_stats_df <- purrr::map(
@@ -70,15 +93,17 @@ summary_stats_df <- purrr::map(
                    language = stringr::str_remove(string = x[["corpus_name"]],
                                    pattern = "_[[:digit:]]{4}$") |> 
       stringr::str_extract(pattern = "[[:alpha:]]{2}$"), 
-      `start date` = min(corpus_df[["date"]]), 
-      `end date` = max(corpus_df[["date"]]), 
+      `corpus name` = stringr::str_c("[", x[["corpus_name"]], "](", x[["corpus_name"]], ")", collapse = ""),
+      `start date` = min(corpus_df[["date"]] |> lubridate::as_date()), 
+      `end date` = max(corpus_df[["date"]] |> lubridate::as_date()), 
       n_items = nrow(corpus_df)
       )
   }) |> 
   purrr::list_rbind()
 
 summary_stats_df |> 
-  knitr::kable(format.args = list(big.mark = " "))
+  knitr::kable(format.args = list(big.mark = " "),
+               escape = FALSE)
 ```
 
 ## List of available datasets

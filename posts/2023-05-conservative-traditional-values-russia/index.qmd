@@ -8,11 +8,11 @@ categories: [russia]
 image: "giocomai_audio_file_spectrum_with_Russian_military_in_the_bakgr_6dbd5883-e633-4acc-a2c5-344b60a33b90.webp"
 bibliography: references.bib
 embed-resources: true
+editor: source
 ---
 
 {{< include ./../_early_disclaimer.qmd >}}
 
-**N.B. This post is actually in draft form and a work in progress, it has not reached its final version**
 
 ## ![](giocomai_audio_file_spectrum_with_Russian_military_in_the_bakgr_6dbd5883-e633-4acc-a2c5-344b60a33b90.webp) Context {#top-left-img}
 
@@ -967,5 +967,4 @@ pervy1tv.ru_ru_values_last_word_df |>
     caption = "Source: Giorgio Comai / tadadit.xyz") +
   ggplot2::theme(legend.title = ggplot2::element_blank())
 ```
-
 

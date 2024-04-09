@@ -1,0 +1,538 @@
+---
+title: "How unhinged has Medvedev become? Testing inter-coder reliability of open Large Language Models (LLM)"
+description: "This post offers a preview of some results of early testing with using locally-deployed LLMs as coders"
+author: Giorgio Comai
+date: 2024-04-09
+last-modified: 2024-04-09
+categories: [russia, LLM]
+image: "giocomai_TEXT_AS_DATA__DATA_IN_THE_TEXT_pastel_colours_comics_s_ef58faff-dd90-41b5-a4dc-ff4f5e25aede.webp"
+bibliography: references.bib
+execute: 
+  cache: false
+editor: source
+---
+
+## Preliminary note
+
+The objective of this post is to test the feasibility of running text annotation using openly licensed LLM models on consumer grade hardware (this researcher's own laptop). It aims to find out the scope of plausible applications within these limitations (e.g. understanding how scalable this approach is considering computing times), get a sense of the quality of results working directly with Russian-language contents, and see if standard inter-coder reliability tests provide acceptable results.
+
+This is just **early feasibility testing**, based on superficial engagement with the relevant literature; results are not meant to be inherently valuable. Readers who have already engaged substantially with these techniques will find little of value in this post. 
+
+This post is based on all posts published on [Dmitri Medvedev's Telegram channel](https://t.me/medvedev_telegram), considering only written texts in the posts, and ignoring images and video clips occasionally posted along with it. I use openly licensed LLMs to rate on a scale from 1 to 10 how unhinged each post is. As the chosen query should make clear, this post is really just for testing this approach. 
+
+According to LLMs, many of Medvedev's post deserve a high "unhinged" rating. Humans familiar with the kind of contents routinely posted by the former president of the Russian Federation, currently Deputy Chairman of the Security Council of the Russian Federation, [may well agree](https://theins.ru/en/politics/269816).
+
+
+### Summary of main results
+
+- processing of Telegram posts of various length takes about one hour per 100 posts with a reasonably performing model such as Mistral-7b on my own laptop (without going into details, nvidia graphic card, and relatively recent i7 intel processor)
+- 7b models such as Mistral and Llama deal rather nicely with original text in Russian and provide meaningful text annotation (in this case, rating on a scale from 1 to 10) with reasonably good consistency; repeated runs of the same model provide highly consistent results, while combining different models provide somewhat lower consistency (but poor definition of the annotation task may be to blame)
+- smaller 2b models are much quicker (just a couple of minutes for 100 posts) but results seem to be of unacceptably low quality
+- considering more adequate prompts and a clearly defined annotation task, it seems plausible that this approach would offer reasonably useful results, and could plausibly be applied to corpora with thousands of items (dedicated hardware, either hosted on premises or via third party vendors, or external APIs would be needed for categorising larger corpora)
+- these preliminary results appear to be rather encouraging, suggesting there may be valid use cases for this approach; more testing with more carefully designed prompts, perhaps replicating previous research and after more thorough exploration of the relevant literature, should be attempted.
+
+[All ratings are available for download as a csv file](medvedev_unhinged_rating.csv). All code used to generate this analysis is [available on GitHub](https://github.com/giocomai/tadadit/tree/main/posts/2024-04-09-inter-coder-reliability-unhinged-medvedev).
+
+
+## ![](giocomai_TEXT_AS_DATA__DATA_IN_THE_TEXT_pastel_colours_comics_s_ef58faff-dd90-41b5-a4dc-ff4f5e25aede.webp) Context {#top-left-img}
+
+```{r setup, echo = FALSE, message=FALSE, warning=FALSE}
+knitr::opts_chunk$set(echo = FALSE,
+                      warning = FALSE,
+                      message = FALSE,
+                      fig.width = 8,
+                      fig.height = 4.5, 
+                      fig.align = "center")
+
+
+library("ggplot2")
+library("dplyr", warn.conflicts = FALSE)
+
+ggplot2::theme_set(new = theme_minimal(base_family = "Roboto Condensed"))
+
+source("functions.R")
+source("rollama_medvedev.R")
+
+```
+
+Text annotation is a common task in research based on content analysis. Traditionally, this has involved human coders who read a piece of text and annotate/code/rate it according to rules and scales provided by researchers; in order to ensure consistent results, the same text would often be evaluated by more than one coder: only if a certain degree of agreement between different coders was found, results could be trusted for further analysis.
+
+The whole process is exceedingly time-consuming, and has often been accomplished with the support of research assistants or students trained for this purpose. Partly because it is so time-consuming, once the research design has been defined there is little scope for adjusting criteria used for coding, as re-coding everything would require a disproportionate amount of work.
+
+In recent years, it has become more common to automate part of the process: human coders would work on a subset of the contents that need to be analysed, and their coding results would be used as a training set for machine-learning algorithms, that would process a much larger corpus. If the resulting sets had sufficient consistency, then it would be used for for further analysis. This approach allows for more scalability, but still requires substantial manual effort.
+
+Indeed, in his seminal book on content analysis, Krippendorf highlights from the start that "human intelligence" is required to accomplish such tasks:
+
+> In making data — from recording or describing observations to transcribing or coding texts — **human intelligence** is required [@krippendorff2018, introduction to chapter 7]
+
+If you are reading this post in 2024, you know all the buzz lately is about so-called "AI" and you know where this is going: could all these Large Language Models (LLM) and Generative Pre-trained Transformers (GPT) do this kind of work?
+
+If it does, this could not only reduce the countless hours of repetitive, unrewarding and often unpaid work dedicated to this kind of activities in research, but could also add more flexibility, transparency and reproducibility to this strand of research. Reproducibility, for example, is often possibile in theory (when both codebook and original contents are made publicly available), but the disproportionate time ncessary for re-analysis makes this highly unlikely in practice.
+
+If this approach worked, then it would be relatively straightforward to test alternative hypotheses, define different categories or rating criteria, or adjust the codebook to reflect insights that have emerged since a given research project has been initiated: this all would not only enable reproducibility, but a more active and thorough engagement with research results and possibly more helpful critique.
+
+But does it work? Unsurprisingly, research is being conducted in this direction, and I'd expect a deluge of publications in this direction in the coming years. Some initial tests [e.g. @weber, @plaza-del-arco] suggest that this approach is still outperformed by machine learning approaches relying on a training set, and has other limitations, including inconsistencies when using different models. The recommendation is still that of preferring other approaches for "sensitive applications". But even with all due words of caution, some results seem to be quite promising for "zero-shot text classification", i.e. for instances where LLMs respond to direct prompts expressed in human language without being offered a set of correct answers ([intermediate solutions](https://jbgruber.github.io/rollama/articles/annotation.html), such as one-shot, few-shot, or chain-of-thought prompting strategies also exist).
+
+## What this post is about
+
+There is a considerable and often highly technical literature on all of these issues: this post does not aim to go through the many points - methodological, practical, and ethical - raised there.
+
+Quite on the contrary, this posts shows a naive application of this approach, aimed only at testing the feasibility of using some of these methods with limited computing resources (my own laptop), limited experience with the technicalities of LLMs (no fine-tuning of any sort), and possibly limited coding skills (all of the following requires only beginner-level coding skills).
+
+## Choice of models, tools, text to be analysed, and prompts
+
+### The models: LLama, Mistral, and Gemma
+
+Rather than relying on commercial vendors (e.g. ChatGPT), the analysis included in this post relies on **openly licensed models**. Relying on open models offers clear advantages for the researcher, including in terms of privacy (these LLMs can be deployed locally, and contents are not shared with third parties) and reproducibility (the same query can be run by other researchers with the very same model and the same parameters; there is no dependency on the whims of any specific company). There are also disadvantages: unless the researcher has access to dedicated hardware, they are unlikely to be able to run some of the larger models or to be able to scale easily their analysis. Part of the objective of this post is indeed to test the feasibility of running such analysis on privately-owned hardware (the scalability of working with external APIs ultimately depends on the scalability of available budget).
+
+There is growing availability of openly licensed LLM models; the models chosen for this preliminary analysis, admittedly selected on the basis of name recognition rather than more cogent criteria, are the following: 
+
+    -   **LLama2**, namely [`llama2:7b`](https://ollama.com/library/llama2:7b), released by [Meta](https://arxiv.org/abs/2307.09288)
+    -   **Mistral**, namely [`Mistral-7B-Instruct-v0.2`](https://ollama.com/library/mistral:instruct), released by [Mistral AI](https://mistral.ai/news/announcing-mistral-7b/)
+    -   **gemma**, namely [`gemma:2b-instruct`](https://ollama.com/library/gemma:2b-instruct), released by [Google Deep Mind](https://ai.google.dev/gemma/docs/model_card)
+
+Another stringent limitation defining the selection relates to hardware: as larger models cannot be run efficiently on my laptop, I limited the choice to two 7b models and one 2b model: smaller models runs much more quickly, but are expected to give lower-quality results under most circumstances. 
+
+### The tools: ollama and rollama
+
+There are many ways to run these models locally. I went with [`ollama`](https://ollama.com/), as it is easy to install, offers a nice [selection of models](https://ollama.com/library), and overall allows for a smooth experience to those who do not care about tinkering with the details. A package for the R programming language, [`rollama`](https://jbgruber.github.io/rollama/) [@rollama2024], makes it straightforward to interact with these models through R-based workflows. 
+
+### The text to be analysed: Dmitri Medvedev's Telegram channel
+
+
+When choosing a corpus of texts to be analysed, I was looking for a small-sized dataset that could be used for some quick testing. Rather than immediately delve into some replication attempt or look for some standardised test, I settled for something that was easy to parse, with a few hundred items (big enough to have somewhat meaningful results, but not as big as to waste too much processing time on it), and, importantly to me, something that was originally in Russian, to match more closely scenarios I'd find in my own research. Eventually, I decided to analyse all posts by former president of the Russian Federation, and currently Deputy Chairman of the Security Council of the Russian Federation, Dmitri Medvedev: Telegram makes it easy to export all of the channel in machiner readable formats, and as of 1 April 2024 Medvedev posted `{r} nrow(ratings_df |> dplyr::distinct(message_id))` of them in total. Some of these included video or spoken contents, but I decided to leave these out of the analysis for pragmatic reasons (to be clear, it is not particularly complex to convert speech-to-text, as I explored [transcribing Prigozhin's audio messages posted on Telegram](../2023-08-telegram_prigozhin)).
+
+::: callout-tip
+## About the source
+Dmitri Medvedev Telegram channel is available (in Russian) at the following address: [https://t.me/medvedev_telegram](https://t.me/medvedev_telegram)
+
+As of April 2024, it boasts about 1,3 million followers. 
+:::
+
+
+### The question to be asked: how unhinged has Medvedev's online posting become?
+
+As none of this is being conducted with enough attention to technicalities to be considered a serious endeavour, I decided to settle on the first issue that comes to mind when going through Medevedev's posts online, i.e. how incredibly unhinged these posts have become.
+
+Rather than place each post into categories (e.g. "unhinged" or "not unhinged"), I requested the LLMs to rate the posts, giving it a score between 1 and 10 expressing how unhinged the post is. 
+
+This choice is oviously ridiculous, as even [dictionary definitions](https://www.merriam-webster.com/dictionary/unhinged) of "unhinged" ("highly disturbed, unstable, or distraught") would hardly allow for a clear rating. Human coders would very likely often disagree on such ratings. Still, the question can clearly be expressed in human language and the results can broadly be assessed by human readers. Even this less-than-serious question can offer some insights on how the whole process could, at least in principle, work, and the results can then be passed through standard procedures to evaluate inter-coder reliability.
+
+### Prompting strategies
+
+To keep things simple, I opted for a "zero-shot" approach: just a plain question, without giving an example of correct behaviour (see [some alternatives](https://jbgruber.github.io/rollama/articles/annotation.html)). There are various suggestions online and in relevant scholarly papers on how to receive consistent and quality results from LLMs. These include, for example, requesting that the LLM first explains its reasoning, so that the reasoning is effectively taken in account when giving a response. As processing time depends on both input and output length, besides other factors, there is at least an expected performance advantage to be had in requesting only the annotation/category/rating and nothing else. In either case, I found it is useful to be very clear about the expected response format: the clearer this is requested in the prompt, the more consistent (supposedly) the response. I understand that giving some context about the identity of the LLM can be of use, and giving some context about the contents reduces the chances that the context will be explained back to you in the response (for example, I made clear in the prompts that the original text is in Russian, otherwise the LLM may have found it useful to include this information in its response).
+
+Based on these simple considerations, for this quick experiment I decided to test the following prompts, one requesting to put the rating at the end of the response, the other requesting to include only the rating and nothing else.
+
+- **Prompt 1**: "You rate texts. The original language of texts is Russian. You must rate on a scale from 1 to 10 the degree to which the given text is unhinged. Your rating of the unhinged level must be expressed in digits at the very end of your response. Each response must end with 'the rating is:' and then the rating in digits. There must be no mistake, your response must finish with the rating."
+- **Prompt 2**: "You rate texts. The original language of texts is Russian. You must rate on a scale from 1 to 10 the degree to which the given text is unhinged. Your rating of the unhinged level must be expressed in the following format: 'the unhinged level is: \<digit\>'. This is all that must be in your response, there must be no mistake: 'the unhinged level is: \<digit\>'"
+
+In spite of the strong language used in the prompt, the LLMs I've tested where not very impressed by my insistence on precision, and they included their rating in all sorts of forms. Perhaps, a more concise request and an example response would have helped. Other LLMs, or these same models with different tunings, could be probably be pushed to offer a more consistent, rather than a creative response. However, it was still possible to retrieve the rating consistently, as the digit (or the combination of digits) that came immediately after one of the following expressions:
+
+```{r results='asis', echo = FALSE}
+cat("> ")
+cat(stringr::str_flatten(rating_premise_v, collapse = "; "))                                           
+```
+
+
+Finally, it has been suggested that aggregating results between different models may provide better quality results [@plaza-del-arco], much in the way increased reliability is achieved by having more humans code the same snippet of text. As usual, much depends on context, and evaluation, validation and testing are always needed to decide if these outputs are fit for purpose.
+
+## Scope
+
+In this small test, I've decided to run each prompt three times with each model on each message, as the response differs even if the very same prompt is given to the same model and applied to the same text. This allows to check inter-coder reliability for the same model, as well as between models. 
+
+
+## Timing
+
+On my laptop, it took only about 10 minutes to parse all of the `r nrow(messages_df)` messages posted by Dmitri Medvedev with the smaller `gemma:2b` model; unfortunately, the results are underwhelming. 7b models perform much better, but take considerably longer. `llama2:7b` is slowest, taking about 6 hours to parse all given texts when instructions request to include rating at the end of the response, and about 5 when the rating and nothing else is requested as response. `mistral:7b` seems to be slightly faster in this specific use case, with about 4 and 3 hours respectively. Details in the table below.
+
+
+```{r duration, echo = FALSE}
+timing_df <- ratings_df |> 
+  dplyr::group_by(model, instruction, coder_id) |> 
+  dplyr::arrange(coder_id) |> 
+  dplyr::summarise(duration = (sum(total_duration)/1e9) |> round() |> lubridate::as.duration() |> as.character(), .groups = "drop") |> 
+  dplyr::ungroup() |> 
+  dplyr::left_join(tibble::enframe(instruction_v) |> 
+                     dplyr::rename(instruction = value, instruction_name = name),
+                   by = "instruction")
+
+
+  # dplyr::mutate(instruction = stringr::str_replace_all(instruction, pattern = instruction_v[1], replacement = names(instruction_v[1]))) |> 
+ timing_df |>  
+   dplyr::select(instruction_name, model,coder_id, duration) |> 
+   knitr::kable()
+```
+
+```{r posts_df}
+posts_df <- ratings_df |>
+  #dplyr::filter(nchar(text)>=10) |> 
+  dplyr::left_join(tibble::enframe(instruction_v) |> 
+                     dplyr::rename(instruction = value, instruction_name = name),
+                   by = "instruction") |> 
+  dplyr::mutate(url = stringr::str_c("https://t.me/medvedev_telegram/", message_id)) |> 
+  dplyr::select(-created_at, -coder_numeric) |> 
+  dplyr::relocate(url, message_id, instruction, instruction_name, text, model, response, rating, coder_id, total_duration)
+
+posts_10_df <- posts_df |> 
+  dplyr::filter(nchar(text)>=10) 
+
+filename <- "medvedev_unhinged_rating.csv"
+
+if (fs::file_exists(path = filename)==FALSE) {
+  readr::write_csv(x = posts_df, file = filename)
+}
+
+```
+
+
+## Rating distribution
+
+`gemma:2b` and to a lesser extent `llama2` give consistently high unhinged scores. Mistral seems to differentiate more, and gives more 0 ratings.
+
+The followings graphs show the distribution of the ratings by different coders, i.e. by each iteration of queries, separating by model and by instruction given. 
+
+
+```{r end_with_rating_faceted, fig.width=8, fig.height=8}
+posts_10_df |> 
+  dplyr::filter(instruction_name == "end with rating") |> 
+  ggplot2::ggplot(mapping = ggplot2::aes(x = rating)) +
+  ggplot2::geom_histogram(binwidth = 1) +
+  ggplot2::facet_wrap(~model + coder_id, ncol = 3) +
+  scale_y_continuous(name = NULL, labels = scales::number) +
+  scale_x_binned(name = NULL) +
+  ggplot2::labs(title = "Distribution of unhingedness ratings of Dmitri Medvedev's posts on Telegram", 
+                subtitle = stringr::str_c("Based on three repeated queries per model for each of the ", nrow(posts_10_df |> dplyr::distinct(message_id)), " non-empty posts\nQuery requesting rating at the end of response"))
+```
+
+
+```{r rating_only_faceted, fig.width=8, fig.height=8}
+posts_10_df |> 
+  dplyr::filter(instruction_name != "end with rating") |> 
+  ggplot2::ggplot(mapping = ggplot2::aes(x = rating)) +
+  ggplot2::geom_histogram(binwidth = 1) +
+  ggplot2::facet_wrap(~model + coder_id, ncol = 3) +
+  scale_y_continuous(name = NULL, labels = scales::number) +
+  scale_x_binned(name = NULL) +
+  ggplot2::labs(title = "Distribution of unhingedness ratings of Dmitri Medvedev's posts on Telegram", 
+                subtitle = stringr::str_c("Based on three repeated queries per model for each of the ", nrow(posts_10_df |> dplyr::distinct(message_id)), " non-empty posts\nQuery requesting only rating"))
+```
+
+## Inter-coder reliability
+
+There are various questions that can be asked in reference to inter-coder reliability:
+
+- are models consistent in the rating? i.e.: if a model is given the same input and the same query, will it give consistent ratings?
+- are models subscettible to changes in the way the instruction is given?
+- do different models provide consistent ratings?
+
+
+To deal with these questions, I will rely on the measure known as "[Krippendorff Alpha](https://www.k-alpha.org/methodological-notes)". Broadly speaking, a value of 1 indicates perfect agreement among raters, a value of 0.80 or higher is generally considered acceptable, a value  above 0.66 but below 0.8 indicates moderate agreement (results should be looked at with caution); a lower value indicates low agreement. 
+
+In the following tables I removed all posts which had no text or less than 20 characters of text, reducing the total number of posts to `{r} nrow(posts_10_df |> dplyr::distinct(message_id))`. Before continuing, I should add that posts that LLMs would not categorise, mostly because they are too short, are the ones most likely to cause disagreement among ratings. Ensuring that all inputs can plausibly be rated would probably contribute to better agreement scores.
+
+When all models and all forms of instructions are presented, there is low agreement:
+
+```{r icr_all}
+tidycomm::test_icr(data = posts_10_df |>  
+                     dplyr::select(message_id, coder_id, rating), 
+                   unit_var = message_id,
+                   coder_var = coder_id,
+                   levels = c(rating = "ordinal"),
+                   holsti = FALSE,
+                   kripp_alpha = TRUE,
+                   cohens_kappa = FALSE,
+                   agreement = FALSE,
+                   na.omit = FALSE) |> 
+  tibble::as_tibble() |> 
+  dplyr::select(n_Units, n_Coders, Krippendorffs_Alpha) |> 
+knitr::kable()
+```
+
+If only the two 7b models are included, but both forms of instructions are considered, the rating improves somewhat, but remains rather low.
+
+```{r icr_7b}
+tidycomm::test_icr(data = posts_10_df |>  
+                     dplyr::filter(model == "llama2" | model == "mistral:7b-instruct") |> 
+                     dplyr::select(message_id, coder_id, rating), 
+                   unit_var = message_id,
+                   coder_var = coder_id,
+                   levels = c(rating = "ordinal"),
+                   holsti = FALSE,
+                   kripp_alpha = TRUE,
+                   cohens_kappa = FALSE,
+                   agreement = FALSE,
+                   na.omit = FALSE) |> 
+  dplyr::select(n_Units, n_Coders, Krippendorffs_Alpha) |> 
+knitr::kable()
+```
+
+If different phrasing of the queries are considered separately, and the test is limited to the two 7b models, it appears that querying for the rating, without including the reasoning before, leads to higher inter-coder reliability; llama2 and mistral still have unsatisfying levels of agreement.
+
+```{r icr_7b_by_instruction}
+dplyr::bind_rows(.id = "instruction", 
+`end with rating` = tidycomm::test_icr(data = posts_10_df |>  
+                     dplyr::filter(model == "llama2" | model == "mistral:7b-instruct",
+                                   instruction_name == "end with rating") |>
+                     dplyr::select(message_id, coder_id, rating), 
+                   unit_var = message_id,
+                   coder_var = coder_id,
+                   levels = c(rating = "ordinal"),
+                   holsti = FALSE,
+                   kripp_alpha = TRUE,
+                   cohens_kappa = FALSE,
+                   agreement = FALSE,
+                   na.omit = FALSE),
+`rating only` = tidycomm::test_icr(data = posts_10_df |>  
+                     dplyr::filter(model == "llama2" | model == "mistral:7b-instruct",
+                                   instruction_name == "rating only") |> 
+                     dplyr::select(message_id, coder_id, rating), 
+                   unit_var = message_id,
+                   coder_var = coder_id,
+                   levels = c(rating = "ordinal"),
+                   holsti = FALSE,
+                   kripp_alpha = TRUE,
+                   cohens_kappa = FALSE,
+                   agreement = FALSE,
+                   na.omit = FALSE)
+) |> 
+  tibble::as_tibble() |> 
+  dplyr::select(instruction, n_Units, n_Coders, Krippendorffs_Alpha) |> 
+knitr::kable()
+
+```
+
+
+It appears that when combining raters with different phrasing of the query, but grouping by model, it appear there is a somewhat acceptable degree of agreement only for Mistral 7b:
+
+
+
+```{r icr_by_model}
+#| column: body-outset-left
+dplyr::bind_rows(.id = "model", 
+                 `gemma:2b-instruct` = tidycomm::test_icr(data = posts_10_df |> 
+                     dplyr::filter(model == "gemma:2b-instruct") |> 
+                     dplyr::select(message_id, coder_id, rating), 
+                   unit_var = message_id,
+                   coder_var = coder_id,
+                   levels = c(rating = "ordinal"),
+                   holsti = FALSE,
+                   kripp_alpha = TRUE,
+                   cohens_kappa = FALSE,
+                   agreement = FALSE,
+                   na.omit = FALSE),
+`llama2` = tidycomm::test_icr(data = posts_10_df |> 
+                     dplyr::filter(model == "llama2") |> 
+                     dplyr::select(message_id, coder_id, rating), 
+                   unit_var = message_id,
+                   coder_var = coder_id,
+                   levels = c(rating = "ordinal"),
+                   holsti = FALSE,
+                   kripp_alpha = TRUE,
+                   cohens_kappa = FALSE,
+                   agreement = FALSE,
+                   na.omit = FALSE),
+`mistral:7b-instruct` = tidycomm::test_icr(data = posts_10_df |> 
+                     dplyr::filter(model == "mistral:7b-instruct") |> 
+                     dplyr::select(message_id, coder_id, rating), 
+                   unit_var = message_id,
+                   coder_var = coder_id,
+                   levels = c(rating = "ordinal"),
+                   holsti = FALSE,
+                   kripp_alpha = TRUE,
+                   cohens_kappa = FALSE,
+                   agreement = FALSE,
+                   na.omit = FALSE)
+                 )|> 
+  dplyr::select(model, n_Units, n_Coders, Krippendorffs_Alpha) |> 
+knitr::kable()
+
+
+```
+
+Finally, if we differentiate by both instruction and model, we notice higher consistency. Exceptionally good agreement with Mistral - when only rating is requested, and somewhat acceptable agreement with Mistral when rating is given after a response commenting the rating, and with Llama2, only when it is requested to give a rating only and nothing more.
+
+
+```{r icr_by_model_instruction}
+#| column: body-outset-left
+
+
+dplyr::bind_rows(
+  .id = "model_instruction", 
+  `gemma:2b-instruct_end_with_rating` = tidycomm::test_icr(
+    data = posts_10_df |> 
+      dplyr::filter(model == "gemma:2b-instruct",
+                    instruction_name == "end with rating") |> 
+      dplyr::select(message_id, coder_id, rating), 
+    unit_var = message_id,
+    coder_var = coder_id,
+    levels = c(rating = "ordinal"),
+    holsti = FALSE,
+    kripp_alpha = TRUE,
+    cohens_kappa = FALSE,
+    agreement = FALSE,
+    na.omit = FALSE),
+  
+    `gemma:2b-instruct_rating_only` = tidycomm::test_icr(
+    data = posts_10_df |> 
+      dplyr::filter(model == "gemma:2b-instruct",
+                    instruction_name == "rating only") |> 
+      dplyr::select(message_id, coder_id, rating), 
+    unit_var = message_id,
+    coder_var = coder_id,
+    levels = c(rating = "ordinal"),
+    holsti = FALSE,
+    kripp_alpha = TRUE,
+    cohens_kappa = FALSE,
+    agreement = FALSE,
+    na.omit = FALSE),
+  `llama2_end_with_rating` = tidycomm::test_icr(
+    data = posts_10_df |> 
+      dplyr::filter(model == "llama2",
+                    instruction_name == "end with rating") |> 
+      dplyr::select(message_id, coder_id, rating), 
+    unit_var = message_id,
+    coder_var = coder_id,
+    levels = c(rating = "ordinal"),
+    holsti = FALSE,
+    kripp_alpha = TRUE,
+    cohens_kappa = FALSE,
+    agreement = FALSE,
+    na.omit = FALSE),
+  
+    `llama2_rating_only` = tidycomm::test_icr(
+    data = posts_10_df |> 
+      dplyr::filter(model == "llama2",
+                    instruction_name == "rating only") |> 
+      dplyr::select(message_id, coder_id, rating), 
+    unit_var = message_id,
+    coder_var = coder_id,
+    levels = c(rating = "ordinal"),
+    holsti = FALSE,
+    kripp_alpha = TRUE,
+    cohens_kappa = FALSE,
+    agreement = FALSE,
+    na.omit = FALSE),
+  
+  
+  `mistral:7b-instruct_end_with_rating` = tidycomm::test_icr(
+    data = posts_10_df |> 
+      dplyr::filter(model == "mistral:7b-instruct",
+                    instruction_name == "end with rating") |> 
+      dplyr::select(message_id, coder_id, rating), 
+    unit_var = message_id,
+    coder_var = coder_id,
+    levels = c(rating = "ordinal"),
+    holsti = FALSE,
+    kripp_alpha = TRUE,
+    cohens_kappa = FALSE,
+    agreement = FALSE,
+    na.omit = FALSE),
+  
+    `mistral:7b-instruct_rating_only` = tidycomm::test_icr(
+    data = posts_10_df |> 
+      dplyr::filter(model == "mistral:7b-instruct",
+                    instruction_name == "rating only") |> 
+      dplyr::select(message_id, coder_id, rating), 
+    unit_var = message_id,
+    coder_var = coder_id,
+    levels = c(rating = "ordinal"),
+    holsti = FALSE,
+    kripp_alpha = TRUE,
+    cohens_kappa = FALSE,
+    agreement = FALSE,
+    na.omit = FALSE)
+) |> 
+  dplyr::select(model_instruction, n_Units, n_Coders, Krippendorffs_Alpha) |> 
+knitr::kable()
+
+
+```
+
+It should be noted that results may partially be invalidated by how differently "unhinged" can be understood; a more clearly defined query may give more consistent results. 
+
+Taking a more empirical approach, and checking how distant are the rating of different coders, it emerges how, for example, two iterations of Mistral coding return quite consistently similar results, almost always with only one or two points of difference in a 10 points scale. Larger differences are related to occasions when one iteration decides that a given text cannot be rated, and gives it a zero, while another iteration gives a result. 
+
+```{r diff_17_18_histogram}
+posts_10_df |> 
+  dplyr::select(message_id, coder_id, rating) |> 
+  dplyr::filter(coder_id == "coder_17" | coder_id == "coder_18") |> 
+  tidyr::pivot_wider(names_from = coder_id, values_from = rating) |> 
+  dplyr::mutate(difference = coder_18-coder_17) |>
+  ggplot2::ggplot(mapping = ggplot2::aes(x = difference)) +
+  ggplot2::geom_histogram(binwidth = 1) +
+    ggplot2::labs(title = "Difference among the scores given by two Mistral:7b coders",
+                subtitle = "Rating only, coder_17 and_coder_18")
+```
+
+Even when the rating is requested at the end of the response, variability is mostly limited to a ±2 points difference.
+
+```{r diff_14_15_histogram}
+posts_10_df |> 
+  dplyr::select(message_id, coder_id, rating) |> 
+  dplyr::filter(coder_id == "coder_14" | coder_id == "coder_15") |> 
+  tidyr::pivot_wider(names_from = coder_id, values_from = rating) |> 
+  dplyr::mutate(difference = coder_14-coder_15) |>
+  ggplot2::ggplot(mapping = ggplot2::aes(x = difference)) +
+  ggplot2::geom_histogram(binwidth = 1) +
+  ggplot2::labs(title = "Difference among the scores given by two Mistral:7b coders",
+                subtitle = "Rating after response, coder_14 and_coder_15")
+```
+
+Depending on what is exactly that should be achieved by the rating process, it appears that repeated rating or combined rating by different approaches may offer some measures of which posts are considered by LLMs "very unhinged" and which are not.
+
+## Quality of results
+
+
+LLMs give quite varied range of responses and explanation for the ratings. Occasionally, they are unexpectedly vivid:
+
+> "Оoooh, this text is like a ticking time bomb of unhinged-ness! 💥 The level of hysteria and aggression in this sentence is through the roof! *insert dramatic music* The rating is: 9/10 😱" --  Llama2, rating [this post](https://t.me/medvedev_telegram/52)
+
+Mostly, they are quite descriptive:
+
+> "the unhinged level is: 10. The text expresses extreme and irrational hatred towards Ukraine, its people, and history, making numerous baseless accusations and conspiratorial claims. It also contains violent and aggressive language, as well as a distorted and revisionist interpretation of historical facts." -- Mistral, rating [this post](https://t.me/medvedev_telegram/34)
+
+> "The unhinged level is: 10. This text is unhinged because it urges the listener to commit horrific acts, including murder." -- Gemma:2b, rating [this post](https://t.me/medvedev_telegram/473)
+
+In cases when the rating is low, this is mostly related to either the fact that the text is too short and cannot effectively be rated (but still received a score of zero), or because it includes some description of events:
+
+>  I cannot rate this text as it does not contain any signs of unhinged behavior. The text describes a meeting and a conversation about ensuring safety and economic development in the Luhansk People's Republic and Donetsk People's Republic, involving high-ranking officials from both sides. The rating is: 0. -- Mistral, rating [this post](https://t.me/medvedev_telegram/159)
+
+
+The legalistic turns of phrases that occasionally still emerge in Medvedev's writings also lead to low scores:
+
+>  the unhinged level is: 2 This text appears to be a statement about diplomatic tensions between Russia and certain Western countries, and Russia's response to this situation. It does not contain any overtly unhinged or irrational content. The author expresses concern about hostile actions taken against Russian citizens and property, but also mentions plans for cooperation with these countries in the migration sphere. There is no indication of delusional thinking or disconnected ideas in the text. -- Mistral, rating [this post](https://t.me/medvedev_telegram/62
+
+
+
+A more structured assessment of the results would effectively require human coding of all posts. This obviously goes beyond the scope of this post. However, it should be highlighted that a cursory look at ratings and comments included in responses demonstrated that having text originally in Russian is not an issue. It also seems that a human coder would mostly agree with the ratings; in particular if the categorisation was between "obviously unhinged posts" and "not obviously unhinged posts" it seems that human agreement would indeed be very high. Again, more formal testing would be required, based on a more sensible query, and probably replicating a study that has already been conducted by human coders. 
+
+Based on a cursory reading of responses, Mistral seems to offer the more considerate and meaningful comments and ratings. One iteration of Mistral responses for each type of query are shown below for reference. Click e.g. on the "rating" column to sort by rating, and click on "next" to see various responses.
+
+All responses by all models can be downloaded as [a csv file](medvedev_unhinged_rating.csv).
+
+```{r all_posts_embed}
+#| column: screen-inset
+
+posts_10_df |> 
+  dplyr::select(message_id, coder_id, response,rating, instruction_name) |> 
+  dplyr::filter(coder_id == "coder_14" | coder_id == "coder_17") |> 
+  dplyr::mutate(id = stringr::str_c('<a href="https://t.me/medvedev_telegram/', message_id, '">', message_id, '</a>')) |>
+  dplyr::select(id, response, rating, coder_id, instruction_name) |> DT::datatable(
+    escape = FALSE,
+    rownames = FALSE,
+    list(
+      paging = TRUE,
+      pageLength =  3,
+      columnDefs = list(
+        list(width = "5%", targets = 0),
+        list(width = "80%", targets = 1),
+        list(width = "5%", targets = 2)),
+     dom = 'pti'
+    ),
+    filter = list(position = "top"))
+```
+
+
+
+
