@@ -1,6 +1,6 @@
 ---
 title: "How unhinged has Medvedev become? Testing inter-coder reliability of open Large Language Models (LLM)"
-description: "Testing the feasibility of using locally-deployed LLMs as coders of Russian-lanuage text"
+description: "Testing the feasibility of using locally-deployed LLMs as coders of Russian-language text"
 author: Giorgio Comai
 date: 2024-04-09
 last-modified: 2024-04-09
