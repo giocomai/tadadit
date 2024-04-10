@@ -38,7 +38,8 @@ See at the bottom of this page for example ratings and responses given by one of
 
 ## Context
 
-```{r setup, echo = FALSE, message=FALSE, warning=FALSE}
+```{r setup, echo = FALSE, message=FALSE, warning=FALSE, eval=TRUE, include=FALSE}
+renv::use(lockfile = "renv_post.lock")
 knitr::opts_chunk$set(echo = FALSE,
                       warning = FALSE,
                       message = FALSE,
@@ -55,6 +56,22 @@ ggplot2::theme_set(new = theme_minimal(base_family = "Roboto Condensed"))
 source("functions.R")
 source("rollama_medvedev.R")
 
+packages_v <- c("dplyr", 
+                "ggplot2",
+                "tidyr",
+                "knitr", 
+                "RSQLite",
+                "DT",
+                "rollama", 
+                "tidycomm")
+
+lapply(packages_v, require, character.only = TRUE)
+
+```
+
+```{r renv, eval = FALSE, include = FALSE}
+renv::snapshot(packages = packages_v,
+               lockfile = "renv_post.lock")
 ```
 
 Text annotation is a common task in research based on content analysis. Traditionally, this has involved human coders who read a piece of text and annotate/code/rate it according to rules and scales provided by researchers; in order to ensure consistent results, the same text would often be evaluated by more than one coder: only if a certain degree of agreement between different coders was found, results could be trusted for further analysis.
@@ -73,7 +90,7 @@ If it does, this could not only reduce the countless hours of repetitive, unrewa
 
 If this approach worked, then it would be relatively straightforward to test alternative hypotheses, define different categories or rating criteria, or adjust the codebook to reflect insights that have emerged since a given research project has been initiated: this all would not only enable reproducibility, but a more active and thorough engagement with research results and possibly more helpful critique.
 
-But does it work? Unsurprisingly, research is being conducted in this direction, and I'd expect a deluge of publications in this direction in the coming years. Some initial tests [e.g. @weber, @plaza-del-arco] suggest that this approach is still outperformed by machine learning approaches relying on a training set, and has other limitations, including inconsistencies when using different models. The recommendation is still that of preferring other approaches for "sensitive applications". But even with all due words of caution, some results seem to be quite promising for "zero-shot text classification", i.e. for instances where LLMs respond to direct prompts expressed in human language without being offered a set of correct answers ([intermediate solutions](https://jbgruber.github.io/rollama/articles/annotation.html), such as one-shot, few-shot, or chain-of-thought prompting strategies also exist).
+But does it work? Unsurprisingly, research is being conducted in this direction, and I'd expect a deluge of publications in this direction in the coming years. Some initial tests [e.g. @weber; @plaza-del-arco] suggest that this approach is still outperformed by machine learning approaches relying on a training set, and has other limitations, including inconsistencies when using different models. The recommendation is still that of preferring other approaches for "sensitive applications". But even with all due words of caution, some results seem to be quite promising for "zero-shot text classification", i.e. for instances where LLMs respond to direct prompts expressed in human language without being offered a set of correct answers ([intermediate solutions](https://jbgruber.github.io/rollama/articles/annotation.html), such as one-shot, few-shot, or chain-of-thought prompting strategies also exist).
 
 ## What this post is about
 
@@ -108,7 +125,7 @@ When choosing a corpus of texts to be analysed, I was looking for a small-sized 
 ## About the source
 Dmitri Medvedev Telegram channel is available (in Russian) at the following address: [https://t.me/medvedev_telegram](https://t.me/medvedev_telegram)
 
-As of April 2024, it boasts about 1,3 million followers. 
+As of April 2024, it boasts about 1.3 million followers. 
 :::
 
 
@@ -129,7 +146,7 @@ Based on these simple considerations, for this quick experiment I decided to tes
 - **Prompt 1**: "You rate texts. The original language of texts is Russian. You must rate on a scale from 1 to 10 the degree to which the given text is unhinged. Your rating of the unhinged level must be expressed in digits at the very end of your response. Each response must end with 'the rating is:' and then the rating in digits. There must be no mistake, your response must finish with the rating."
 - **Prompt 2**: "You rate texts. The original language of texts is Russian. You must rate on a scale from 1 to 10 the degree to which the given text is unhinged. Your rating of the unhinged level must be expressed in the following format: 'the unhinged level is: \<digit\>'. This is all that must be in your response, there must be no mistake: 'the unhinged level is: \<digit\>'"
 
-In spite of the strong language used in the prompt, the LLMs I've tested where not very impressed by my insistence on precision, and they included their rating in all sorts of forms. Perhaps, a more concise request and an example response would have helped. Other LLMs, or these same models with different tuning, could be probably be pushed to offer a more consistent, rather than a creative response. However, it was still possible to retrieve the rating consistently, as the digit (or the combination of digits) that came immediately after one of the following expressions:
+In spite of the strong language used in the prompt, the LLMs I've tested were not very impressed by my insistence on precision, and they included their rating in all sorts of forms. Perhaps, a more concise request and an example response would have helped. Other LLMs, or these same models with different tuning, could be probably be pushed to offer a more consistent, rather than a creative response. However, it was still possible to retrieve the rating consistently, as the digit (or the combination of digits) that came immediately after one of the following expressions:
 
 ```{r results='asis', echo = FALSE}
 cat("> ")
@@ -270,6 +287,7 @@ knitr::kable()
 If different phrasing of the queries are considered separately, and the test is limited to the two 7b models, it appears that querying for the rating, without including the reasoning before, leads to higher inter-coder reliability; llama2 and mistral still have unsatisfying levels of agreement.
 
 ```{r icr_7b_by_instruction}
+#| column: body-outset-left
 dplyr::bind_rows(.id = "instruction", 
 `end with rating` = tidycomm::test_icr(data = posts_10_df |>  
                      dplyr::filter(model == "llama2" | model == "mistral:7b-instruct",
@@ -303,7 +321,7 @@ knitr::kable()
 ```
 
 
-It appears that when combining raters with different phrasing of the query, but grouping by model, it appears there is a somewhat acceptable degree of agreement only for Mistral 7b:
+When combining raters with different phrasing of the query, but grouping by model, it appears there is a somewhat acceptable degree of agreement only for Mistral 7b:
 
 
 
@@ -449,7 +467,7 @@ knitr::kable()
 
 ```
 
-It should be noted that results may partially be invalidated by how differently "unhinged" can be understood; a more clearly defined query may give more consistent results. 
+It should be noted that results may partially be invalidated by how differently "unhinged" can be understood; a more clearly defined query may well give more consistent results. 
 
 Taking a more empirical approach, and checking how distant are the rating of different coders, it emerges how, for example, two iterations of Mistral coding return quite consistently similar results, almost always with only one or two points of difference in a 10 points scale. Larger differences are related to occasions when one iteration decides that a given text cannot be rated, and gives it a zero, while another iteration gives a result. 
 
@@ -507,7 +525,7 @@ The legalistic turns of phrases that occasionally still emerge in Medvedev's wri
 
 A more structured assessment of the results would effectively require human coding of all posts. This obviously goes beyond the scope of this post. However, it should be highlighted that a cursory look at ratings and comments included in responses demonstrated that having text originally in Russian is not an issue. It also seems that a human coder would mostly agree with the ratings; in particular if the categorisation was between "obviously unhinged posts" and "not obviously unhinged posts" it seems that human agreement would indeed be very high. Again, more formal testing would be required, based on a more sensible query, and probably replicating a study that has already been conducted by human coders. 
 
-Based on a cursory reading of responses, Mistral seems to offer the more considerate and meaningful comments and ratings. One iteration of Mistral responses for each type of query are shown below for reference. Click e.g. on the "rating" column to sort by rating, and click on "next" to see various responses.
+Based on a cursory reading of responses, Mistral seems to offer the more considerate and meaningful comments and ratings. One iteration of Mistral responses for each type of query are shown below for reference. Click e.g. on the "rating" column to sort by rating, click on "next" to see various responses, and click on the id on the left to see the original post on Telegram.
 
 All responses by all models can be downloaded as [a csv file](medvedev_unhinged_rating.csv).
 
