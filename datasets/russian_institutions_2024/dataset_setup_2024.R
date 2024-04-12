@@ -2,13 +2,25 @@ library("ggplot2")
 library("dplyr", warn.conflicts = FALSE)
 library("castarter")
 
-cas_set_options(
-  base_folder = fs::path(fs::path_home_r(), 
-                         "R",
-                         "castarter_2024"),
-  project = "Russian institutions",
-  website = website_name 
-)
+
+if (website_name == "zavtra.ru_ru") {
+  cas_set_options(
+    base_folder = fs::path(fs::path_home_r(), 
+                           "R",
+                           "castarter_2024"),
+    project = "Russian media",
+    website = website_name
+  )
+} else {
+  cas_set_options(
+    base_folder = fs::path(fs::path_home_r(), 
+                           "R",
+                           "castarter_2024"),
+    project = "Russian institutions",
+    website = website_name 
+  )
+}
+
 
 corpus_name <- stringr::str_c(website_name, "_2024")
 
