@@ -11,6 +11,7 @@ if (website_name == "zavtra.ru_ru") {
     project = "Russian media",
     website = website_name
   )
+  base_explore_link <- "https://explore.tadadit.xyz/2024/"
 } else {
   cas_set_options(
     base_folder = fs::path(fs::path_home_r(), 
@@ -19,6 +20,7 @@ if (website_name == "zavtra.ru_ru") {
     project = "Russian institutions",
     website = website_name 
   )
+  base_explore_link <- "https://explore.tadadit.xyz/2024/ru_institutions_2024/"
 }
 
 
@@ -54,7 +56,7 @@ description_string <- paste(description_string_01, description_string_02, collap
 summary_stats_text <- function() {
   cat(
     stringr::str_c(
-      paste("**Dataset name**:", website_name),
+      paste("**Dataset name**:", corpus_name),
       paste("**Dataset description**:", description_string),
       paste("**Start date**:", min(corpus_df$date)),
       paste("**End date**:", max(corpus_df$date)),
@@ -88,8 +90,8 @@ corpus_year_df |>
         " and ",
         format.Date(x = max(corpus_df$date), "%e %B %Y")) |> 
         stringr::str_squish(),
-      stringr::str_c("Source: Giorgio Comai / tadadit.xyz / ", corpus_name)
-    )  
+      caption = stringr::str_c("Source: Giorgio Comai / tadadit.xyz / ", corpus_name)
+    ) 
 }
 
 words_per_year <- function() {
@@ -102,7 +104,7 @@ words_per_year <- function() {
     cas_summarise(period = "year", auto_convert = TRUE) |>
     rename(year = date) 
   
-  n_breaks <- min(max(corpus_year_df[["year"]])-min(corpus_year_df[["year"]]), 10)
+  n_breaks <- min(max(corpus_year_df[["year"]], na.rm = TRUE)-min(corpus_year_df[["year"]], na.rm = TRUE), 10)
   
   corpus_year_df |> 
     ggplot(mapping = aes(x = year, y = n)) +
@@ -117,7 +119,7 @@ words_per_year <- function() {
                                    " and ",
                                    format.Date(x = max(corpus_df$date), "%e %B %Y")) |> 
            stringr::str_squish(),
-         stringr::str_c("Source: Giorgio Comai / tadadit.xyz / ", corpus_name)
+         caption = stringr::str_c("Source: Giorgio Comai / tadadit.xyz / ", corpus_name)
          )
 }
 
@@ -125,8 +127,8 @@ words_per_year <- function() {
 missing_table <- function() {
   
   missing_long_df <- corpus_df |> 
-    dplyr::mutate(dplyr::across(-date, \(x) {is.na(x)|(as.character(x)=="")})) |> 
-    tidyr::pivot_longer(-date, names_to = "field", values_to = "missing") |> 
+    dplyr::mutate(dplyr::across(dplyr::everything(), \(x) {is.na(x)|(as.character(x)=="")})) |> 
+    tidyr::pivot_longer(dplyr::everything(), names_to = "field", values_to = "missing") |> 
     dplyr::group_by(field, missing) |> 
     dplyr::count() |> 
     dplyr::mutate(missing = dplyr::if_else(missing, "missing", "present")) |> 
@@ -138,7 +140,7 @@ missing_table <- function() {
     dplyr::mutate(missing_share = scales::percent(missing/(present+missing), trim = FALSE,accuracy = 0.1)) 
   
   tibble::tibble(field = colnames(corpus_df)) |> 
-    dplyr::filter(!(field %in% c("doc_id", "date"))) |> 
+   # dplyr::filter(!(field %in% c("doc_id", "date"))) |> 
     dplyr::left_join(y = missing_df, by = "field") |> 
     knitr::kable(format.args = list(big.mark = " "))
 }
@@ -165,12 +167,11 @@ download_callout <- function() {
   cat(
     stringr::str_c(
       "::: {.callout-tip title='Explore or download this dataset'}",
-      stringr::str_c("**[Explore in an interactive web interface](", "https://explore.tadadit.xyz/ru_institutions_2024/", corpus_name, ")**", collapse = ""),
+      stringr::str_c("**[Explore in an interactive web interface](", base_explore_link, corpus_name, ")**", collapse = ""),
       stringr::str_c("**Links for download**: ", "[compressed csv](https://github.com/giocomai/tadadit/releases/download/", corpus_name, "/", corpus_name, ".csv.gz) / ", "[ods](https://github.com/giocomai/tadadit/releases/download/", corpus_name, "/", corpus_name, ".ods)", collapse = ""),
      ":::",
       sep = "\n\n"
     )
   )
-
 }
 

@@ -2,8 +2,8 @@
 title: "zavtra.ru_ru_2024"
 description: "Corpus based on the website of Russian weekly newspaper 'Zavtra' (in Russian, 1996-2023)"
 author: Giorgio Comai
-date: 2024-04-12
-last-modified: 2024-04-12
+date: 2024-04-16
+last-modified: 2024-04-16
 categories: ["corpus", "full corpus", "Russian media", "Russian language"]
 editor: source
 ---
@@ -20,16 +20,27 @@ source(fs::path("..", "russian_institutions_2024", "dataset_setup_2024.R"))
 download_callout()
 ```
 
+<hr />
+
+::: {.callout-tip title="Official release"}
+
+Official release with DOI now available on Discuss Data:
+
+[doi:10.48320/DAE0B5B8-157F-471A-BB3C-EA24E0B2A7F7](https://doi.org/10.48320/DAE0B5B8-157F-471A-BB3C-EA24E0B2A7F7).
+
+Giorgio Comai (2024): *zavtra.ru_ru - Full text corpus based on the website of Russian weekly newspaper 'Zavtra' (in Russian, 1996-2023)*, v. 1.0, Discuss Data, [doi:10.48320/DAE0B5B8-157F-471A-BB3C-EA24E0B2A7F7](https://doi.org/10.48320/DAE0B5B8-157F-471A-BB3C-EA24E0B2A7F7).
+
+::: 
 
 ## Scope of this corpus
 
-This corpus is based on the website of Russian weekly newspaper [zavtra.ru](http://zavtra.ru/). More specifically, according to the ["about" page of the website](https://zavtra.ru/about), the website zavtra.ru "appeared on the basis of the digital version of the newspaper 'Zavtra'".
+This corpus is based on the website of Russian weekly newspaper [zavtra.ru](http://zavtra.ru/).
 
-The structure of the website - an archive with a separate issue dedicated to teach issue of the printed version of the magazine, and the respective page showing in which page of the printed version the article appears - suggests a strict correspondence between the online and the printed version; this, however, has not been checked. 
+The structure of the website suggests a strict correspondence between the online and the printed version: the website includes an archive with a separate section dedicated to each issue of the printed version of the newspaper. Archive pages show also which contents supposedly appear on which page of the printed version. Exact correspondence, however, has not been checked. 
 
-The website also hosts additional contents, such as podcasts, which are not included in this corpus. Only contents linked from the archive page of an issue of the magazine are included in this corpus. 
+The website also hosts additional contents, such as podcasts, which are not included in this corpus. Only contents linked from the archive page of an issue of the newspaper are included in this corpus.
 
-The earliest issue included is issue 149, published on 14 October 1996. The most recent issue included is issue 1563, published on 27 December 2023.
+The earliest issue included in this corpus is issue 149, published on 14 October 1996. The most recent issue included in this corpus is issue 1563, published on 27 December 2023.
 
 
 ## Summary statistics
@@ -58,9 +69,18 @@ missing_graph()
 
 ## Narrative explanation of how this textual corpus was built
 
-Zavtra keeps a full archive of its publications starting from 1996. This corpus was built through a script that retrieves archive pages for each year (e.g. [this for 1996](https://zavtra.ru/archive/1996)), then retrieves the link to the page dedicated to each issue, and from there, extracts links to individual articles. Hence only articles attached to an issue is effectively included in the corpus. 
+*Zavtra* keeps a full archive of its publications starting from 1996. This corpus was built through a script that retrieves archive pages for each year (e.g. [this for 1996](https://zavtra.ru/archive/1996)), then retrieves the link to the page dedicated to each issue, and from there, extracts links to individual articles. Hence only articles attached to an issue are effectively included in the corpus. 
 
-Metadata such as author, date, and tags have been retrieved from the article page itself. Number of the issue is obtained based on the archive page where link to the given page was found. 
+The number of the issue in which each article supposedly appears is obtained based on the archive page where link to the given page was found (see below for potential issues). 
+
+Metadata such as author, date, and tags have been retrieved from the article page itself, based on relevant html tags. In particular:
+
+- `title` is retrieved from `<div>` of class `header__title`
+- `date` and `datetime` have been parsed from the `<span>` of class `header__data`
+- `author` is retrieved from `<span>` of class `avtor-name`
+- `intro` is retrieved from `<div>` of class `header__anonse`
+- `tags` is retrieved from `<span>` of class `artags`
+- `text` is retrieved from `<div>` of class `article__content`
 
 ## Data quality issues
 
@@ -71,17 +91,20 @@ As appears from the above graphs, fields such as "tags" and "intro" have been us
 Some minor issues are listed below:
 
 - especially in articles related to earlier years, title, date of publication, and issue number may be repeated at the beginning of the article itself
-- the date of publication included in such cases may be off by a few days with the date of publication reported above the title
-- the issue number may also be off by one, e.g. this inline text makes reference to issue 228, but is linked from the archive from the page of issue 227. 
+- the date of publication included in such cases may be off by a few days in respect to the date of publication reported above the title
+- the issue number may also be off by one, e.g. this inline text makes reference to issue 228, but is linked from the archive page of issue 227. 
 - a very small number of issues includes only one article
 
 Here is an example showing all of the above issues. 
 
-[Issue 227](https://zavtra.ru/archive/1998/4/227), available from the archive page related to [1998](https://zavtra.ru/archive/1998), includes only [one article](https://zavtra.ru/blogs/1998-04-1711anshl). This [article](https://zavtra.ru/blogs/1998-04-1711anshl), includes at the very beginning of its text the title, and then the following string: "15 (228) Date: 17–04–98". This would suggest that the article was originally published on 17 April 1998 and belonged to issue 228. Yet on the very same page, 13 April 1998 is presented as date of publication, and the article is linked from the archive page of issue 227. Metadata in the corpus would consistently rely on website metadata, hence would keep these latter points of reference. 
+[Issue 227](https://zavtra.ru/archive/1998/4/227), available from the archive page related to [1998](https://zavtra.ru/archive/1998), includes only [one article](https://zavtra.ru/blogs/1998-04-1711anshl). This [article](https://zavtra.ru/blogs/1998-04-1711anshl), includes at the very beginning of its text the title, and then the following string: "15 (228) Date: 17–04–98". This would suggest that the article was originally published on 17 April 1998 and belonged to issue 228. Yet on the very same web page, 13 April 1998 is presented as date of publication, and the 
+article is linked from the archive page of issue 227.
 
-These issues are likely of negligibile impact for analyses looking at long term trends, but should be kept in consideration by researchers for whom exact time of publication is of the essence. Time of publication (hour and minute) should probably be disregarded for earlier years: the 3.00am time of publication reported for many articles is probably just an artifact of importing contents from previous versions of the website, which may have assumed GMT as default time. Again, as these are the metadata currently visible online, they have been dutifully been included in the published corpus, but should be looked at with caution.. 
+Metadata in this corpus consistently rely on website metadata, hence would keep these latter points of reference, and ignore metadata included within the text itself. 
 
-The vast majority of newspaper issues includes between 15 and 30 articles (see graph below). In a small number of cases, as mentioned above, only one article is included in each issue. This may or may not hint at missing articles (perhaps, these were actually published as double issues, and the lone remaining article has been mis-attributed to an effectively non-existent issue). No additional checks have been conducted on these outliers. 
+As the difference is only of a few days, these issues are likely of negligibile impact for analyses looking at long term trends, but should be kept in consideration by researchers for whom exact date of publication is of the essence. Time of publication (hour and minute) should probably be disregarded for earlier years: the 3.00am time of publication reported for many articles is probably just an artifact of importing contents from previous versions of the website, which may have assumed GMT as the default time. Again, as these are the metadata currently visible online, they have been dutifully included in the published corpus, but should be looked at with caution.
+
+The vast majority of newspaper issues includes between 15 and 30 articles (see histogram below). In a small number of cases, as mentioned above, only one article is included in each issue. This may or may not hint at missing articles (perhaps, these were actually published as double issues, and the lone remaining article has been mis-attributed to an effectively non-existent issue). No additional checks have been conducted on these outliers. 
 
 ```{r distribution_per_issue}
 corpus_df |> 
@@ -112,11 +135,11 @@ corpus_df |>
 
 ## License information
 
-At the time contents were retrieved, the footer of zavtra.ru made clear that all contents are available under a Creative Commons license:
+At the time contents were retrieved, the footer of *zavtra.ru* made clear that all contents are available under a Creative Commons license:
 
-> Все материалы сайта доступны по лицензии: [Creative Commons Attribution 4.0 International][https://creativecommons.org/licenses/by/4.0/deed.ru)
+> Все материалы сайта доступны по лицензии: [Creative Commons Attribution 4.0 International](https://creativecommons.org/licenses/by/4.0/deed.ru)
 
-The contents of this dataset - “zavtra.ru_ru_2024” - are distributed within the remits of this license. To the extent that it is possible, the corpus itself is also distributed by its creator, Giorgio Comai, with the same CC-BY license, as well as under the Open Data Commons Attribution license (ODC-BY).
+The contents of this dataset - `zavtra.ru_ru_2024` - are distributed in line with this license. To the extent that it is possible, the corpus itself is also distributed by its creator, Giorgio Comai, with the same CC-BY license, as well as under the Open Data Commons Attribution license (ODC-BY).
 
 
 ```{r corpus_original_df}
@@ -130,9 +153,9 @@ corpus_df <- corpus_original_df
 
 ## Dataset cleaning and reordering
 
-The following steps are conducted on the original dataset before exporting:
+The following columns have been added to the original dataset before exporting:
 
-- introduce an id, based on the row number after reordering for issue number; this is used for reference, and does not necessarily represent order of publication
+- introduce an `id`, based on the row number after reordering for issue number; this is used for reference, and does not necessarily represent order of publication
 - introduce a `doc_id` column (composed of the website base url, the language of the dataset, and the `id`) and set this as the first column of the dataset
 
 
@@ -144,6 +167,7 @@ corpus_pre_df <- corpus_df
 ## ensure dates always present
 corpus_df <- corpus_df |> 
   dplyr::filter(is.na(date)==FALSE) 
+
   
 check <- assertthat::assert_that(nrow(corpus_original_df)==nrow(corpus_df), 
                         msg = "rows dropped due to missing dates")
