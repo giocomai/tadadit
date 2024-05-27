@@ -110,7 +110,7 @@ words_per_year <- function() {
     ggplot(mapping = aes(x = year, y = n)) +
     geom_col() +
     scale_y_continuous(name = "", labels = scales::number) +
-    scale_x_continuous(name = "", breaks = scales::pretty_breaks(n = 10)) +
+    scale_x_continuous(name = "", breaks = n_breaks) +
     labs(title = paste("Number of words per year published on", description_string_02, collapse = " "),
          subtitle = stringr::str_c("Based on ",
                                    scales::number(nrow(corpus_df)),

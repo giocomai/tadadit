@@ -15,7 +15,7 @@ corpus_df |>
 
 piggyback::pb_new_release(repo = "giocomai/tadadit",
                           tag = corpus_name,
-                          body = summary_stats_text)
+                          body = summary_stats_text())
 
 piggyback::pb_upload(file = release_file,
                      repo = "giocomai/tadadit",

@@ -1,0 +1,136 @@
+---
+title: "archive.government.ru_ru_2024"
+description: "Corpus based on the archived version of Russia's government website (in Russian, 2008-2013)"
+author: Giorgio Comai
+date: 2024-05-07
+last-modified: 2024-05-07
+categories: ["dataset", "Russian institutions", "Russian government", "Russian language"]
+editor: source
+---
+
+```{r setup, echo = FALSE, message=FALSE, warning=FALSE, results='asis'}
+website_name <- "archive.government.ru_ru"
+description_string_01 <- "all news items published on"
+description_string_02 <- "archive.government.ru"
+license_string <- "[Creative Commons Attribution 3.0 International](http://creativecommons.org/licenses/by/3.0/)"
+
+source(fs::path("..", "dataset_setup_2024.R"))
+
+
+download_callout()
+
+```
+
+## Scope of this corpus
+
+This corpus is based on all contents published in the "news", "transcripts", and "telegrams" sections of the website [archive.government.ru](http://archive.government.ru/) as it was available online in early 2024.
+
+This website is an archived, static version of Russia's government former website, including only posts for the period May 2008 to May 2013, starting with Vladimir Putin becoming prime minister but including one year after he returned to the presidency and Dmitri Medvedev was prime minister. This is in spite of the fact that the [current government website suggests](http://government.ru/archive/) this archived version should cover the period: "07.05.2008-07.05.2012".
+
+Users should be aware that broadly for the same period (specifically, the time during which Vladimir Putin was prime minister) a separate website for the prime minister was maintained, and its archived version is still available online at [archive.premier.gov.ru](http://archive.premier.gov.ru/). 
+
+
+## Summary statistics
+
+```{r summary_stats, results='asis'}
+summary_stats_text()
+```
+
+
+```{r items_per_year}
+items_per_year()
+```
+
+```{r words_per_year}
+words_per_year()
+```
+
+```{r missing_table}
+missing_table()
+```
+
+```{r missing_graph}
+missing_graph()
+```
+
+
+## Narrative explanation of how this corpus has been created
+
+This corpus has been built based on index pages of the "news", "transccripts", and "telegrams" sections. At the bottom of [each index page](http://archive.government.ru/news/) there is a "show more" button, which shows older posts. The script automatically parses all links for as long as the "shor more" button would show older posts.
+
+Text and metadata have been extracted from the resulting pages. Given that the format of the resulting page differed depending on context, a cascade of css extractors was used for some fields. More specifically, "date" was retrieved from either a `<p>` element of class `date` or from a `<div>` element of class `entry__meta__date`; "text" from either a `<div>` element of class `b06-richtext` or of class `entry__content`.
+
+Many posts include tags to individuals in a dedicated field called "participants" ("*Участники*"), which is included along with other metadata.
+
+### Duplicates
+
+Some items have been posted on the same date, with the same title, and mostly with exactly or almost exactly the same text under different sections of the websites. In such cases (250 in total), the one categorised as "transcript" has been kept, the others discarded.
+
+
+## License information
+
+At the time contents were retrieved, the footer of the website makes clear that all contents available are published with a Creative Commons Attribution 3.0 license:
+
+> [Все материалы сайта доступны по лицензии: Creative Common Attribution 3.0](http://creativecommons.org/licenses/by/3.0/)"
+
+The contents of this dataset - “archive.government.ru_ru” - are distributed within the remits of this license. To the extent that it is possible, the dataset itself is also distributed by its creator, Giorgio Comai, with the same CC-BY license, as well as under the Open Data Commons Attribution license (ODC-BY).
+
+
+
+```{r corpus_original_df, eval = FALSE}
+corpus_original_df <- cas_read_db_contents_data() |> 
+  dplyr::collect() 
+
+corpus_df <- corpus_original_df
+
+# corpus_df |> dplyr::filter(text=="") |> View()
+```
+
+
+
+```{r cleaning, eval = FALSE}
+corpus_df <- corpus_original_df
+
+corpus_pre_df <- corpus_df 
+
+## ensure dates always present
+corpus_df <- corpus_df |> 
+  dplyr::filter(is.na(date)==FALSE) 
+  
+check <- assertthat::assert_that(nrow(corpus_original_df)==nrow(corpus_df), 
+                        msg = "rows dropped due to missing dates")
+
+## close dataset at end date
+corpus_df <- corpus_df |> 
+  dplyr::filter(date<=end_date) 
+
+## deduplicate consistently by section order
+
+section_order_v <- c("stens", 
+                     "docs", 
+                     "telegrams")
+
+corpus_df <- tibble::tibble(section = section_order_v) |> 
+  dplyr::left_join(corpus_df,
+                   by = "section") 
+
+corpus_df <- corpus_df |> 
+  dplyr::distinct(date, title, text, .keep_all = TRUE)
+
+corpus_df <- corpus_df |> 
+  dplyr::select(-id) |> 
+  dplyr::rowwise() |> 
+  dplyr::mutate(doc_id = stringr::str_c(website_name, "_", internal_id)) |> 
+  dplyr::ungroup() |> 
+  dplyr::relocate(doc_id, text, title, date, internal_id) |> 
+  dplyr::relocate(url, .after = dplyr::last_col()) |> 
+  dplyr::arrange(date, internal_id)
+
+```
+
+
+```{r piggyback, eval = FALSE}
+source(fs::path("..", "piggyback_corpus.R"))
+```
+
+

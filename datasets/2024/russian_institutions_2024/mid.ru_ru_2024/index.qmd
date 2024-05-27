@@ -1,0 +1,172 @@
+---
+title: "mid.ru_ru_2024"
+description: "Corpus based on the website of Russia's MFA (in Russian, 2003-2023)"
+author: Giorgio Comai
+date: 2024-05-04
+last-modified: 2024-05-04
+categories: ["corpus", "full corpus", "Russian institutions", "Russia's MFA", "Russian language"]
+editor: source
+---
+
+
+```{r setup, echo = FALSE, message=FALSE, warning=FALSE, results='asis'}
+website_name <- "mid.ru_ru"
+description_string_01 <- "all news items published on"
+description_string_02 <- "the Russian-language version of mid.ru"
+license_string <- "Permissive (see details)"
+
+source(fs::path("..", "dataset_setup_2024.R"))
+
+
+download_callout()
+
+```
+
+
+## Scope of this corpus
+
+This corpus includes all news items published on the Russian-language version of the website of Russia's MFA. 
+
+## Summary statistics
+
+```{r summary_stats, results='asis'}
+summary_stats_text()
+```
+
+```{r items_per_year}
+items_per_year()
+```
+
+```{r words_per_year}
+words_per_year()
+```
+
+
+```{r missing_table}
+missing_table() 
+```
+
+```{r missing_graph}
+missing_graph()
+```
+
+
+
+## Narrative explanation of how this textual dataset was built
+
+The website of Russia's MFA makes it possible to search in its news section by date. All index pages for each date starting with earliest publications have been retrieved. In the few occasions when more than 20 items were published on the same day, a second page for the relevant day was also retrieved. Here is an example of such an index page:
+
+- [https://www.mid.ru/ru/foreign_policy/news/?activeFrom=22.09.2011&activeTo=22.09.2011](https://www.mid.ru/ru/foreign_policy/news/?activeFrom=22.09.2011&activeTo=22.09.2011)
+
+Direct links to news items were extracted from these pages. 
+
+The corpus includes the limited metadata available through the website, namely:
+
+- title
+- date and time of publication
+- an internal id which is included in almost all posts (see note below)
+- a list of the languages in which a given post has been published
+
+## Notes
+
+```{r echo=FALSE, message=FALSE}
+no_text_df <- readr::read_csv(file = stringr::str_c("website_name", "-", "no_text.csv")) |> 
+  dplyr::select(date, title, url) 
+```
+
+This section lists some issues that may be of interest to users of this corpus
+
+- Along with news, the MFA publishes items that detail the timing and accreditation rules for press briefings, see for example: [https://mid.ru/ru/foreign_policy/news/1927386/](https://mid.ru/ru/foreign_policy/news/1927386/). As these do no not include substantive contents, they are not included in the dataset. 
+- Almost all news items are published with an identifier, e.g. "1383-22-09-2011" for [this item](https://www.mid.ru/ru/foreign_policy/news/1607500/). In many instances, in particular in the earlier years, the identifier is missing, and in a handful it is not unique. As a consequence, the numeric component of the url is likely preferrable as the main unique identifier.
+- The Russian-language version of this corpus has a significantly larger number of publications. 
+- There are `r nrow(no_text_df)` items with empty text fields. Indeed, they simply include no text besides the title or include just a link to an external file (not included in this corpus).
+
+```{r eval = FALSE}
+no_text_df |> 
+  knitr::kable()
+```
+
+
+## License information
+
+At the time contents were retrieved, the [page on the conditions for the use of website contents](https://mid.ru/ru/ob_ispolzovanii_informatsii_sayta/) makes clear that contents can be used for research purposes and can be re-published, as long as reference is always made to the website of the MFA. 
+
+> Materials on the website of the Russian Ministry of Foreign Affairs are generally accessible and open for non-commercial use (personal, family, education, research, etc.).
+
+> Their reprinting, as well as any quoting in the mass media is allowed only with a reference to the website of the Russian Ministry of Foreign Affairs as a source of the information.
+
+No specific license is however mentioned.
+
+The contents of this dataset - “mid.ru_ru” - are distributed within the remits of this license. To the extent that it is possible, the dataset itself is also distributed by its creator, Giorgio Comai, at the same conditions, as well as under the Open Data Commons Attribution license (ODC-BY).
+
+
+
+```{r corpus_original_df, message=FALSE, echo=FALSE}
+
+corpus_original_df <- cas_read_db_contents_data() |> 
+  dplyr::collect()
+
+corpus_df <- corpus_original_df
+```
+
+```{r cleaning, message=FALSE, echo=FALSE, include=FALSE}
+corpus_df <- corpus_original_df
+
+corpus_pre_df <- corpus_df 
+
+## ensure dates always present
+corpus_df <- corpus_df |> 
+  dplyr::filter(is.na(date)==FALSE) 
+  
+# check <- assertthat::assert_that(nrow(corpus_original_df)==nrow(corpus_df), 
+#                         msg = "rows dropped due to missing dates")
+
+## close dataset at end date
+corpus_df <- corpus_df |> 
+  dplyr::filter(date<=end_date) 
+
+
+## drop duplicated url_id
+
+corpus_df <- corpus_df |> 
+  dplyr::arrange(nchar(url)) |> 
+  dplyr::distinct(url_id, .keep_all = TRUE)
+
+assertthat::assert_that(nrow(corpus_df)==nrow(corpus_df |> 
+  dplyr::distinct(url_id)), 
+               msg = "duplicated url_id")
+
+
+## export items without text
+no_text_file <- stringr::str_c("website_name", "-", "no_text.csv")
+
+if (fs::file_exists(no_text_file)==FALSE) {
+  no_text_df <- corpus_df |> dplyr::filter(text=="")
+  
+  readr::write_csv(x = no_text_df,
+                   file = no_text_file)
+  
+}
+
+# Check max number of publications by date
+corpus_df |> 
+  dplyr::group_by(date) |> 
+  dplyr::count() |> 
+  dplyr::arrange(dplyr::desc(n))
+
+corpus_df <- corpus_df |> 
+  dplyr::select(-id) |> 
+  dplyr::rowwise() |> 
+  dplyr::mutate(doc_id = stringr::str_c(website_name, "_", url_id)) |> 
+  dplyr::ungroup() |> 
+  dplyr::relocate(doc_id, text, date, datetime, title, internal_id, url_id, translations, countries) |> 
+  dplyr::arrange(date, datetime, internal_id)
+
+```
+
+
+
+
+```{r piggyback, eval = FALSE}
+source(fs::path("..", "piggyback_corpus.R"))
+```

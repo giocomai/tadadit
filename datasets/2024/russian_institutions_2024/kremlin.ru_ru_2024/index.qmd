@@ -8,7 +8,8 @@ categories: [dataset, Russian institutions, Russian language]
 editor: source
 ---
 
-```{r setup, echo = FALSE, message=FALSE, warning=FALSE}
+
+```{r setup, echo = FALSE, message=FALSE, warning=FALSE, results='asis'}
 website_name <- "kremlin.ru_ru"
 description_string_01 <- "all news items published on"
 description_string_02 <- "the Russian-language version of Kremlin.ru"
@@ -20,6 +21,7 @@ source(fs::path("..", "dataset_setup_2024.R"))
 download_callout()
 
 ```
+
 
 ## Scope of this dataset
 
@@ -176,6 +178,7 @@ source(fs::path("..", "piggyback_corpus.R"))
 
 ## Useful links
 
+- the English-language version of this corpus: [kremlin.ru_en_2024](https://tadadit.xyz/datasets/russian_institutions_2024/kremlin.ru_en_2024/)
 - a detailed walkthrough of the technicalities involved in creating this corpus: [Extracting textual contents from the Kremlin’s website with castarter](https://tadadit.xyz/tutorials/2023-02-kremlin_ru_en_extract/)
 - an blog post using a previous version of this dataset: [Russophobia in Russian official statements and media](https://tadadit.xyz/posts/2023-09-russophobia/)
 
