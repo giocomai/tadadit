@@ -45,7 +45,24 @@ readr::read_csv("ca_methods_and_sources.csv", show_col_types = FALSE) %>%
     )) %>% 
   dplyr::select(-"dataset_available", -"dataset_link") %>% 
 knitr::kable()
+
 ```
+
+### Sources that have been checked systematically
+
+The above table is based on targeted but unsystematic searchers on Google Scholar, as well as manual parsing of titles and abstract of the following area studies journals:
+
+-   [Communist and Post-Communist Studies](https://online.ucpress.edu/cpcs/)
+
+    -   
+
+-   [Problems of Post-Communism](https://www.tandfonline.com/journals/mppc20)
+
+    -   full years: 2023
+
+    -   partial: 2024, issue 1
+
+-   
 
 ## Conclusions
 

@@ -9,3 +9,7 @@ _freeze
 _publish.yml
 _site
 .Rprofile
+blokad_ru_pp.rds
+blokad_ru_pp_info.rds
+blokad_trimmed.txt
+pp_ru_subs.csv.gz

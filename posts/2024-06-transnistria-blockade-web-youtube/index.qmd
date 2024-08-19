@@ -1,0 +1,537 @@
+---
+title: "Transnistria 'under blockade': an analysis of local media"
+description: "A quantitative analysis of the main local news agency and TV station, including visual evidence of about 2 000 mentions of 'blockade' on Transnistria's TV."
+author: Giorgio Comai
+date: 2024-06-05
+last-modified: 2024-06-05
+categories: [transnistria, youtube]
+image: "giocomai_visual_representation_of_an_audio_wave_file_an_audio_m_68e5fae2-c19d-42a6-b423-65d0a6c4bf5e.webp"
+bibliography: references.bib
+execute: 
+  cache: false
+editor: source
+draft: false
+---
+
+
+```{r setup, echo = FALSE, message=FALSE, warning=FALSE, eval=TRUE, include=FALSE}
+# {{< include ./../_early_disclaimer.qmd >}}
+renv::use(lockfile = "renv_post.lock")
+knitr::opts_chunk$set(echo = FALSE,
+                      warning = FALSE,
+                      message = FALSE,
+                      fig.width = 8,
+                      fig.height = 4.5, 
+                      fig.align = "center")
+
+
+library("ggplot2")
+library("dplyr", warn.conflicts = FALSE)
+
+ggplot2::theme_set(new = theme_minimal(base_family = "Roboto Condensed"))
+
+packages_v <- c("fs",
+                "readr",
+                "lubridate",
+                "dplyr", 
+                "ggplot2",
+                "tidyr",
+                "knitr", 
+                "renv", 
+                "RSQLite",
+                "DT",
+                "reactable",
+                "castarter", 
+                "stringr",
+                "yyjsonr")
+
+lapply(packages_v, require, character.only = TRUE)
+
+knitr::opts_chunk$set(echo = FALSE,
+                      fig.width = 8,
+                      fig.height = 4.5)
+
+ggplot2::theme_set(
+  new = theme_minimal(
+    base_family = "Roboto Condensed")
+)
+
+fs::dir_create("data")
+```
+
+```{r renv, eval = FALSE, include = FALSE}
+renv::snapshot(packages = packages_v,
+               lockfile = "renv_post.lock")
+```
+
+
+
+```{r npmr_df}
+library("castarter")
+
+npmr_df_path <- fs::path("data", "npmr.rds")
+
+if (fs::file_exists(npmr_df_path)==FALSE) {
+  
+  cas_set_options(base_folder = fs::path(fs::path_home_r(), 
+                                         "R",
+                                         "castarter_tadadit"),
+                  project = "Transnistria media",
+                  website = "novostipmr.com_old_ru"
+  )
+  
+  old_nmpr_df <- cas_read_db_contents_data() |> 
+    dplyr::select(date, title, text, url) |> 
+    dplyr::collect()
+  
+  old_previous_df <- readr::read_csv(fs::path(cas_get_base_folder(), "novostiPMROld.csv"),
+                                     col_select = c("dates", "articlesTxt", "articlesLinks")) |> 
+    dplyr::rename(date = dates, text = articlesTxt, url = articlesLinks) |> 
+    dplyr::mutate(url = fs::path_file(url))
+  
+  cas_set_options(base_folder = fs::path(fs::path_home_r(), 
+                                         "R",
+                                         "castarter_tadadit"),
+                  project = "Transnistria media",
+                  website = "novostipmr.com_ru"
+  )
+  
+  new_nmpr_df <- cas_read_db_contents_data() |> 
+    dplyr::select(date, title, text, url) |> 
+    dplyr::collect()
+  
+  
+  
+  
+  min_new_date <- new_nmpr_df |> 
+    dplyr::slice_min(date, with_ties = FALSE) |> 
+    dplyr::pull(date) |> 
+    as.Date()
+  
+  max_old_date <- old_nmpr_df |> 
+    dplyr::slice_max(date, with_ties = FALSE) |> 
+    dplyr::pull(date) |> 
+    as.Date()
+  
+  npmr_combo_df <- bind_rows(
+    .id = "source",
+    old_online = old_nmpr_df |> 
+      mutate(date = as.Date(date)), 
+    old_previous = old_previous_df |> 
+      filter(date>max_old_date, date<min_new_date), 
+    online = new_nmpr_df |> 
+      mutate(date = as.Date(date))
+  ) |> 
+    dplyr::mutate(year = lubridate::year(date))
+  
+  saveRDS(object = npmr_combo_df, file = npmr_df_path)
+}
+
+
+npmr_df <- readRDS(npmr_df_path)
+
+
+most_recent_date <- npmr_df |> 
+    dplyr::slice_max(date, with_ties = FALSE) |> 
+    dplyr::pull(date) |> 
+    as.Date()
+
+npmr_blokad_count_df <- npmr_df |> 
+  cas_count(pattern = "блокад") 
+```
+
+## References to "blockade" on Transnistria's main news agency
+
+Based on an analysis of `r scales::number(nrow(npmr_df))` news items published by Transnistria's main news agency (novostipmr.com) between `r min(npmr_df$date, na.rm = TRUE) |> format.Date("%B %Y")  |> stringr::str_squish()` and `r max(npmr_df$date, na.rm = TRUE) |> format.Date("%e %B %Y")  |> stringr::str_squish()`, it immediately appears how references to "blockade" have featured quite frequently in local news reporting, with mentions peaking in 2006, during the major crisis that followed the introduction of [new customs regulation](https://en.wikipedia.org/wiki/2006_Transnistrian_customs_crisis).
+
+
+```{r npmr_count_blokad_absolute_barchart}
+npmr_blokad_count_df |> 
+  cas_summarise(period = "year") |> 
+  ggplot(mapping = aes(x = date, y = n)) +
+  geom_col() +
+  scale_x_date(name = NULL, date_breaks = "2 years", date_labels = "%Y") +
+  scale_y_continuous(name = "") +
+    labs(
+    title = "Number of mentions per year of 'blockade' on novostipmr.com",
+    subtitle = "N.B.: Last updated on 30 May 2024; data for 2024 are incomplete"
+    )
+```
+
+Given how much the number and scope of publications on NovostiPMR has changed through the years, both absolute and relative word frequency graphs do not fully reflect the underlying trends (the number of publications was much smaller in the early years, but there was also more focus on political news). 
+
+::: {.column-page}
+
+
+```{r  npmr_count_blokad_relative_barchart, eval = TRUE}
+#| layout-ncol: 2
+npmr_df |> 
+  mutate(year = lubridate::year(date)) |> 
+  cas_count_relative(pattern = "блокад", group_by = year) |> 
+  ggplot(mapping = aes(x = year, y = n)) +
+  geom_col() +
+  scale_x_continuous(name = NULL) +
+  scale_y_continuous(name = "Relative frequency") +
+      labs(
+    title = "Relative frequency of 'blockade' on novostipmr.com",
+    subtitle = "N.B.: Last updated on 30 May 2024; data for 2024 are incomplete"
+    )
+
+npmr_df |> 
+  mutate(year = lubridate::year(date)) |> 
+  cas_count_total_words(group_by = year) |> 
+  ggplot(mapping = aes(x = year, y = n)) +
+  geom_col() +
+  scale_x_continuous(name = NULL) +
+  scale_y_continuous(name = "Total number of words", labels = scales::number) +
+  labs(
+    title = "Total number of words published on novostipmr.com per year",
+    subtitle = "N.B.: Last updated on 30 May 2024; data for 2024 are incomplete"
+  )
+```
+
+:::
+
+
+```{r total_word_count, eval = FALSE}
+npmr_df |> 
+  mutate(year = lubridate::year(date)) |> 
+  cas_count_total_words(group_by = year) |> 
+  ggplot(mapping = aes(x = year, y = n)) +
+  geom_col() +
+  scale_x_continuous(name = NULL) +
+  scale_y_continuous(name = "Total number of words", labels = scales::number) +
+  labs(
+    title = "Total number of words published on novostipmr.com per year",
+    subtitle = "N.B.: Last updated on 30 May 2024; data for 2024 are incomplete"
+  )
+```
+
+
+
+Yet, by focusing on the last decade when the volume and type of publications was somewhat more stable, and switching from yearly totals to moving averages, it is easier to discern moments in time when references to "blockade" have become more frequent. A first attempt shows some trends, but also a remarkably constant feature: a higher number of mentions in late January every year is mostly associated with the commemoration of the [siege of Leningrad](https://en.wikipedia.org/wiki/Siege_of_Leningrad), which ended on 27 January 1944. 
+
+
+
+```{r blokad_nmpr_kwic_df, eval = TRUE}
+blokad_nmpr_kwic_path <- fs::path("data", "blokad_nmpr_kwic.rds")
+
+if (fs::file_exists(blokad_nmpr_kwic_path)==FALSE) {
+  blokad_nmpr_kwic_df <- npmr_df |> 
+    cas_kwic(pattern = "блокад")
+  saveRDS(object = blokad_nmpr_kwic_df, file = blokad_nmpr_kwic_path)
+}
+
+blokad_nmpr_kwic_df <- readRDS(blokad_nmpr_kwic_path)
+
+
+npmr_leningrad_df <- npmr_df |> 
+  filter(stringr::str_detect(text, pattern = stringr::fixed(ignore_case = TRUE,"ленинград"))) |> 
+  select(url)
+  
+```
+
+::: {.column-page}
+
+```{r blokad_leningrad}
+#| layout-ncol: 2
+#| 
+npmr_post_2013_df <- npmr_df |> 
+filter(is.na(date) == FALSE & date>=as.Date("2013-01-01")) 
+
+npmr_post_2013_df |> 
+  cas_count(pattern = "блокад") |> 
+  cas_summarise(period = "day", before = 45, after = 45) |>
+  ggplot(mapping = aes(x = date, y = n)) +
+  geom_line() +
+  scale_x_date(name = NULL, date_breaks = "1 years", date_labels = "%Y") +
+  scale_y_continuous(name = NULL) +
+  labs(
+    title = "References to 'blockade' on novostipmr.com",
+    subtitle = "Average number of mentions per day, calculated on a moving average of 91 days",
+    caption = stringr::str_c(
+      "Based on ", 
+      scales::number(nrow(npmr_post_2013_df)), 
+      " news items published between ",
+      min(npmr_post_2013_df$date) |> format("%e %B %Y") |> stringr::str_squish(), 
+      " and ", 
+      max(npmr_post_2013_df$date) |> format("%e %B %Y") |> stringr::str_squish(),
+      "\nData processing: Giorgio Comai / tadadit.xyz")
+  )
+
+blokad_nmpr_kwic_df |> 
+  filter(date>=as.Date("2013-01-01")) |> 
+  # mutate(leningrad = stringr::str_detect(text, pattern = stringr::fixed(ignore_case = TRUE,"ленинград"))) |>
+  filter(stringr::str_detect(text, pattern = stringr::fixed(ignore_case = TRUE,"ленинград"))) |> 
+  group_by(date) |> 
+  count() |> 
+  ungroup() |> 
+  # dplyr::mutate(pattern = dplyr::if_else(leningrad, "Leningrad", "Other")) |> 
+  dplyr::mutate(pattern = "ленинград") |> 
+  cas_summarise(period = "day", before = 45, after = 45) |>
+  ggplot(mapping = aes(x = date, y = n)) +
+  geom_line() +
+  scale_x_date(name = NULL, date_breaks = "1 years", date_labels = "%Y") +
+  scale_y_continuous(name = NULL) +
+labs(
+title = "References to 'blockade' and 'Leningrad' in the same sentence on novostipmr.com",
+subtitle = "Average number of mentions per day, calculated on a moving average of 91 days",
+caption = stringr::str_c(
+"Based on ", 
+scales::number(nrow(npmr_post_2013_df)), 
+" news items published between ",
+min(npmr_post_2013_df$date) |> format("%e %B %Y") |> stringr::str_squish(), 
+" and ", 
+max(npmr_post_2013_df$date) |> format("%e %B %Y") |> stringr::str_squish(),
+"\nData processing: Giorgio Comai / tadadit.xyz")
+)
+```
+
+:::
+
+
+If we remove all articles that include mentions of "Leningrad", even if this will probably remove also some pieces related to current affairs, we get a more revealing picture:
+
+
+```{r blokad_no_leningrad}
+blokad_nmpr_kwic_df |> 
+  dplyr::anti_join(npmr_leningrad_df, by = "url") |> 
+  filter(date>=as.Date("2013-01-01")) |> 
+  # mutate(leningrad = stringr::str_detect(text, pattern = stringr::fixed(ignore_case = TRUE,"ленинград"))) |>
+  filter(stringr::str_detect(text,
+                             pattern = stringr::fixed(ignore_case = TRUE,"ленинград"),
+                             negate = TRUE)) |> 
+  group_by(date) |> 
+  count() |> 
+  ungroup() |> 
+  # dplyr::mutate(pattern = dplyr::if_else(leningrad, "Leningrad", "Other")) |> 
+  dplyr::mutate(pattern = "ленинград") |> 
+  cas_summarise(period = "day", before = 45, after = 45) |>
+  ggplot(mapping = aes(x = date, y = n)) +
+  geom_line() +
+  scale_x_date(name = NULL, date_breaks = "1 years", date_labels = "%Y") +
+  scale_y_continuous(name = NULL) +
+  labs(
+    title = "References to 'blockade' on novostipmr.com",
+    subtitle = "Average number of mentions per day, calculated on a moving average of 91 days\nExcluding articles mentioning 'Leningrad'",
+    caption = stringr::str_c(
+      "Based on ", 
+      scales::number(nrow(npmr_post_2013_df)), 
+      " news items published between ",
+      min(npmr_post_2013_df$date) |> format("%e %B %Y") |> stringr::str_squish(), 
+      " and ", 
+      max(npmr_post_2013_df$date) |> format("%e %B %Y") |> stringr::str_squish(),
+      "\nData processing: Giorgio Comai / tadadit.xyz")
+  )
+    
+```
+
+In this timeframe, we see some relatively tranquil periods, with fewer references to "Blockade', in particular 2019. But moments of tension are well reflected and easily recognisable:
+
+- March 2014: after Russia's annexation of Crimea, [Ukraine closes its border with Transnistria to males with Russian citizenship](https://tass.com/world/723682)
+- June 2015: [Ukraine canceled the agreement](https://eurasianet.org/with-ukrainian-blockade-drums-of-war-sounding-in-transnistria) that allowed Russia to supply its troops stationed in Transnistria
+- late 2015: a new agreement between Moldova and Ukraine on [joint control of border crossings was signed](https://novostipmr.com/ru/news/15-11-05/vitaliy-ignatev-troynoy-tamozhennyy-i-pogranichnyy-kontrol-ne); besides, the news agency posted a number of statements and opinion pieces that highlighting the difficulty of the situation and the role that Russia could/should play (perhaps, trying to get more active Russian involvement)
+- relative quiet until the summer of 2017, when the deal on joint Moldo-Ukraining border control [actually comes to fruition](https://euromaidanpress.com/2017/07/21/ukraine-helps-moldova-regain-control-over-border-in-transnistria-region/)
+- then again fewer references to "blockade", until a brief increase related to Covid in early 2020, and a more consistent increase in mentions in late 2021, when they are mostly related to the so-called ["bank" blockade](https://novostipmr.com/ru/news/21-11-11/bankovskaya-blokada-so-storony-moldovy-vlechet-problemy-dlya-vsego) related to difficulties in registering bank accounts of Transnistria-based companies
+- then, after the beginning of Russia's invasion of Ukraine in February 2022, frequency of mentions onece again increase, in relation to new limitations to border crossings toward Ukraine
+- finally, in early 2024, a new peak of references to "blockade" related to the unexpected [introduction of new custom duties](https://balkaninsight.com/2024/01/05/moldova-tells-companies-in-breakaway-transnistria-time-to-pay-taxes/)
+
+
+These are mostly references are to "economic blockade", but looking at co-occurrences of selected keywords in the same sentence as "blockade" it appears that other types of "blockade" appear quite frequently:
+
+
+```{r blockade_by_type, eval = TRUE}
+
+patterns_df <- tribble(
+  ~pattern_ru,         ~pattern_en,
+  "военн[а-я]+",        "military",
+  
+  "экономическ[а-я]+",  "economic",
+  "финансов[а-я]+",     "financial",
+  "таможенн[а-я]+",     "customs",
+  "банковск[а-я]+",     "bank",
+  
+  "железнодорожн[а-я]+|железной дороги", "train",
+  "транспорт", "transport",
+  
+  "информационн[а-я]+", "informational",
+  
+  "дипломатическ[а-я]+","diplomatic",
+  "политическ[а-я]+",   "political",
+
+  "правов[а-я]+",       "legal",
+  
+  "лекарств[а-я]+|медикамент[а-я]+",       "medicines",
+  
+  "Ленинград",          "leningrad"
+)
+
+# Блокадные меры 
+
+
+matches_df <- purrr::map(.x = purrr::transpose(.l = patterns_df), .f = function(x) {
+  out_df <- tibble::tibble(x = stringr::str_detect(string = blokad_nmpr_kwic_df$text, pattern = stringr::regex(pattern = x$pattern_ru, ignore_case = TRUE)))
+  colnames(out_df) <- x$pattern_en
+  out_df
+}) |> purrr::list_cbind()
+
+matches_combo_df <- dplyr::bind_cols(
+  blokad_nmpr_kwic_df, 
+  matches_df
+) 
+
+
+no_match_df <- matches_combo_df |> 
+  dplyr::filter(!dplyr::if_any(military:leningrad, \(x) x>0))
+  
+
+
+matches_combo_df |> 
+  dplyr::summarise(dplyr::across(military:leningrad, sum)) |> 
+  pivot_longer(cols = dplyr::everything(), names_to = "type", values_to = "n") |> 
+  arrange(dplyr::desc(n)) |> 
+  knitr::kable()
+
+```
+
+::: column-page
+
+It may also be worth noticing how some of the blockade-related concerns changed through the years: for example, the issue of "informational blockade" is much less of a concern in recent years, while, on the contrary, the issue of "bank blockade" has effectively emerged only in recent years.
+
+```{r selected_blockade_types}
+#| layout-ncol: 2
+matches_combo_df |> 
+  dplyr::filter(informational) |> 
+  dplyr::filter(is.na(year)==FALSE) |> 
+  dplyr::group_by(year) |> 
+  count() |> 
+  ggplot2::ggplot(mapping = aes(x = year, y = n)) +
+  geom_col() +
+  scale_x_continuous(name = NULL, breaks = scales::pretty_breaks(n = 10)) +
+  scale_y_continuous(name = NULL, breaks = scales::pretty_breaks(n = 6)) +
+  labs(title = "Number of references to 'informational blockade' on Novostipmr.com")
+
+matches_combo_df |> 
+  dplyr::filter(bank) |> 
+  dplyr::filter(is.na(year)==FALSE) |> 
+  dplyr::group_by(year) |> 
+  count() |> 
+  ggplot2::ggplot(mapping = aes(x = year, y = n)) +
+  geom_col() +
+  scale_x_continuous(name = NULL, breaks = scales::pretty_breaks(n = 10)) +
+  scale_y_continuous(name = NULL, breaks = scales::pretty_breaks(n = 6)) +
+  labs(title = "Number of references to 'bank blockade' on Novostipmr.com")
+```
+
+:::
+
+
+### All references to "blockade" on NovostiPMR.com
+
+Here are all references to "blockade" on novostipmr.com, in context:
+
+::: column-screen-inset
+
+```{r blokad_nmpr_kwic_reactable}
+blokad_nmpr_kwic_df |> 
+  dplyr::anti_join(npmr_leningrad_df, by = "url") |> 
+  dplyr::filter(is.na(url)==FALSE) |> 
+  dplyr::mutate(title = stringr::str_c("<a href='", url, "'>", title, "</a>")) |> 
+  dplyr::select(-year, -text, -url, -source) |> 
+  #filter(date>=as.Date("2013-01-01")) |> 
+  dplyr::arrange(date) |> 
+ DT::datatable(
+    escape = FALSE,
+    rownames = FALSE,
+    list(
+      paging = TRUE,
+      pageLength =  5,
+      columnDefs = list(
+        list(width = "10%", targets = 0),
+        list(width = "30%", targets = 1),
+        list(width = "20%", targets = 2),
+        list(width = "10%", targets = 3),
+        list(width = "20%", targets = 4)),
+      dom = 'pti'
+    ),
+    filter = list(position = "top")
+ )
+ 
+    # reactable::reactable(filterable = TRUE,
+    #                    highlight = TRUE, 
+    #                    resizable = TRUE,
+    #                    defaultPageSize = 5,
+    #                    columns = list(
+    #                      date = reactable::colDef(maxWidth = 130),
+    #                      title = reactable::colDef(html = TRUE),
+    #                      before = reactable::colDef(align = "right",
+    #                                                 minWidth = 120),
+    #                      pattern = reactable::colDef(maxWidth = 120),
+    #                      after = reactable::colDef(minWidth = 120)
+    #                    ),
+    #                    paginationType = "jump")
+```
+
+:::
+
+
+N.B: for some of the earlier publication, the date could not be efficiently identified exactly: for the earliest years, publications are set to the 15th of the month of publication, if the exact date could not be retrieved.
+
+
+## Transnistria's "Pervy Pridnestrovsky" TV channel
+
+```{r blokad_ru_pp}
+blokad_ru_pp_df <- readr::read_rds(file = "blokad_ru_pp.rds")
+
+info_blokad_df <- readr::read_rds(file = "blokad_ru_pp_info.rds")
+
+
+```
+
+What about television? References to "blockade" are common in news segments, politics-focused broadcasts, and talks shows. 
+
+Out of the about 40 000 video clips available on [Pervy Pridnestrovsky's YouTube channel](https://www.youtube.com/@PervyPridnestrovsky) for which automatic captions are available, `r scales::number(length(unique(blokad_ru_pp_df$yt_id)))` include at least one mention of "blockade", for a total of `r scales::number(nrow(blokad_ru_pp_df))` mentions in total.[^1]
+
+[^1]: This analysis has been conducted through a dedicated R package created for this purpose by this author; see the documentation, as well as references to other software that enabled this excercise, on the [project's repository](https://github.com/giocomai/ytdlpr).
+
+In order to get a more direct sense of these contents, rather than repeat the above analysis, a series of 4-seconds segments for each mention of "blockade" is included below. 
+
+An overlay text on top of each clip shows:
+
+- the date when the clip was published
+- the YouTube identifier for each clip
+- the title
+- the timing in the given clip where the given segment can be found. 
+
+The following video clip shows all mentions that appeared between January and May 2024, and lasts about 24 minutes. 
+
+{{< video https://youtu.be/D8mUl2zMAg8 >}}
+
+The following table includes a direct link to all mentions of "blockade" in each of the video clips that appeared on Pervy Pridnestrovsky's YouTube channel (it is possible to filter by date or keywords to find more easily contents of interest):
+
+::: column-screen-inset
+
+```{r blokad_pp_links}
+info_blokad_df |> 
+  dplyr::left_join(y = blokad_ru_pp_df,
+                   by = "yt_id") |> 
+  dplyr::arrange(upload_date) |> 
+  dplyr::mutate(title = stringr::str_c("<a href='", link, "'>", title, "</a>")) |>
+  dplyr::select(upload_date, title, text) |> 
+DT::datatable(
+    escape = FALSE,
+    rownames = FALSE,
+    list(
+      paging = TRUE,
+      pageLength =  5,
+      columnDefs = list(
+        list(width = "20%", targets = 0),
+        list(width = "40%", targets = 1),
+        list(width = "40%", targets = 2)),
+      dom = 'pti'
+    ),
+    filter = list(position = "top")
+ )
+```
+
+:::
