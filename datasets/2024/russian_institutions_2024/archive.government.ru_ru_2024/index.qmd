@@ -56,7 +56,7 @@ missing_graph()
 
 ## Narrative explanation of how this corpus has been created
 
-This corpus has been built based on index pages of the "news", "transccripts", and "telegrams" sections. At the bottom of [each index page](http://archive.government.ru/news/) there is a "show more" button, which shows older posts. The script automatically parses all links for as long as the "shor more" button would show older posts.
+This corpus has been built based on index pages of the "news", "transcripts", and "telegrams" sections. At the bottom of [each index page](http://archive.government.ru/news/) there is a "show more" button, which shows older posts. The script automatically parses all links for as long as the "show more" button would show older posts.
 
 Text and metadata have been extracted from the resulting pages. Given that the format of the resulting page differed depending on context, a cascade of css extractors was used for some fields. More specifically, "date" was retrieved from either a `<p>` element of class `date` or from a `<div>` element of class `entry__meta__date`; "text" from either a `<div>` element of class `b06-richtext` or of class `entry__content`.
 
@@ -69,7 +69,7 @@ Some items have been posted on the same date, with the same title, and mostly wi
 
 ## License information
 
-At the time contents were retrieved, the footer of the website makes clear that all contents available are published with a Creative Commons Attribution 3.0 license:
+The footer of the website makes clear that all contents available are published with a Creative Commons Attribution 3.0 license:
 
 > [Все материалы сайта доступны по лицензии: Creative Common Attribution 3.0](http://creativecommons.org/licenses/by/3.0/)"
 

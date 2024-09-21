@@ -1,0 +1,160 @@
+---
+title: "archive.premier.gov.ru_ru_2024"
+description: "Corpus based on the archived version of the website of Russia's prime minister (in Russian, 2008-2012)"
+author: Giorgio Comai
+date: 2024-08-26
+last-modified: 2024-08-26
+categories: ["dataset", "Russian institutions", "Russian government", "Russian language"]
+editor: source
+---
+
+```{r setup, echo = FALSE, message=FALSE, warning=FALSE, results='asis'}
+website_name <- "archive.premier.gov.ru_ru"
+description_string_01 <- "all news items published on"
+description_string_02 <- "archive.premier.gov.ru"
+license_string <- "[Creative Commons Attribution 3.0 International](http://creativecommons.org/licenses/by/3.0/)"
+
+source(fs::path("..", "dataset_setup_2024.R"))
+
+
+download_callout()
+
+```
+
+## Scope of this corpus
+
+This corpus is based on all contents published in the ["news" section](http://archive.premier.gov.ru/events/news/) of the website [archive.premier.gov.ru](http://archive.premier.gov.ru/) as it was available online in early 2024.
+
+Users should be aware that broadly for the same period (specifically, the time during which Vladimir Putin was prime minister) a separate website for the government was maintained, and its archived version is still available online at [archive.government.gov.ru](http://archive.government.ru/). 
+
+
+## Summary statistics
+
+```{r summary_stats, results='asis'}
+summary_stats_text()
+```
+
+
+```{r items_per_year}
+items_per_year()
+```
+
+```{r words_per_year}
+words_per_year()
+```
+
+```{r missing_table}
+missing_table()
+```
+
+```{r missing_graph}
+missing_graph()
+```
+
+
+## Narrative explanation of how this corpus has been created
+
+This corpus has been built based on index pages of the [event "news"](http://archive.premier.gov.ru/events/news/) section, retrieving links starting with the earliest publication.
+
+Links to photo, video, and audio pages have been removed, only textual contents have been kept. 
+
+Text and metadata have been extracted from the resulting pages.
+
+### Duplicates
+
+Some items have been posted on the same date, with the same title, and with the same text under different urls (but the same numeric component in the url, here recorded as `internal_id`). In such cases, duplicates have been removed. 
+
+### Items with title but no text
+
+There are `r corpus_df |> dplyr::filter(text=="") |> nrow()` items with title, but no text. These are kept in the dataset, as the title may still offer relevant contents. 
+
+
+## License information
+
+At the time contents were retrieved, the footer of the website makes clear that all contents available are published with a Creative Commons Attribution 3.0 license:
+
+> [Creative Commons Attribution 3.0 Непортированная](http://creativecommons.org/licenses/by/3.0/)"
+
+The contents of this dataset - “archive.premier.gov.ru_ru” - are distributed within the remits of this license. To the extent that it is possible, the dataset itself is also distributed by its creator, Giorgio Comai, with the same CC-BY license, as well as under the Open Data Commons Attribution license (ODC-BY).
+
+
+
+```{r corpus_original_df, eval = FALSE}
+corpus_original_df <- cas_read_db_contents_data() |> 
+  dplyr::collect() 
+
+corpus_df <- corpus_original_df
+
+# corpus_df |> dplyr::filter(text=="") |> View()
+```
+
+
+
+
+```{r cleaning, eval = FALSE}
+corpus_df <- corpus_original_df
+
+corpus_pre_df <- corpus_df 
+
+## ensure dates always present, and of date class
+corpus_df <- corpus_df |> 
+  dplyr::mutate(date = as.Date(date)) |> 
+  dplyr::filter(is.na(date)==FALSE) 
+
+check <- assertthat::assert_that(nrow(corpus_original_df)==nrow(corpus_df), 
+                        msg = "rows dropped due to missing dates")
+
+## drop all visits that are not events, as they are collector pages without text  
+# corpus_df |> 
+#   dplyr::filter(title == "") |> 
+#   nrow()
+
+no_contents_df <- corpus_df |> 
+  dplyr::filter(stringr::str_detect(url, stringr::fixed("/visits/"))) |> 
+  dplyr::filter(stringr::str_detect(url, stringr::fixed("/events/"), negate = TRUE)) 
+
+corpus_df <- corpus_df |> 
+  dplyr::anti_join(no_contents_df, by = "url")
+
+## close dataset at end date
+corpus_df <- corpus_df |> 
+  dplyr::filter(date<=end_date) 
+
+## deduplicate consistently by section order
+
+section_order_v <- c("visits/world", 
+                     "visits/ru", 
+                     "events/news")
+
+corpus_df <- tibble::tibble(section = section_order_v) |> 
+  dplyr::left_join(corpus_df,
+                   by = "section") 
+
+corpus_df <- corpus_df |> 
+  dplyr::distinct(date, title, text, .keep_all = TRUE)
+
+check <- assertthat::are_equal(x = corpus_df |> 
+                                 dplyr::group_by(internal_id, .keep_all = TRUE) |> 
+                                 dplyr::add_count() |> 
+                                 dplyr::filter(n>1) |> 
+                                 nrow(),
+                               y = 0,
+                               msg = "no duplicate internal_id found")
+
+corpus_df <- corpus_df |> 
+  dplyr::select(-id) |> 
+  dplyr::rowwise() |> 
+  dplyr::mutate(doc_id = stringr::str_c(website_name, "_", internal_id)) |> 
+  dplyr::ungroup() |> 
+  dplyr::relocate(doc_id, text, title, date, datetime, section, internal_id) |> 
+  dplyr::relocate(url, .after = dplyr::last_col()) |> 
+  dplyr::arrange(date, internal_id)
+
+```
+
+
+```{r piggyback, eval = FALSE}
+source(fs::path("..", "piggyback_corpus.R"))
+```
+
+

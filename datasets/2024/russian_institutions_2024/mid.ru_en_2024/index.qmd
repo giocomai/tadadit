@@ -78,7 +78,7 @@ This section lists some issues that may be of interest to users of this corpus
 
 - Many items include the string: "Unofficial translation from Russian"
 - Along with news, the MFA publishes items that detail the timing and accreditation rules for press briefings, see for example: [https://mid.ru/en/foreign_policy/news/1927386/](https://mid.ru/en/foreign_policy/news/1927386/). As these do no not include substantive contents, they are not included in the dataset. 
-- Almost all news items are published with an identifier, e.g. "1383-22-09-2011" for [this item](https://www.mid.ru/en/foreign_policy/news/1607500/). In a few dozens of instances the identifier is missing, and in a handful it is not unique. As a consequence, the numeric component of the url is likely preferrable as the main unique identifier.
+- Almost all news items are published with an identifier, e.g. "1383-22-09-2011" for [this item](https://www.mid.ru/en/foreign_policy/news/1607500/). In a few dozens of instances the identifier is missing, and in a handful it is not unique. As a consequence, the numeric component of the url is likely preferable as the main unique identifier.
 - The Russian-language version of this corpus has a significantly larger number of publications. 
 - There are `r nrow(no_text_df)` items with empty text fields, they are listed below. Indeed, they simply include no text besides the title or include just a link to an external file (not included in this corpus).
 

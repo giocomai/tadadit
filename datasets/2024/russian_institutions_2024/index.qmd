@@ -1,5 +1,5 @@
 ---
-title: "Russian institutions 2024"
+title: "Russian state institutions 2024"
 listing:
   sort: "title asc"
   type: table
@@ -12,18 +12,20 @@ listing:
 editor: source
 ---
 
-This is a collection of text datasets based on contents extracted from the websites of Russian institutions.
+This is a collection of full-text datasets based on contents extracted from the websites of Russian institutions.
 
 This is a stable release.
 
 - all datasets do not include materials published after 31 December 2023
 - download urls and links to metadata pages are expected to remain available at their current location; updates with new contents may be announced here, but will be published separately; any quality adjustment introduced after final publication will be documented
 - a formal release in an established repository is forthcoming - relevant links will be added here
-- context and use cases will be described in a dedicated book chapter [forthcoming] 
+- context and use cases are described in a dedicated book chapter:
+
+> Comai, Giorgio (2025, forthcoming), "Text-mining on-line sources from Russia openly", in *Autocracy, Influence, War: Russian Propaganda Today*, edited by Paul Goode
 
 The name of each corpus is composed of the bare domain name, a two letter code of the main language of the contents, and the year of release of the dataset, separated by an underscore, e.g. `kremlin.ru_ru_2024`.
 
-```{r echo=FALSE, eval = TRUE, message=FALSE, warning=FALSE}
+```{r setup, echo=FALSE, eval = TRUE, message=FALSE, warning=FALSE}
 library("piggyback")
 options(piggyback.verbose = FALSE)
 base_folder <- fs::dir_create(fs::path(fs::path_home_r(), "R", "ru_institutions_2024"))
@@ -52,14 +54,17 @@ In line with the [`tif` standard](https://docs.ropensci.org/tif/), each corpus h
 - additional columns include fields and metadata, depending on availability of contents: this may include substantive text contents (e.g. a separate `lede` or `description` field), categories, tags, location, author, additional identifiers, etc.
 - finally, `url` is always the last column
 
-`doc_id` and `url` are unique and always present. In all of these datasets, also `date` is always present.
+`doc_id` and `url` are conceptually unique and always present. In all of these datasets, also `date` is always present. All other fields may be missing or empty for some of the items (e.g. there may be items with title, but no text, or vice-versa). See the documentation accompanying each dataset for more details. 
 
+## License
+
+Details about licensing are includeded along with the documentation of each corpus. The specifics vary slightly, but all of the source websites used to create this collection explicitly allowed for re-publication of contents a under a Creative Commons (CC-BY) license or similar. [To the extent that it is possible](https://joinup.ec.europa.eu/licence/compatibility-check/ODC-By-1.0/CC-BY-4.0), the datasets themselves are also distributed by its creator, Giorgio Comai, under the Open Data Commons Attribution license (ODC-BY).
 
 ## Summary statistics
 
 *Click on the corpus name for more information and download links*
 
-```{r echo=FALSE, message=FALSE, warning=FALSE}
+```{r available_corpora, echo=FALSE, message=FALSE, warning=FALSE}
 #| column: screen
 
 available_df <- tibble::tribble(
@@ -69,7 +74,7 @@ available_df <- tibble::tribble(
   "Russia's MFA", "mid.ru_ru_2024",
   "Russia's MFA", "mid.ru_en_2024",
   "Russia's government", "government.ru_ru_2024",
-  "Russia's government (archived version)", "archive.government.gov.ru_ru_2024",
+  "Russia's government (archived version)", "archive.government.ru_ru_2024",
   "Russia's prime minister (archived version)", "archive.premier.gov.ru_ru_2024",
   "Russia's Duma", "duma.gov.ru_ru_2024",
   "Russia's Duma (transcripts)", "transcript.duma.gov.ru_ru_2024"

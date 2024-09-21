@@ -1,0 +1,132 @@
+---
+title: "government.ru_ru_2024"
+description: "Corpus based on the Russia's government website (in Russian, 2013-2023)"
+author: Giorgio Comai
+date: 2024-08-22
+last-modified: 2024-08-22
+categories: ["dataset", "Russian institutions", "Russian government", "Russian language"]
+editor: source
+---
+
+```{r setup, echo = FALSE, message=FALSE, warning=FALSE, results='asis'}
+website_name <- "government.ru_ru"
+description_string_01 <- "all news items published on"
+description_string_02 <- "government.ru"
+license_string <- "[Creative Commons Attribution 3.0 International](http://creativecommons.org/licenses/by/3.0/)"
+
+source(fs::path("..", "dataset_setup_2024.R"))
+
+
+download_callout()
+
+```
+
+## Scope of this corpus
+
+This corpus is based on all contents published in the "news" section of the website [government.ru](http://government.ru/) as it was available online in early 2024.
+
+
+## Summary statistics
+
+```{r summary_stats, results='asis'}
+summary_stats_text()
+```
+
+
+```{r items_per_year}
+items_per_year()
+```
+
+```{r words_per_year}
+words_per_year()
+```
+
+```{r missing_table}
+missing_table()
+```
+
+```{r missing_graph}
+missing_graph()
+```
+
+
+## Narrative explanation of how this corpus has been created
+
+This corpus has been built based on index pages of the "news" section of the website, parsing older posts as they would be auto-loaded when scrolling the news [index page](http://government.ru/news/).
+
+Text and metadata have been extracted from the resulting pages, relying on the well structured format of the news pages, presenting each element in a dedicated element:
+
+- the title is always included in a `<h3>` element of class `reader_article_headline`
+- the date is always included in a `<span>` element of class `reader_article_dateline__date`
+- the time is always included in a `<span>` element of class `reader_article_dateline__time`
+- the place is always included in a `<span>` element of class `entry__meta__date__place`
+- the place is always included in a `<li>` element of class `reader_article_tags_item`
+- the main text is always included in a `<div>` element of class `reader_article_body`
+
+### Data cleaning
+
+Among all news items extracted, only two do not have a date ([one](http://government.ru/news/32224/) and [two](http://government.ru/news/20666/)), seemingly because they effectively link to other contents. They have been removed from the dataset.
+
+Besides, two items have a date of publication set many years before all other contents available on the website ([one](http://government.ru/news/22043/) and [two](http://government.ru/news/22042/)). They have also been removed for clarity.
+
+There are 28 items with date, title, and tags, but an empty text field. They mostly refer to meetings such as [this one](http://government.ru/news/6807/); the titles have a format similar to "Medvedev met gubernor of X", and such, with not additional content shared. They are maintained in the dataset, as title and tags may still contain useful information. 
+
+
+## License information
+
+The footer of the website makes clear that all contents available are published with a Creative Commons Attribution 3.0 license:
+
+> [Все материалы сайта доступны по лицензии: Creative Common Attribution 4.0](http://creativecommons.org/licenses/by/4.0/)"
+
+The contents of this dataset - “government.ru_ru” - are distributed within the remits of this license. To the extent that it is possible, the dataset itself is also distributed by its creator, Giorgio Comai, with the same CC-BY license, as well as under the Open Data Commons Attribution license (ODC-BY).
+
+
+
+```{r corpus_original_df, eval = FALSE}
+corpus_original_df <- cas_read_db_contents_data() |> 
+  dplyr::collect() 
+
+corpus_df <- corpus_original_df
+
+# corpus_df |> dplyr::filter(text=="") |> View()
+```
+
+
+
+```{r cleaning, eval = FALSE}
+corpus_df <- corpus_original_df
+
+corpus_pre_df <- corpus_df 
+
+## ensure dates always present
+corpus_df <- corpus_df |> 
+  dplyr::filter(is.na(date)==FALSE) 
+  
+# check <- assertthat::assert_that(nrow(corpus_original_df)==nrow(corpus_df), 
+#                         msg = "rows dropped due to missing dates")
+
+## close dataset at end date
+corpus_df <- corpus_df |> 
+  dplyr::filter(date<=end_date) 
+
+corpus_df <- corpus_df |> 
+  dplyr::filter(date>=as.Date("2011-01-01")) 
+
+
+corpus_df <- corpus_df |> 
+  dplyr::select(-id) |> 
+  dplyr::rowwise() |> 
+  dplyr::mutate(doc_id = stringr::str_c(website_name, "_", internal_id)) |> 
+  dplyr::ungroup() |> 
+  dplyr::relocate(doc_id, text, title, date, internal_id) |> 
+  dplyr::relocate(url, .after = dplyr::last_col()) |> 
+  dplyr::arrange(date, internal_id)
+
+```
+
+
+```{r piggyback, eval = FALSE}
+source(fs::path("..", "piggyback_corpus.R"))
+```
+
+

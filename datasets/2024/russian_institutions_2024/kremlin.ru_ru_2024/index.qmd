@@ -19,7 +19,6 @@ source(fs::path("..", "dataset_setup_2024.R"))
 
 
 download_callout()
-
 ```
 
 
@@ -73,22 +72,12 @@ Some items are posted in more than one section with different urls; they however
 
 In order to prevent duplication of contents, only one of these articles is preserved in the final dataset; for consistency, only the first match, according to the order in which sections are listed above, is kept. This allows to see easily which posts are defined as "transcripts" and gives precedence to more specific sections (the generic "news" is used only if the given item was not posted in previous sections). This choice should be substantively irrelevant for most use cases, as all sections are anyway included in a separate field. 
 
-## License information
-
-At the time contents were retrieved, the footer of kremlin.ru as well as the dedicated [copyright page](http://kremlin.ru/about/copyrights) make clear that:
-
-> "all materials published on this website are available with the following license "[Creative Commons Attribution 4.0 International](http://creativecommons.org/licenses/by/4.0/deed.ru)"
-
-This license gives the right to “copy and redistribute the material in any medium or format”, and to “remix, transform, and build upon the material for any purpose, even commercially”, as long as appropriate credit is given to the source and the license is included.
-
-The contents of this dataset - “kremlin.ru_ru” - are distributed within the remits of this license. To the extent that it is possible, the dataset itself is also distributed by its creator, Giorgio Comai, with the same CC-BY license, as well as under the Open Data Commons Attribution license (ODC-BY).
-
 
 
 
 ```{r}
-corpus_original_df <- cas_read_db_contents_data() |> 
-  dplyr::collect() 
+corpus_original_df <- cas_read_db_contents_data() |>
+  dplyr::collect()
 
 corpus_df <- corpus_original_df
 ```
@@ -107,67 +96,345 @@ The following steps are conducted on the original dataset before exporting:
 ```{r cleaning}
 corpus_df <- corpus_original_df
 
-corpus_pre_df <- corpus_df 
+corpus_pre_df <- corpus_df
 
 ## ensure dates always present
-corpus_df <- corpus_df |> 
-  dplyr::filter(is.na(date)==FALSE) 
-  
-check <- assertthat::assert_that(nrow(corpus_original_df)==nrow(corpus_df), 
-                        msg = "rows dropped due to missing dates")
+corpus_df <- corpus_df |>
+  dplyr::filter(is.na(date) == FALSE)
+
+check <- assertthat::assert_that(nrow(corpus_original_df) == nrow(corpus_df),
+  msg = "rows dropped due to missing dates"
+)
 
 ## close dataset at end date
-corpus_df <- corpus_df |> 
-  dplyr::filter(date<=end_date) 
+corpus_df <- corpus_df |>
+  dplyr::filter(date <= end_date)
 
 
 ## deduplicate consistently by section order
 
-section_order_v <- c("http://kremlin.ru/events/president/transcripts/",
+section_order_v <- c(
+  "http://kremlin.ru/events/president/transcripts/",
   "http://kremlin.ru/events/administration/",
   "http://kremlin.ru/events/state-council/",
-  "http://kremlin.ru/events/security-council/", 
+  "http://kremlin.ru/events/security-council/",
   "http://kremlin.ru/events/councils/",
-  "http://kremlin.ru/events/president/news/")
+  "http://kremlin.ru/events/president/news/"
+)
 
-corpus_pre_df <- corpus_df 
+corpus_pre_df <- corpus_df
 
-corpus_df <- tibble::tibble(section_order = section_order_v) |> 
-  dplyr::left_join(corpus_df |> 
-  dplyr::mutate(section_order = stringr::str_remove(url, "[[:digit:]]+")),
-  by = "section_order") 
- 
-check <- assertthat::assert_that(nrow(corpus_pre_df)==nrow(corpus_df),
-                        msg = "rows dropped when reordering by section")
+corpus_df <- tibble::tibble(section_order = section_order_v) |>
+  dplyr::left_join(
+    corpus_df |>
+      dplyr::mutate(section_order = stringr::str_remove(url, "[[:digit:]]+")),
+    by = "section_order"
+  )
+
+check <- assertthat::assert_that(nrow(corpus_pre_df) == nrow(corpus_df),
+  msg = "rows dropped when reordering by section"
+)
 
 
 corpus_df <- corpus_df |>
-  dplyr::distinct(internal_id, .keep_all = TRUE) |> 
-  dplyr::arrange(date, internal_id) |> 
+  dplyr::distinct(internal_id, .keep_all = TRUE) |>
+  dplyr::arrange(date, internal_id) |>
   dplyr::select(-section_order)
 
 
-check <- assertthat::assert_that(0 == corpus_df |> 
-                          dplyr::group_by(internal_id) |> 
-                          dplyr::count() |> 
-                          dplyr::ungroup() |> 
-                          dplyr::filter(n>1) |> 
-                          nrow(),
-                        msg = "duplicated items still present")
+check <- assertthat::assert_that(
+  0 == corpus_df |>
+    dplyr::group_by(internal_id) |>
+    dplyr::count() |>
+    dplyr::ungroup() |>
+    dplyr::filter(n > 1) |>
+    nrow(),
+  msg = "duplicated items still present"
+)
 
 
 
-corpus_df <- corpus_df |> 
-  dplyr::select(-id) |> 
-  dplyr::rowwise() |> 
-  dplyr::mutate(doc_id = stringr::str_c(website_name, "_", internal_id)) |> 
-  dplyr::ungroup() |> 
-  dplyr::rename(url_id = internal_id) |> 
-  dplyr::relocate(doc_id, text, title, date, time, datetime) |> 
+corpus_df <- corpus_df |>
+  dplyr::select(-id) |>
+  dplyr::rowwise() |>
+  dplyr::mutate(doc_id = stringr::str_c(website_name, "_", internal_id)) |>
+  dplyr::ungroup() |>
+  dplyr::rename(url_id = internal_id) |>
+  dplyr::relocate(doc_id, text, title, date, time, datetime) |>
   dplyr::relocate(url_id, url, .after = dplyr::last_col())
 
 check <- assertthat::assert_that(nrow(corpus_df) == nrow(corpus_df |> dplyr::distinct(doc_id)),
-                                 msg = "duplicated doc_id")
+  msg = "duplicated doc_id"
+)
+```
+
+## Available fields and data issues
+
+Each post published on the Kremlin's website often includes additional fields, besides `title` and `date`. Whenever they are present, they are included in this dataset in a dedicated column (see above for some statistics about availability of such data). 
+
+These fields include:
+
+- `text` - text is mostly available, but there are `r corpus_df |> dplyr::filter(text=="") |> nrow() |> scales::number()` items where only title (and occasionally other fields such as description and location) are available
+- `announcement` - can either be TRUE, or FALSE. When TRUE, the relative item refers to posts marked as announcements of (usually) meetings planned to happen. They are marked with "Анонс" on the official website and indicate a future date. There are in total `r corpus_df |> dplyr::filter(as.logical(announcement)) |> nrow() |> scales::number()` such posts; the researcher may want to remove posts marked as "announcement" before processing the corpus. See [this post](http://kremlin.ru/events/president/news/60997) as an example.
+- `description` - a brief text, usually summarising the post
+- `sections` - one or more website section where the post has been published. If more than one, sections are comma-separated. This is a full list of sections found in the corpus: `r corpus_df |> dplyr::distinct(sections) |> dplyr::pull(sections) |> unlist() |> stringr::str_split(",", simplify = TRUE) |> stringr::str_squish() |> tibble::enframe(value = "sections") |> dplyr::distinct(sections) |> dplyr::filter(sections!="") |> dplyr::pull(sections) |> stringr::str_flatten_comma()`
+- tags, including `themes` and `themes_id`, 
+- at the bottom of the post, the Kremlin's website often includes a few tags, separated by type. Each post can have one or more of these. These include `themes`, `persons`, and `countries`. For example, an announcement [post about a forthcoming visit to Belarus president Lukashenko](http://kremlin.ru/events/president/news/60997) will have "foreign policy" marked as a theme, Lukashenko as "person", and "Belarus" as country. In the dataset, where more than one string is present, they are separated by a semi column (`;`). The dataset includes also additional `themes_id`, `persons_id`, and `countries_id` column: these are unique identifiers that refer to dedicated pages on the website. For example, in the case of this post Lukashenko has `person_id` 119, corresponding to [https://kremlin.ru/catalog/persons/119/](https://kremlin.ru/catalog/persons/119/), where all meetings with Lukashenko are expected to be stored; the theme, "foreign policy", has `theme_id` 82, corresponding to [http://kremlin.ru/catalog/keywords/82/](http://kremlin.ru/catalog/keywords/82/), and the `country_id` is "BY", corresponding to [http://kremlin.ru/catalog/countries/BY/](http://kremlin.ru/catalog/countries/BY/). No additional checks has been conducted to verify how complete these fields are (e.g. if effectively Lukashenko is tagged is correctly tagged in each and every meeting involving him, or whenever he is mentioned)
+- `location` - next to the date, at the top of the post, often reference is made to the location from where the post is supposedly issued. For example, [this post announcing that Putin arrived in Australia for a meeting](http://kremlin.ru/events/president/news/47013), includes "Brisbane" ("Брисбен") written next to the date.
+
+## Enriching the dataset through Wikidata
+
+The `location` field refers to locations in free text format: these include name of specific halls, of specific buildings, of villages, of cities, of regions, or generic references to countries. As such, they are difficult to parse, i.e., to identify that "Брисбен" is a city located in Australia. In order to enrich these data, each of these locations has been tentatively associated with a [Wikidata](https://www.wikidata.org/) identifier. [Wikidata](https://www.wikidata.org/) is a sort of database back-end associated with Wikipedia that enables retrieving data systematically. Based on this matching, a number of additional pieces of information have been added as separated fields. Each of these fields includes `_w_` in the column name to clarify it comes from Wikidata, not from the source website itself. 
+
+- `location_w_qid` - is the Q identifier used by Wikidata. For example, Brisbane corresponds to [Q34932](https://www.wikidata.org/wiki/Q34932)
+- `location_w_label_en`, `location_w_description_en`, `location_w_label_ru`, `location_w_description_en`: this is how Wikidata identifies and describes (in English and Russian) the given item
+- `location_w_country_qid`: this is the country of the given location according to Wikidata (Wikidata property "P17" of the location). `location_w_country_name` and `location_w_country_code` are derived from here. 
+- `location_w_latitude` and `location_w_longitude` are the coordinates of the location. Be mindful that this can be very specific (e.g. a specific building) or very generic. For example, if only "Canada" is given a location, the coordinates will be a point in the middle of Canada. 
+
+An interactive map with all geo-located post and links to the original source for each of them can be explored [following this link](kremlin.ru_ru_2024_posts_by_location.html).
+
+Even if the full list of locations has been manually inspected, it is highly likely that due to the large number of items involved this dataset still includes some matching errors. Additional data quality checks are recommended if these fields are central to the analysis. 
+
+The data user should also be aware that location included in the post may not necessarily refer to an official visit. No full matching with this [List of international presidential trips made by Vladimir Putin](https://en.wikipedia.org/wiki/List_of_international_presidential_trips_made_by_Vladimir_Putin) is expected.
+
+In at least some instances, presidential aids or envoys are also mentioned: for example, if you notice a meeting in Canada in December 2022, this does not refer to a Putin visit, but to the [participation of a presidential advisor to a conference](http://kremlin.ru/events/administration/70178).
+
+Users considering retrieval of additional properties from Wikidata may consider relying on the R package [`tidywikidatar`](https://edjnet.github.io/tidywikidatar/).
+
+
+
+```{r wikidata_locations, eval = TRUE}
+library("tidywikidatar")
+tw_set_cache_folder(path = fs::path(fs::path_home_r(), "R", "tw_data_kremlin"))
+tw_create_cache_folder(ask = FALSE)
+tw_set_language(language = "en")
+tw_enable_cache()
+
+locations_qid_df <- readr::read_csv("kremlin.ru_ru_locations_qid.csv",
+  col_types = "c"
+) |>
+  dplyr::distinct() |>
+  dplyr::rename(location_w_qid = location_qid) |>
+  dplyr::filter(is.na(location_w_qid) == FALSE) |>
+  dplyr::mutate(
+    location_w_label_en = tw_get_label(location_w_qid, language = "en"),
+    location_w_description_en = tw_get_description(location_w_qid, language = "en"),
+    location_w_label_ru = tw_get_label(location_w_qid, language = "ru"),
+    location_w_description_ru = tw_get_description(location_w_qid, language = "ru")
+  ) |>
+  dplyr::mutate(location_w_country_qid = tw_get_p1(id = location_w_qid, p = "P17")) |>
+  dplyr::mutate(
+    location_w_country_name = tw_get_label(location_w_country_qid, language = "en"),
+    location_w_country_code = tw_get_p1(id = location_w_country_qid, p = "P297")
+  ) |>
+  dplyr::mutate(location_w_coordinates = tw_get_p1(id = location_w_qid, p = "P625")) |>
+  tidyr::separate(
+    col = location_w_coordinates,
+    into = c("location_w_latitude", "location_w_longitude"),
+    sep = ",",
+    remove = TRUE,
+    convert = TRUE
+  )
+
+# locations_qid_df |> dplyr::filter(is.na(location_w_latitude)) |> View()
+
+corpus_df <- corpus_df |>
+  dplyr::left_join(
+    y = locations_qid_df,
+    by = "location"
+  ) |>
+  dplyr::relocate(location, .before = location_w_qid) |>
+  dplyr::relocate(url_id, url, .after = dplyr::last_col())
+```
+
+
+
+```{r location_map}
+kremlin_ll <- corpus_df |>
+  dplyr::rename(
+    lat = location_w_latitude,
+    lon = location_w_longitude
+  ) |>
+  dplyr::filter(is.na(lon) == FALSE) |>
+  dplyr::select(lat, lon, title, location, url, date, datetime, location_w_country_code, doc_id) |>
+  dplyr::mutate(popup_content = stringr::str_c(
+    "<big><b><a href='", url, "' target='_blank'>", title, "</a></b><br />",
+    "Date: ", date, "<br />",
+    "Location: ", as.character(location), "<br />",
+    "</big>"
+  )) |>
+  dplyr::ungroup() |>
+  dplyr::mutate(lat = as.numeric(lat), lon = as.numeric(lon)) |>
+  dplyr::group_by(lat, lon) |>
+  dplyr::add_count(name = "n_same_location") |>
+  dplyr::mutate(lat = dplyr::if_else(condition = n_same_location > 1,
+    true = jitter(x = lat, amount = 0.01),
+    false = lat,
+    missing = as.numeric(NA)
+  )) |>
+  dplyr::mutate(lon = dplyr::if_else(condition = n_same_location > 1,
+    true = jitter(x = lon, amount = 0.01),
+    false = lon,
+    missing = as.numeric(NA)
+  ))
+
+
+
+if (fs::file_exists("kremlin.ru_ru_2024_posts_by_location.html") == FALSE) {
+  responsiveness_and_stats <- "\'<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\'"
+
+  kremlin_ll_nm <-  kremlin_ll |>
+    dplyr::filter(stringr::str_detect(
+      string = location,
+      pattern = stringr::regex(
+        pattern = "Москва",
+        ignore_case = TRUE
+      ),
+      negate = TRUE
+    ))
+  
+  kremlin_ru_leaflet <- kremlin_ll_nm |>
+    leaflet::leaflet() |>
+    leaflet::addTiles(
+      urlTemplate = "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",
+      attribution = '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap contributors</a>, &copy; <a href="https://carto.com/attributions">CARTO</a>'
+    ) |>
+    leaflet::addMarkers(
+      lng = kremlin_ll_nm$lon,
+      lat = kremlin_ll_nm$lat,
+      popup = kremlin_ll_nm$popup_content,
+    ) |>
+    htmlwidgets::onRender(paste0("
+    function(el, x) {
+      $('head').append(", responsiveness_and_stats, ");
+    }"))
+
+
+
+  htmlwidgets::saveWidget(kremlin_ru_leaflet,
+    file = "kremlin.ru_ru_2024_posts_by_location.html",
+    title = "Posts on Kremlin.ru (Russian version) by location",
+    selfcontained = TRUE
+  )
+}
+```
+
+
+```{r leaflet_playback, eval = FALSE}
+# not working
+kremlin_sf <- sf::st_as_sf(kremlin_ll, coords = c("lon", "lat")) |>
+  dplyr::mutate(datetime = as.POSIXct(datetime)) |>
+  dplyr::filter(location_w_country_code != "RU") |>
+  head(100)
+
+kremlin_leaflet_play <- kremlin_ll |>
+  dplyr::filter(location_w_country_code != "RU") |>
+  head(100) |>
+  leaflet::leaflet() |>
+  leaflet::addTiles(
+    urlTemplate = "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",
+    attribution = '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap contributors</a>, &copy; <a href="https://carto.com/attributions">CARTO</a>'
+  ) |>
+  leaflet.extras2::addPlayback(
+    data = kremlin_sf,
+    time = "datetime",
+    popup = ~popup_content
+  )
+
+htmlwidgets::saveWidget(kremlin_leaflet_play,
+  file = "kremlin_ru_leaflet_play.html",
+  title = "Posts on Kremlin.ru (Russian version) by location",
+  selfcontained = TRUE
+)
+```
+
+
+```{r animated, eval = FALSE}
+# not quite working
+# better plain facets
+kremlin_sf <- sf::st_as_sf(kremlin_ll, coords = c("lon", "lat")) |>
+  dplyr::mutate(datetime = as.POSIXct(datetime)) |>
+  dplyr::mutate(year = lubridate::year(datetime)) |>
+  dplyr::filter(year > 1999) |>
+  dplyr::mutate(year = as.character(year)) |>
+  # dplyr::slice_sample(n = 100) |>
+  sf::st_set_crs(4326)
+
+library("rnaturalearth")
+library("rnaturalearthdata")
+
+world <- ne_countries(scale = "medium", returnclass = "sf")
+
+kremlin_animated_gg <- ggplot() +
+  geom_sf(data = world) +
+  geom_sf(data = kremlin_sf, mapping = aes(group = date), size = 2, col = "tomato4", alpha = 0.7) +
+  gganimate::transition_states(
+    states = year,
+    state_length = 1,
+    transition_length = 0,
+    wrap = FALSE
+  ) +
+  # gganimate::shadow_mark(past = TRUE, alpha = 0.2, fill = "tomato3") +
+  labs(
+    title = "Location attached to statements on Russia's president website (Kremlin.ru, Russian Version)",
+    subtitle = "Year: {closest_state}"
+  ) +
+  ggplot2::theme_minimal(base_family = "Roboto Condensed", base_size = 18) +
+  ggplot2::theme(
+    plot.title = ggplot2::element_text(hjust = 0.5),
+    plot.subtitle = ggplot2::element_text(hjust = 0.5)
+  )
+
+## Render animation
+gganimate::animate(kremlin_animated_gg,
+  end_pause = 30,
+  nframes = 300,
+  height = 540,
+  width = 960
+)
+
+if (fs::file_exists("kremlin_location.gif") == FALSE) {
+  gganimate::anim_save(filename = "kremlin_location.gif")
+}
+```
+
+
+```{r location_facetted, fig.width=12, fig.height=9}
+#| column: screen-inset
+
+kremlin_sf <- sf::st_as_sf(kremlin_ll, coords = c("lon", "lat")) |>
+  dplyr::mutate(datetime = as.POSIXct(datetime)) |>
+  dplyr::mutate(year = lubridate::year(datetime)) |>
+  # dplyr::filter(year>1999) |>
+  dplyr::mutate(year = as.character(year)) |>
+  # dplyr::slice_sample(n = 100) |>
+  sf::st_set_crs(4326)
+
+# library("rnaturalearth")
+# library("rnaturalearthdata")
+
+world <- rnaturalearth::ne_countries(scale = "medium", returnclass = "sf")
+
+kremlin_faceted_gg <- ggplot() +
+  geom_sf(data = world, fill = "grey95", colour = "grey40") +
+  geom_sf(
+    data = kremlin_sf,
+    size = 1,
+    color = "tomato4",
+    alpha = 0.7
+  ) +
+  ggplot2::facet_wrap(vars(year), nrow = 5, ncol = 5) +
+  labs(
+    title = "Locations attached to statements on Russia's president website\n (Kremlin.ru, Russian Version)",
+    caption = stringr::str_c("Source: Giorgio Comai / tadadit.xyz / ", corpus_name)
+  ) +
+  ggplot2::theme_minimal(base_family = "Roboto Condensed", base_size = 14) +
+  ggplot2::theme(
+    plot.title = ggplot2::element_text(hjust = 0.5),
+    plot.subtitle = ggplot2::element_text(hjust = 0.5)
+  )
+
+kremlin_faceted_gg
 ```
 
 
@@ -178,9 +445,19 @@ source(fs::path("..", "piggyback_corpus.R"))
 
 ## Useful links
 
-- the English-language version of this corpus: [kremlin.ru_en_2024](https://tadadit.xyz/datasets/russian_institutions_2024/kremlin.ru_en_2024/)
+- the English-language version of this corpus: [kremlin.ru_en_2024](https://tadadit.xyz/datasets/2024/russian_institutions_2024/kremlin.ru_en_2024/)
 - a detailed walkthrough of the technicalities involved in creating this corpus: [Extracting textual contents from the Kremlin’s website with castarter](https://tadadit.xyz/tutorials/2023-02-kremlin_ru_en_extract/)
 - an blog post using a previous version of this dataset: [Russophobia in Russian official statements and media](https://tadadit.xyz/posts/2023-09-russophobia/)
 
 
 
+
+## License information
+
+At the time contents were retrieved, the footer of kremlin.ru as well as the dedicated [copyright page](http://kremlin.ru/about/copyrights) make clear that:
+
+> "all materials published on this website are available with the following license "[Creative Commons Attribution 4.0 International](http://creativecommons.org/licenses/by/4.0/deed.ru)"
+
+This license gives the right to “copy and redistribute the material in any medium or format”, and to “remix, transform, and build upon the material for any purpose, even commercially”, as long as appropriate credit is given to the source and the license is included.
+
+The contents of this dataset - “kremlin.ru_ru” - are distributed within the remits of this license. To the extent that it is possible, the dataset itself is also distributed by its creator, Giorgio Comai, with the same CC-BY license, as well as under the Open Data Commons Attribution license (ODC-BY).

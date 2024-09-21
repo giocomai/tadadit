@@ -1,0 +1,125 @@
+---
+title: "transcript.duma.gov.ru_ru_2024"
+description: "Corpus based on the Russia's Duma website (in Russian, 2006-2023)"
+author: Giorgio Comai
+date: 2024-08-27
+last-modified: 2024-08-27
+categories: ["dataset", "Russian institutions", "Russian parliament", "Russian language"]
+editor: source
+---
+
+```{r setup, echo = FALSE, message=FALSE, warning=FALSE, results='asis'}
+website_name <- "transcript.duma.gov.ru_ru"
+description_string_01 <- "all transcripts published on"
+description_string_02 <- "transcript.duma.gov.ru"
+license_string <- "see details"
+
+source(fs::path("..", "dataset_setup_2024.R"))
+
+
+download_callout()
+
+```
+
+## Scope of this corpus
+
+This corpus is based on all transcripts of Duma sessions as published on the official website [transcript.duma.gov.ru](http://transcript.duma.gov.ru/) as it was available online in early 2024. All text of session transcripts and voting is extracted as such, e.g. without differentiating by speaker, or parsing vote results.
+
+
+::: {.callout-note}
+Users of this dataset should be aware that Russia's Duma makes available these contents (and more) through a dedicated API available at the following address: [http://api.duma.gov.ru/](http://api.duma.gov.ru/). This however requires to obtain an API after [requesting it](http://api.duma.gov.ru/key-request). The data available through API for the period 1994-2021 have previously been extracted and are available on *Discuss Data*: 
+
+>  dekoder.org (2021): Duma Speeches: A Term Frequency Analysis – Russian State Duma Transcripts 1994–2021, v. 1.0, Discuss Data, https://doi.org/10.48320/FB52DAC2-66E3-47A3-86C5-B2A3DADF41BF 
+
+:::
+
+
+## Summary statistics
+
+```{r summary_stats, results='asis'}
+summary_stats_text()
+```
+
+
+```{r items_per_year}
+items_per_year()
+```
+
+```{r words_per_year}
+words_per_year()
+```
+
+```{r missing_table}
+missing_table()
+```
+
+```{r missing_graph}
+missing_graph()
+```
+
+
+## Narrative explanation of how this corpus has been created
+
+Rather than by querying the archive, this dataset has been created by all urls based on the observation that the page of each url is made of a numeric identifier, e.g. `http://transcript.duma.gov.ru/node/1234/`. Urls that returned missing pages were discarded. 
+
+
+## License information
+
+The section of Duma's website dedicated to transcripts does not have a dedicated page with terms of use or licensing information. Its footer includes a generic copyright notice, claiming copyright.
+
+> © Государственная Дума Федерального Собрания Российской Федерации, 2024
+
+The [about page of the main Duma website](http://duma.gov.ru/about/info/), of which this transcripts section is ultimately part, includes a page "On the use of information" ("Об использовании информации"), which clarifies the permissive conditions for re-publishing contents used on the website. Even if it does not include reference to specific license, it unambiguously states that contents can be published anywhere, without any sort of limitation, with the only condition being that a link the original source must be included. It appears that the same terms of use should apply also to the "transcripts" section of the website.
+
+> Все материалы официального сайта Государственной Думы Федерального Собрания Российской Федерации могут быть воспроизведены в любых средствах массовой информации, на серверах сети Интернет или на любых иных носителях без каких‑либо ограничений по объему и срокам публикации.
+> Это разрешение в равной степени распространяется на газеты, журналы, радиостанции, телеканалы, сайты и страницы сети Интернет. Единственным условием перепечатки и ретрансляции является ссылка на первоисточник. Никакого предварительного согласия на перепечатку со стороны Аппарата Государственной Думы не требуется.
+
+The contents of this dataset - “transcript.duma.gov.ru_ru” - are distributed within the remits of this license. To the extent that it is possible, the dataset itself is also distributed by its creator, Giorgio Comai under the Open Data Commons Attribution license (ODC-BY).
+
+
+
+```{r corpus_original_df, eval = FALSE}
+corpus_original_df <- cas_read_db_contents_data() |> 
+  dplyr::collect() 
+
+corpus_df <- corpus_original_df
+
+# corpus_df |> dplyr::filter(text=="") |> View()
+```
+
+
+
+```{r cleaning, eval = FALSE}
+corpus_df <- corpus_original_df
+
+corpus_pre_df <- corpus_df 
+
+## ensure dates always present
+corpus_df <- corpus_df |> 
+  dplyr::filter(is.na(date)==FALSE) 
+  
+check <- assertthat::assert_that(nrow(corpus_original_df)==nrow(corpus_df), 
+                         msg = "rows dropped due to missing dates")
+
+## close dataset at end date
+corpus_df <- corpus_df |> 
+  dplyr::filter(date<=end_date) 
+
+
+corpus_df <- corpus_df |> 
+  dplyr::select(-id) |> 
+  dplyr::rowwise() |> 
+  dplyr::mutate(doc_id = stringr::str_c(website_name, "_", url_id)) |> 
+  dplyr::ungroup() |> 
+  dplyr::relocate(doc_id, text, title, date, url_id) |> 
+  dplyr::relocate(url, .after = dplyr::last_col()) |> 
+  dplyr::arrange(date, url_id)
+
+```
+
+
+```{r piggyback, eval = FALSE}
+source(fs::path("..", "piggyback_corpus.R"))
+```
+
+
