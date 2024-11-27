@@ -1,0 +1,55 @@
+---
+title: "Introducing 'Russian state institutions full-text datasets' (2024 edition)"
+description: "Stable version now officially published: a collection of corpora based on textual contents extracted from the websites of Russian state institutions"
+author: Giorgio Comai
+date: 2024-10-30
+last-modified: 2024-10-30
+categories: [datasets, russia, text-mining]
+image: "00036-47730177.webp"
+execute: 
+  cache: true
+editor: source
+draft: false
+---
+
+I am happy to announce that I have finally publicly released with a permissive license a set of textual datasets extracted from the website of Russian institutions.
+
+They are free to download, accompanied by detailed documentation at the following stable address (and, for redundancy, [on Zenodo](https://doi.org/10.5281/zenodo.14012169)):
+
+> Giorgio Comai (2024): **Russian state institutions full-text datasets – A collection of corpora based on contents extracted from the websites of Russian state institutions**, v. 1.0, *Discuss Data*, <https://doi.org/10.48320/0578D7FE-35F7-4E9E-A29D-926618A5C6BD>
+
+You can also find the same information on this website, by clicking on the corpus name of the summary table below:
+
+```{r available_corpora, echo=FALSE, message=FALSE, warning=FALSE}
+#| column: screen
+base_path <- fs::path("..", "..", "datasets", "2024", "russian_institutions_2024")
+summary_df <- readr::read_csv(fs::path(base_path, "ru_institutions_2024_summary_stats.csv"))
+
+summary_df |> 
+  dplyr::mutate(`corpus name` = stringr::str_replace(`corpus name`, pattern = stringr::fixed("]("), replacement = stringr::str_c("](", base_path,"/"))) |> 
+  knitr::kable(format.args = list(big.mark = " "),
+               escape = FALSE)
+```
+
+Find more context about the file formats and the data included [on the page dedicated to this release](../datasets/2024/russian_institutions_2024/). The [official release on Discuss Data](https://doi.org/10.48320/0578D7FE-35F7-4E9E-A29D-926618A5C6BD) includes a pdf file for each of these datasets, outlining data processing and data quality issues.
+
+These are the same datasets I have used in some of my previous posts, including:
+
+-   [Traditional, conservative, Christian, distinct… how supposedly old values emerged in the official and media discourse in Russia since 2012](2023-05-conservative-traditional-values-russia)
+-   [Who said it first? ‘The collective West’ in Russia’s nationalist media and official statements](2023-03-who-says-it-first-nationalist-media-kremlin)
+
+This is a stable release, and is expected to be updated once a year. The current version includes all posts published until the end of 2023; you may expect an updated version in the early months of 2024.
+
+All datasets include for each item a title, a date, and the text, as well as further metadata according to availability: for example, if a website also showed a "tag" section along with each post, or a field dedicated to named individuals, these are also made available.
+
+For the dataset based on the Kremlin's website, an additional attempt has been made to geolocate the location from which each of the press releases was issued. This may not be 100% accurate, but should tentatively enable some more approaches for analysis. Also, it allows for exploring speeches and statements [through an interactive map](../datasets/2024/russian_institutions_2024/kremlin.ru_ru_2024/kremlin.ru_ru_2024_posts_by_location.html) (posts issued from Moscow are excluded).
+
+These datasets are free to download in full and should be easy to import in any content or text analysis software you may be using. For quick searches or basic word frequency exploration, I have made them [available also through a basic web interface](https://explore.tadadit.xyz/2024/ru_institutions_2024/) that enables basic operations, as well as filtering and exporting of text. The interface is not a finalised product and will eventually be updated, but should be mostly functional (although slow when the "keyword-in-context" option is enabled).
+
+::: callout-tip
+-   stable [link for download from *Discuss Data*](https://doi.org/10.48320/0578D7FE-35F7-4E9E-A29D-926618A5C6BD)
+
+-   [interactive web interface](https://explore.tadadit.xyz/2024/ru_institutions_2024/) for basic filtering and word-frequency analysis
+
+-   more details on each of this datasets [available on this website](../datasets/2024/russian_institutions_2024/) (same information as that included in pdf format along with the release)
+:::

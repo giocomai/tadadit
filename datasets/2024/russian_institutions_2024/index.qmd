@@ -31,10 +31,10 @@ options(piggyback.verbose = FALSE)
 base_folder <- fs::dir_create(fs::path(fs::path_home_r(), "R", "ru_institutions_2024"))
 
 get_corpus <- function(corpus_name) {
-  pb_download(dest = base_folder, 
-            repo = "giocomai/tadadit",
-            tag = corpus_name, 
-            file = stringr::str_c(corpus_name, ".csv.gz", collapse = ""))
+  # pb_download(dest = base_folder, 
+  #           repo = "giocomai/tadadit",
+  #           tag = corpus_name, 
+  #           file = stringr::str_c(corpus_name, ".csv.gz", collapse = ""))
   invisible(fs::path(base_folder, stringr::str_c(corpus_name, ".csv.gz", collapse = "")))
 }
 
@@ -105,6 +105,8 @@ summary_stats_df <- purrr::map(
       )
   }) |> 
   purrr::list_rbind()
+
+readr::write_csv(x = summary_stats_df, file = "ru_institutions_2024_summary_stats.csv")
 
 summary_stats_df |> 
   knitr::kable(format.args = list(big.mark = " "),

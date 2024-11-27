@@ -1,0 +1,10 @@
+institution,website,language,corpus name,start date,end date,n_items
+Russia's president,kremlin.ru,en,[kremlin.ru_en_2024](kremlin.ru_en_2024),1999-12-31,2023-12-31,33165
+Russia's president,kremlin.ru,ru,[kremlin.ru_ru_2024](kremlin.ru_ru_2024),1999-12-31,2023-12-31,45538
+Russia's MFA,mid.ru,ru,[mid.ru_ru_2024](mid.ru_ru_2024),2003-01-02,2023-12-31,56203
+Russia's MFA,mid.ru,en,[mid.ru_en_2024](mid.ru_en_2024),2003-01-04,2023-12-31,25943
+Russia's government,government.ru,ru,[government.ru_ru_2024](government.ru_ru_2024),2012-04-24,2023-12-30,17135
+Russia's government (archived version),archive.government.ru,ru,[archive.government.ru_ru_2024](archive.government.ru_ru_2024),2008-05-07,2013-05-21,7103
+Russia's prime minister (archived version),archive.premier.gov.ru,ru,[archive.premier.gov.ru_ru_2024](archive.premier.gov.ru_ru_2024),2008-05-07,2012-05-07,3323
+Russia's Duma,duma.gov.ru,ru,[duma.gov.ru_ru_2024](duma.gov.ru_ru_2024),2006-04-05,2023-12-30,29094
+Russia's Duma (transcripts),transcript.duma.gov.ru,ru,[transcript.duma.gov.ru_ru_2024](transcript.duma.gov.ru_ru_2024),1994-01-11,2023-12-15,6032
