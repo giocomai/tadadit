@@ -12,6 +12,16 @@ editor: source
 draft: false
 ---
 
+
+::: {.callout-tip title="Quick links"}
+
+-   stable [link for download from *Discuss Data*](https://doi.org/10.48320/0578D7FE-35F7-4E9E-A29D-926618A5C6BD)
+
+-   [interactive web interface](https://explore.tadadit.xyz/2024/ru_institutions_2024/) for basic filtering and word-frequency analysis
+
+-   more details on each of this datasets [available on this website](../datasets/2024/russian_institutions_2024/) (same information as that included in pdf format along with the release)
+:::
+
 I am happy to announce that I have finally publicly released with a permissive license a set of textual datasets extracted from the website of Russian institutions.
 
 They are free to download, accompanied by detailed documentation at the following stable address (and, for redundancy, [on Zenodo](https://doi.org/10.5281/zenodo.14012169)):
@@ -46,10 +56,6 @@ For the dataset based on the Kremlin's website, an additional attempt has been m
 
 These datasets are free to download in full and should be easy to import in any content or text analysis software you may be using. For quick searches or basic word frequency exploration, I have made them [available also through a basic web interface](https://explore.tadadit.xyz/2024/ru_institutions_2024/) that enables basic operations, as well as filtering and exporting of text. The interface is not a finalised product and will eventually be updated, but should be mostly functional (although slow when the "keyword-in-context" option is enabled).
 
-::: callout-tip
--   stable [link for download from *Discuss Data*](https://doi.org/10.48320/0578D7FE-35F7-4E9E-A29D-926618A5C6BD)
-
--   [interactive web interface](https://explore.tadadit.xyz/2024/ru_institutions_2024/) for basic filtering and word-frequency analysis
-
--   more details on each of this datasets [available on this website](../datasets/2024/russian_institutions_2024/) (same information as that included in pdf format along with the release)
+::: {.callout-note}
+This textual dataset has been created in the context of the project "[Framings of Russia's invasion of Ukraine in Russia's pro-Kremlin public discourse](https://www.balcanicaucaso.org/eng/Projects2/Framing-Russia-s-invasion-of-Ukraine-s-in-Russia-s-pro-Kremlin-public-discourse)" carried out with the support of the Italian Ministry of Foreign Affairs and International Cooperation under art. 23 bis, D.P.R. 18/1967. Find more information and the full disclaimer [on the project's web page](https://www.balcanicaucaso.org/eng/Projects2/Framing-Russia-s-invasion-of-Ukraine-s-in-Russia-s-pro-Kremlin-public-discourse). 
 :::
