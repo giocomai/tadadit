@@ -294,11 +294,13 @@ For example, [this post](https://t.me/Prigozhin_hat/3796) shows a question asked
 ```{=html}
 <script async src="https://telegram.org/js/telegram-widget.js?22" data-telegram-post="Prigozhin_hat/3796" data-width="100%"></script>
 ```
+
 Conveniently, this is accompanied by [another post](https://t.me/Prigozhin_hat/3795) that includes both the question and the answer given in both textual and audio format:
 
 ```{=html}
 <script async src="https://telegram.org/js/telegram-widget.js?22" data-telegram-post="Prigozhin_hat/3795" data-width="100%"></script>
 ```
+
 In this case, everything seems easy: we can in principle ignore both the screenshotted picture and the audio-file, as the very same contents are presented also in textual format.
 
 But then, in other occasions there are only audio-files or voice messages with no context whatsoever. This was the case, for example, for most messages posted during the mutiny on 24 June, including [the one that announced its end](https://t.me/concordgroup_official/1303):
@@ -306,16 +308,19 @@ But then, in other occasions there are only audio-files or voice messages with n
 ```{=html}
 <script async src="https://telegram.org/js/telegram-widget.js?22" data-telegram-post="concordgroup_official/1303" data-width="100%"></script>
 ```
+
 In others still, the content of the question previously-screenshotted is transcribed, but Prigozhin's comments are conveyed only in audio format.
 
 ```{=html}
 <script async src="https://telegram.org/js/telegram-widget.js?22" data-telegram-post="concordgroup_official/1303" data-width="100%"></script>
 ```
+
 Finally, there are occasional posts including some documents or video files:
 
 ```{=html}
 <script async src="https://telegram.org/js/telegram-widget.js?22" data-telegram-post="concordgroup_official/1297" data-width="100%"></script>
 ```
+
 Video files often include spoken comments, or depict meetings. They are only very occasionally central to Prigozhin's communication, and even when they are, mostly not for the spoken content. Video files should not be dismissed, however, and they may actually be an important part of the communication of other Telegram channels, all the way from Strelkov to the "military bloggers" who produce video contents. In the rest of this post, I will leave out video clips, both for facilitating consistency in the processing of results and because including them introduces further ethical questions (they include, among other things, the voice of Ukrainians prisoners of war).
 
 In the following steps, I will proceed with turning images into text (only briefly) and then really focus on turning audio messages into text format that can be searched and processed further.

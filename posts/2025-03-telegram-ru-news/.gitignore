@@ -1,0 +1,15 @@
+base_telegram_folder.txt
+output_df_phi4.rds
+quackingllama_akdengi_saiga_gemma2.duckdb
+quackingllama_deepseek_r1_8b.duckdb
+quackingllama_gemma2.duckdb
+quackingllama_gemma3.duckdb
+quackingllama_lakomoor_vikhr_llama_3_2_1b_instruct_1b.duckdb
+quackingllama_llama3_2.duckdb
+quackingllama_mistral.duckdb
+quackingllama_olmo2.duckdb
+quackingllama_owl_t_lite.duckdb
+quackingllama_phi4.duckdb
+quackingllama_phi4_mini.duckdb
+all_df.rds
+all_df_phi4.rds

@@ -18,7 +18,7 @@ website:
     creator: "@giocomai"
   open-graph: true
   page-footer:
-    center: "A project led by [Giorgio Comai](https://giorgiocomai.eu/), researcher and data analyst at [OBCT](https://www.balcanicaucaso.org/)/[CCI](https://www.cci.tn.it/). <br />Project carried out with the support of the Italian Ministry of Foreign Affairs and International Cooperation under art. 23 bis, D.P.R. 18/1967.<br /> All opinions expressed within the scope of this project represent the opinion of their author and not those of the Ministry.<br />All textual and visual contents on this website are published under a [CC-BY](https://creativecommons.org/licenses/by/4.0/) license. All code is published under a [MIT license](https://mit-license.org/). Illustrations generated with [Midjourney](https://midjourney.com/)."
+    center: "A project led by [Giorgio Comai](https://giorgiocomai.eu/), researcher and data analyst at [OBCT](https://www.balcanicaucaso.org/)/[CCI](https://www.cci.tn.it/). <br />Project carried out with the support of the Italian Ministry of Foreign Affairs and International Cooperation under art. 23 bis, D.P.R. 18/1967.<br /> All opinions expressed within the scope of this project represent the opinion of their author and not those of the Ministry.<br />All textual and visual contents on this website are published under a [CC-BY](https://creativecommons.org/licenses/by/4.0/) license. All code is published under a [MIT license](https://mit-license.org/)."
 
 format:
   html:

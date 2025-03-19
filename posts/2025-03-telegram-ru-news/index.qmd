@@ -1,0 +1,1081 @@
+---
+title: "Analysing Russian news via Telegram, processing them with open LLMs"
+description: "Testing alternatives for investigating public discourse."
+author: Giorgio Comai
+date: 2025-03-18
+last-modified: 2025-03-18
+categories: [datasets, russia, text-mining, telegram]
+image: "00034-2040918459.webp"
+execute: 
+  cache: true
+editor: source
+draft: false
+bibliography: references.bib
+---
+
+::: {.callout-tip}
+### What is this about, in brief
+
+__Starting point__: What if we used LLMs (commonly referred to as "[AI](https://giorgiocomai.eu/post/2025-03-beach_volley_ai/)") to categorise Russian Telegram channels and extract information from posts?
+
+If responses are consistent, this would be vastly more efficient than human coding; as categorisation choices are expressed in natural language, results would be easier to interpret for non-technical users, who who would be able to better appreciate results and provide feedback that could be immediately implemented. As the approach relies on open LLMs (rather than ChatGPT or the likes), this would be fully replicable.
+
+___Preliminary conclusions___: the whole thing is quite promising, as others have been noticing, and especially if combined with other established approaches for content analysis, can become part of reasonably efficient and effective workflows.
+
+__For R users__: I've developed a package to streamline local operations with this specific use case in mind, see more on the [package's documentation website](https://giocomai.github.io/quackingllama/).
+
+__Disclaimer__: if you're interested in substantive results, rather than tentative mothodological explorations, you can safely skip this post, and wait a few more weeks for the more content-relevant follow-up.
+
+:::
+
+
+
+This post points at possible solutions for two issues that are common to studies analysing different types of public discourse in Russia.
+
+-   finding textual sources that are meaningful and representative of different types of discourse, while being accessible and easy to process
+-   find an approach to text categorisation that is straightforward to implement for the technical user, but also easy to understand by non-technical readers, enabling engagement and substantive feedback
+
+In contrast to my [previous work](https://discuss-data.net/dataset/0578d7fe-35f7-4e9e-a29d-926618a5c6bd/), I will address the first issue by focusing on public Telegram channels (rather than text-mining websites), and the second by testing locally deployed Large Language Models (LLM), rather than plain pattern-matching or bag-of-words approaches. Both solutions are of course complementary to tried and tested approaches, and are outlined here primarily as a tentative contribution to methodological debates.
+
+After offering some context, this post will tentatively address a substantive question, i.e. when Russian public discourse refers to territories Russia lays claim to and partially controls since its invasion of Ukraine in 2022, what does it focus on? Are military affairs central to news coverage about these regions?
+
+In order to facilitate processing of data with these approaches, two dedicated packages for the R programming language have been developed:
+
+-   [`telegramparser`](https://github.com/giocomai/telegramparser/), streamlining the process of reading Telegram export files into R; at this stage, this is just a basic package collecting some convenience functions, but may be developed further.
+-   [`quackingllama`](https://giocomai.github.io/quackingllama/) is a more fully-featured and documented R package that facilitates interacting with open LLMs deployed locally with [Ollama](https://ollama.com/), efficiently caching results in a local [DuckDB](https://duckdb.org/) database (hence, the name of the package).
+
+## On Telegram as a source
+
+Similarly to other authoritarian regimes, Russian authorities have long demonstrated a keen awareness of the role of digital media in shaping public discourse. For example, they made efforts to increase the visibility of pro-Kremlin voices on YouTube [@fedor2017], even as Navalny was reaching millions denouncing government corruption on the same platform [@glazunova2020]. As Russia invaded Ukraine, pro-war Telegram channels often referred to as "Z-bloggers" or "war correspondents" [@farbman2023] gained considerable visibility on a platform that has become increasingly prominent in Russia's news landscape.
+
+Telegram's relevance may be further growing, as the functioning of services such as YouTube that have long been central to Russia's on-line culture are being significantly degraded, and - besides TikTok - no big challengers are emerging (other US-based platforms that had a relatively significant user-base in Russia such as Facebook, Instagram, and Twitter have been banned since 2022).
+
+Alyukov characterises the current situation as a "hybrid media system in which the government attempts to synchronise reporting across broadcast and digital media" [@alyukov2024, 401], and points at the fact that scholars have dedicated limited attention to "autocrats’ simultaneous use of different media" [@alyukov2024, 401], insisting on the complementary nature of different segments of the media environment.
+
+What is worth noticing is that at this stage Telegram is effectively the main on-line space where different facets of Russian public discourse appear, including traditional media (TV, newspapers, news agencies), state officials, Z-bloggers and "war correspondents", independent media outlets, and all sorts of public figures. All of these contents can be reached without obstacles by Russia-based users, even if not all of them are easily accessible from Western Europe.[^1] Telegram does limit access to some major channels based on the user's sim card; for example, users with mobile phone registered in an EU-country wouldn't be able to access Russian news agency "[Ria Novosti](https://t.me/rian_ru)" or Russian nationalist TV channel "[Tsargrad](https://t.me/tsargradtv)". A wide variety of channels remain however available.
+
+[^1]: On 10 March 2025, [access to Telegram has been suspended in Chechnya a Dagestan](https://www.themoscowtimes.com/2025/03/10/chechen-official-decries-prejudiced-telegram-ban-in-north-caucasus-regions-a88303); it is unclear if this is just a temporary measure.
+
+For scholars interested in analysing public discourse in Russia, Telegram has an important advantage: considering how easy it is to export the entire archive of Telegram channels, it is possible to get access to a full-text archive of a wide variety of sources in a few minutes.
+
+Although some of these channels have a substantive photo or audio-visual component, the textual part remains predominant for most of them, and even video-bloggers would mostly provide substantial hints about the content of their clips. Targeted analyses may require further attention to pictures, video, or audio contents, as was the case with [this analysis of Prigozhin's audio files](../2023-08-telegram_prigozhin/). But overall, any and all big themes and trends in the Russian *Runet* would inevitably appear in the textual contents of major Telegram channels.
+
+At the most basic level, exporting the textual contents of Telegram channels can be used as a speedy proxy solution in lieu of retrieving full-text contents from their original sources, as e.g. [@ptaszek2024] did for their analysis of Russian and Ukrainian news agencies. In order to catch big trends, the short summary of news posted by the agencies of Telegram was functionally equivalent to retrieving the original posts in full, but it was much more efficient in terms of time and/or money (no need for lenghty scraping or access to expensive services).
+
+At present, exploring Telegram channels allows for access to more varied types of contents compared to established media. Besides variety of contents, some additional approaches are enabled by Telegram's specificities, including references and reposts between channels, providing additional hints about network effects and news distribution dynamics. Indeed, services that rank the influence of Telegram channels in Russia (such as [tgstat](https://tgstat.ru/ratings/channels/news?sort=members)) do not rely exclusively on the number of subscribers to a channel, but look also at how much they are cited.
+
+### A preliminary overview of different types of Telegram channels
+
+```{r setup, echo = FALSE, message=FALSE, include=TRUE}
+#library("extrafont")
+knitr::opts_chunk$set(echo = FALSE,
+                      fig.width = 8,
+                      fig.height = 4.5)
+
+library("ggplot2")
+library("dplyr", warn.conflicts = FALSE)
+source("functions.R")
+
+# pak::pak("giocomai/telegramparser")
+library("telegramparser")
+
+ggplot2::theme_set(new = theme_minimal(base_family = "Roboto Condensed"))
+
+base_telegram_folder <- readr::read_lines(file = "base_telegram_folder.txt") 
+
+tp_set_options(path = base_telegram_folder)
+
+tp_rename(base_telegram_folder)
+
+telegram_files <- fs::dir_ls(path = base_telegram_folder) 
+#tp_set_all_usernames()
+
+all_channels_df <- readr::read_csv(
+  file = fs::path(base_telegram_folder, "tp_usernames.csv"),
+  col_types = "icc"
+)
+```
+
+```{r eval = FALSE, echo = FALSE, include = FALSE}
+tp_set_username(channel_name = "Коммерсантъ", path = base_telegram_folder)
+```
+
+Here is a table providing a set of examples for Telegram channels across different types of sources that are relevant to Russian public discourse. This is not a systematic review, and just aims at providing some hints about the main types of sources that can be found on Russian-language Telegram relevant to political issues and Russia's invasion of Ukraine.
+
+```{r tg_categories_df, echo = FALSE}
+tg_categories_df <-  tibble::tribble(
+  ~channel_name, ~type,
+  "ВЕСТИ", "Russian mainstream media", 
+  "Первый канал. Новости", "Russian mainstream media",
+  
+  "Интерфакс", "Russian news agency",
+  "ТАСС", "Russian news agency",
+  
+  "Московский комсомолец: главное сегодня", "Russian newspaper",
+  "Коммерсантъ", "Russian newspaper",
+  
+  "Раньше всех. Ну почти.", "Russian news on Telegram", 
+  "Readovka", "Russian news on Telegram", 
+  "Baza", "Russian news on Telegram", 
+  
+  
+  "Kotsnews", "Z-blogger, etc.",
+  "Операция Z: Военкоры Русской Весны", "Z-blogger, etc.",
+  "WarGonzo", "Z-blogger, etc.",
+  "Караульный Z",  "Z-blogger, etc.",
+  "НЕЗЫГАРЬ", "Z-blogger, etc.",
+  "Два майора", "Z-blogger, etc.", 
+  
+
+  
+  "Дмитрий Медведев", "Russian state official",
+  "Мария Захарова", "Russian state official",
+  "Kadyrov_95", "Russian state official",
+  
+  "Маргарита Симоньян", "pro-government media figure",
+  "СОЛОВЬЁВ", "pro-government media figure",
+  
+  "Администрация Херсонской области", "official accounts related to Russia-controlled Ukrainian territories",
+  "Владимир Сальдо", "official accounts related to Russia-controlled Ukrainian territories",
+  
+  "BBC News | Русская служба", "International media with Russian-language version", 
+  
+  "Медуза — LIVE", "Russian independent media",
+  "Телеканал Дождь", "Russian independent media"
+  )
+```
+
+```{r metadata_df, echo = FALSE}
+#| column: page
+#| 
+metadata_df <- tp_get_metadata(path = base_telegram_folder)
+
+metadata_brief_df <- metadata_df |> 
+  dplyr::group_by(channel_name,channel_id) |> 
+  dplyr::slice_max(retrieved_at) |> 
+  dplyr::ungroup() |> 
+  dplyr::transmute(channel_name,
+                   earliest_post = as.Date(earliest_post),
+                   latest_post = as.Date(latest_post),
+                   total_posts) |> 
+  dplyr::ungroup()
+
+tg_categories_df |> 
+  dplyr::left_join(y = metadata_brief_df,
+                   by = "channel_name") |> 
+  dplyr::left_join(y = all_channels_df,
+                   by = "channel_name") |> 
+  dplyr::mutate(channel_name = purrr::map2_chr(
+    .x = channel_name,
+    .y = channel_username,
+    .f = \(x, y) {
+     htmltools::a(x, href = stringr::str_flatten("https://t.me/", y, collapse = "")) |> as.character()
+  })) |> 
+  dplyr::select(-channel_id, -channel_username, -latest_post) |> 
+  dplyr::group_by(type) |> 
+  gt::gt(caption = "Selected Telegram channels and number of posts published until mid-January 2025") |> 
+   gt::fmt_markdown(columns = "channel_name") |> 
+  gt::fmt_number(columns = "total_posts", decimals = 0, sep_mark = " ") |> 
+  gt::tab_options(row_group.as_column = TRUE)
+
+
+
+```
+
+```{r telegram_duration, eval=FALSE, include=FALSE}
+metadata_df |> 
+  dplyr::group_by(channel_name,channel_id) |> 
+  dplyr::slice_max(latest_post) |> 
+  dplyr::ungroup() |> 
+  dplyr::mutate(total_days = lubridate::as.duration(latest_post-earliest_post))
+```
+
+## On categorising texts with open LLMs
+
+There's a growing literature on relying on LLMs to classify texts [e.g. @weber; @plaza-del-arco], and relatively encouraging results on how, in the right conditions, LLMs show accuracy that is reliably consistent with human coders [@bojic]. ^[Find some more context in this [previous post](../2024-04-09-inter-coder-reliability-unhinged-medvedev/) dedicated to text categorisation with LLMs; the implementation is much more consistent in this post.]. Building upon [a naive previous attempt](../2024-04-09-inter-coder-reliability-unhinged-medvedev/) at text categorisation, this time I will rely on the [structured outputs](https://ollama.com/blog/structured-outputs) feature introduce in Ollama in December 2024, enabling more consistent parsing of results. 
+
+
+As an early and tentative test, I will proceed and try to establish how many of the posts that mention one of the Ukrainian regions partly controlled by Russia in a mainstream media outlet refer to military issues or to anything else, and will then parse posts that are *not* about military issue to extract some information about them.
+
+I will proceed with the following steps:
+
+- take the Telegram channel of a mainstream media outlet, in this case, "Vesti"
+- extract all posts that make reference to "Kherson", one of the Ukrainian regions partly under Russian control
+- ask different LLMs to categorise these text based on a binary option, i.e. to reply either `TRUE` or `FALSE` when prompted if a given text is "about military"
+- ask LLMs to tag posts that are not "about military", and extract named entities such as names of individuals and locations
+- check processing time with different models
+- preliminarily evaluate consistency of results
+
+```{r vesti_df, echo = FALSE}
+vesti_df <- tp_select(path = base_telegram_folder,
+                      channel_name = "ВЕСТИ") |> 
+  tp_read_json() |> 
+  tp_read_messages()
+
+kherson_df <- vesti_df |> 
+  dplyr::filter(
+    stringr::str_detect(string = text,
+                        pattern = stringr::fixed(pattern = "херсон",
+                                                 ignore_case = TRUE)))
+```
+
+### About the source: Telegram Vesti 
+
+
+Vesti is the all-news channel of Russia's state broadcaster. As of March 2025, its [Telegram channel](https://t.me/vestiru) boasts about 170&nbsp;000 subscribers. As you'd expect, most of its posts are news updates, sometimes accompanied by pictures or video clips. It is reasonable to expect that its news agenda reflects practices of the TV channel itself. 
+
+Here are some summary statistics about Vesti's Telegram channel at the time of writing:
+
+```{r basic_vesti_l, echo = FALSE}
+
+basic_vesti_l <- list(
+     `Earliest post` = vesti_df |> 
+  dplyr::slice_min(date,with_ties = FALSE) |> 
+  dplyr::pull(date) |> 
+  format("%d %B %Y"),
+  `Latest post` = vesti_df |> 
+  dplyr::slice_max(date,with_ties = FALSE) |> 
+  dplyr::pull(date) |> 
+  format("%d %B %Y"),
+  `Total posts` = vesti_df |> 
+    nrow() |> 
+    scales::number(),
+   `Total posts with reference to Kherson` = kherson_df |> 
+    nrow() |> 
+    scales::number()
+
+) 
+
+basic_vesti_l |> 
+  tibble::as_tibble() |> 
+  tidyr::pivot_longer(cols = dplyr::everything(),
+                      names_to = "Feature",
+                      values_to = "Value") |> 
+  gt::gt(caption = "Basic information about Vesti's Telegram channel")
+
+```
+
+The question we want to answer at this stage is: "how many among the `r basic_vesti_l[["Total posts with reference to Kherson"]]` posts that mention "Kherson" are about the military, and how many are not?".
+
+### How many posts with reference to Kherson are about military affairs?
+
+We proceed with asking this question to LLMs. There are surely more adequate techniques to get this kind of response, but for the sake of this excercise, I passed to the LLM only the most basic set of instructions:
+
+- a system message: "You are a helpful assistant. You tag and classify Russian texts."
+- a schema set to receive a structured response, forcing the LLM to reply `TRUE` or `FALSE` to the expression "About military"; I also allowed it to pass tags as a string, but this is ignored in the analysis for the time being (a better prompt and forcing to give results as a list rather than as a string would have been more effective).
+- the text of the Telegram post in full in the prompt. 
+
+I passed the very same prompt to a bunch of open LLMs, including models of different sizes by established companies active in this space (Meta, Microsoft, Google), Olmo as an example of a fully open LLM (others have only open weights), a version of Deepseek, and a few small models optimised for Russian language.^[For benchmarks of LLMs for tasks in Russian, see [Ru Arena General](https://huggingface.co/spaces/Vikhrmodels/arenahardlb); [RuSentNE-LLM-Benchmark](https://github.com/nicolay-r/RuSentNE-LLM-Benchmark); [Multimodal Evaluation for Russian-language Architectures (MERA)](https://mera.a-ai.ru/en/leaderboard); [brief outline of Russian-language optimised models available for Ollama](https://nickveselov.ru/ollama.html).]
+
+Larger models are generally expected to be of higher quality, but slower and more demanding in terms of resources.  Newer models are often more performing than older ones (in this set, Google's `gemma3` and Microsoft's `phi4-mini`, are the most recent additions). Of course, a major factor determining processing speed is the hardware used for this task, in this case my own laptop, including availability of GPU and vRAM (in my case, a relatively powerful but oldish laptop, with a GPU that made 3.6 GiB of vRAM available to Ollama).
+
+While all of these models have generic capabilities, different models excel at different tasks, as well as in their capability to interact with different languages.
+
+
+```{r models_v, echo = FALSE}
+
+models_df <- tibble::tribble(
+  ~model, ~author, ~parameter, ~link,
+"llama3.2", "Meta", "3b", "https://ollama.com/library/llama3.2",
+  "phi4", "Microsoft", "14b", "https://ollama.com/library/phi4",
+  "phi4-mini", "Microsoft", "3.8b", "https://ollama.com/library/phi4-mini",
+  "gemma2", "Google", "9b", "https://ollama.com/library/gemma2",
+  "gemma3", "Google", "4b", "https://ollama.com/library/gemma3",
+  "olmo2", "Ai2", "7b", "https://ollama.com/library/olmo2",
+  "deepseek-r1:8b", "deepseek", "8b", "https://ollama.com/library/deepseek-r1",
+  "mistral", "Mistral", "7b", "https://ollama.com/library/mistral",
+  "owl/t-lite", "T-bank", "4.7b", "https://ollama.com/owl/t-lite", 
+  "akdengi/saiga-gemma2", "", "5.8", "https://ollama.com/akdengi/saiga-gemma2",
+  "lakomoor/vikhr-llama-3.2-1b-instruct:1b","", "1b", "https://ollama.com/lakomoor/vikhr-llama-3.2-1b-instruct"
+)
+
+models_v <- models_df |> 
+  dplyr::pull(model)
+
+models_df |> 
+    dplyr::mutate(model = purrr::map2_chr(
+    .x = model,
+    .y = link,
+    .f = \(x, y) {
+     htmltools::a(x, href = y) |> as.character()
+  })) |> 
+  dplyr::select(-link) |> 
+  gt::gt(caption = "LLMs included in this test") |> 
+  gt::fmt_markdown(columns = "model")
+```
+
+### How many of these posts are about military affairs?
+
+```{r quackingllama responses military affairs, echo = FALSE}
+library("quackingllama")
+ql_enable_db()
+
+schema <- list(
+  type = "object",
+  properties = list(
+    `tags` = list(type = "string"),
+    `about military` = list(type = "boolean")
+  ),
+  required = c(
+    "tags",
+    "about military"
+  )
+)
+
+telegram_df <- kherson_df
+
+all_responses_df <- purrr::map(
+  .x = models_v,
+  .f = \(current_model) {
+    #print(current_model)
+    prompt_df <- ql_prompt(
+      prompt = telegram_df[["text"]],
+      model = current_model,
+      system = "You are a helpful assistant. You tag and classify Russian texts.",
+      format = schema
+    )
+    
+    results_df <- prompt_df |> 
+      ql_generate(only_cached = FALSE,
+                  error = "warn") 
+    
+    
+    responses_df <- results_df |> 
+     # head() |> 
+      dplyr::mutate(
+        response_extracted = purrr::map(
+          .x = response,
+          .f = \(x) {
+            if (is.na(x)) {
+              return(NA)
+            } else {
+            x |> 
+              yyjsonr::read_json_str() |>
+              tibble::as_tibble()  
+            }
+          })
+      ) |> 
+      tidyr::unnest(cols = response_extracted,
+                    keep_empty = TRUE)
+    
+    
+    responses_df |> 
+      dplyr::rename(text = prompt) |> 
+      dplyr::left_join(y = telegram_df,
+                       by = "text")
+  }) |> 
+  purrr::list_rbind()
+
+
+
+```
+
+```{r responses_by_model_df, eval = TRUE, echo=FALSE}
+responses_by_model_df <- all_responses_df |> 
+  dplyr::select(doc_id, datetime, text, `about military`, model) |> 
+  # dplyr::group_by(datetime, text, model) |> 
+  # dplyr::mutate(about_military_total = sum( `about military`, na.rm = TRUE)) |> 
+  # dplyr::ungroup() |> 
+  tidyr::pivot_wider(names_from = model,
+                     values_from = `about military`) |> 
+  dplyr::rowwise() |> 
+  dplyr::mutate(about_military_total = sum(dplyr::c_across(dplyr::all_of(models_v)), na.rm = TRUE))
+
+# readr::write_csv(x = responses_by_model_df,
+#                  file = "responses_by_model.csv")
+
+```
+
+Looking at the result, it soon emerges that the answer to this question in many cases is not so straightforward, and that unless criteria were more clearly defined, human coders would surely have a lot of disagreement. 
+
+Indeed, unsurprisingly, different models do not reply very consistently, although larger models seemingly agree more. For example, if we limit the selection to only two of the largest models (`phi4` and `mistral`) included in this test, we get a *Krippendorf's Alpha* showing a moderate but relatively good result of inter-coder relialibility.^[It should be noted, that these are all understood to be "small" models compared to those most often available to consumers through established commercial offers.]
+
+`phi4` and `mistral` have a score close to 0.8, while all others have much lower scores.^[The measure known as "[Krippendorff Alpha](https://www.k-alpha.org/methodological-notes)" is commonly used to evaluate inter-coder reliability. Broadly speaking, a value of 1 indicates perfect agreement among raters, a value of 0.80 or higher is generally considered acceptable, a value above 0.66 but below 0.8 indicates moderate agreement (results should be looked at with caution); a lower value indicates low agreement.] A better definition of categorisation criteria would surely help.
+
+
+```{r ka_about_military, echo=FALSE}
+ka_military_df <- tidycomm::test_icr(data = all_responses_df |> 
+                                       dplyr::filter(model %in% c("phi4", "mistral")) |> 
+  dplyr::select(doc_id, `about military`, model) , 
+                   unit_var = doc_id,
+                   coder_var = model,
+                   levels = c(`about military` = "nominal"),
+                   holsti = FALSE,
+                   kripp_alpha = TRUE,
+                   cohens_kappa = FALSE,
+                   agreement = FALSE,
+                   na.omit = TRUE) |> 
+  tibble::as_tibble()  
+  
+ka_military_df |>
+  dplyr::select(n_Units, n_Coders, Krippendorffs_Alpha) |> 
+  gt::gt(caption = "'Krippendorff Alpha' based on responses by `mistral` and `phi4` categorising a post as either 'about military' or not.")
+```
+
+
+```{r ggplot about military, echo=FALSE}
+all_responses_df |> 
+  dplyr::group_by(model) |> 
+  dplyr::count(`about military`) |> 
+  dplyr::mutate(`about military` = dplyr::if_else(`about military`, 
+                                                  "about military", 
+                                                  "not about military")) |> 
+  ggplot2::ggplot(mapping = ggplot2::aes(x = n, y = model, fill = `about military`)) +
+  ggplot2::geom_col() +
+  ggplot2::scale_y_discrete(name = NULL) +
+  ggplot2::scale_x_continuous(name = "Number of posts", labels = scales::number) +
+  ggplot2::scale_fill_manual(values = c("#984e45", "#73969a")) +
+  ggplot2::theme(legend.title = ggplot2::element_blank()) +
+  ggplot2::labs(title = "How many posts mentioning Kherson are 'about military'?", 
+                subtitle = stringr::str_flatten(c("Based on posts published on Vesti's Telegram channel until", basic_vesti_l$`Latest post`), collapse = " "))
+```
+
+Even with such a broad and rather unsatisfying definition, it appears that according to all LLMs queried, about two thirds of posts (or more) are about military affairs. 
+
+
+```{r fix db, eval=FALSE, echo=FALSE, include=FALSE}
+
+purrr::walk(.x = fs::dir_ls(glob = "*.duckdb"), .f = \(current_file) {
+  
+con <- duckdb::dbConnect(duckdb::duckdb(),
+        dbdir = current_file,
+        read_only = FALSE)
+
+#duckdb::dbListTables(db)
+fixed_df <- quackingllama::ql_na_response_df |> 
+  dplyr::slice(0) |> 
+  dplyr::bind_rows(dplyr::tbl(src = con, "generate") |>
+          dplyr::collect())
+
+duckdb::dbRemoveTable(conn = con, name = "generate")
+
+duckdb::dbWriteTable(conn = con, name = "generate", value = fixed_df)
+}
+  
+)
+
+#current_file <- fs::dir_ls(glob = "*.duckdb")[[1]]
+
+```
+
+
+
+### If not about military affairs, then about what?
+
+
+```{r non_military_v, echo=FALSE}
+non_military_v <- all_responses_df |> 
+  dplyr::filter(model == "phi4") |> 
+  dplyr::filter(`about military` == FALSE) |> 
+  dplyr::pull(doc_id)
+
+
+non_military_df <- telegram_df |> 
+  dplyr::filter(doc_id %in% non_military_v) |> 
+  dplyr::select(doc_id, text)
+  
+
+schema <- list(
+  type = "object",
+  properties = list(
+    `title (in English)` = list(type = "string"),
+    `summary (in English)` = list(type = "string"),
+    `tags (in English)` = list(type = "array"),
+    `name of locations` = list(type = "array"),
+    `name of individuals` = list(type = "array"),
+    `named entities` = list(type = "array")
+  ),
+  required = c(
+    "title (in English)",
+    "summary (in English)",
+    "tags (in English)",
+    "name of locations",
+    "name of individuals",
+    "named entities"
+  )
+)
+```
+
+In conducting structured analysis, we'd review more carefully the source dataset (is Telegram's Vesti channel really relevant?), the definition of the categorisation criteria, as well as the consistency of results (including consistency with human coding for at least part of results). As this is just a preliminary test of the workflow, I'll proceed with processing further the dataset based on the results of the biggest among the models included (`phi4`).
+
+Passing to LLMs this new list of posts (`r scales::number(length(unique(non_military_v)))` posts that are supposedly not about military affairs), I ask them to extract:
+
+- name of locations
+- name of individuals
+- named entities
+
+and to describe each post with:
+
+- title
+- summary
+- tags
+
+Even if in the system message I insisted that the response be in English, some LLMs effectively responded in Russian. Arguably, at least for named entities recognition, keeping the source language may well be more effective.
+
+These are some observations after skimming through results:
+
+- there's some inconsistency in the response language; even more explicit clarity in the prompt may help, or perhaps it's wiser to process data in Russian and, if needed, translate results as late as possible in the process;
+- all models do a decent job of extracting information, with perhaps `phi4-mini` performing worst and `llama3.2` more prone to invent things (e.g. if a Russian institution is mentioned, then other institutions or officials not present in the post are also reported)
+- all models occasionally add some information not present in the post, e.g. if there is only a surname they tend to add a supposedly plausible first name (e.g. if only "Peskov" is mentioned, a reference to "Evgeny Peskov", rather than "Dmitry Peskov" may be added); this is however not very common. 
+
+While not impeccable, the data seem of good-enough quality to answer some basic questions, or else hint at interesting aspects that may then be validated with other methods. For example, if it emerges that a given official is mentioned particularly often, or a location particularly prominent, this can then be systematically checked with basic word matching. 
+
+
+The following tables report the results for each of these responses (e.g. what title each of these LLMs gave to a given post? which individuals or entities did it identify?); by clicking on the first column on the left, you'll see the original post on Telegram. These are shared here in order to let the reader form their own opinion on the quality of results.
+
+These can also be downloaded as csv files (or all together in a single rds file, allowing for nested columns).
+
+- [title](data/title.csv)
+- [summary](data/summary.csv)
+- [tags](data/tags.csv)
+- [name of locations](data/locations.csv)
+- [name of individuals](data/individuals.csv)
+- [named entities](data/entities.csv)
+
+```{r contents_responses_df, echo=FALSE, include=FALSE, message=FALSE}
+
+models_v <- c("gemma3", "phi4-mini", "phi4")
+models_v <- c("gemma3", "owl/t-lite","llama3.2", "phi4-mini", "phi4")
+
+#current_model <- "phi4"
+
+contents_responses_df <- purrr::map(
+  .x = models_v,
+  .f = \(current_model) {
+    #print(current_model)
+    prompt_df <- ql_prompt(
+      prompt = non_military_df[["text"]],
+      model = current_model,
+      system = "You are a helpful assistant, that always responds in English. You summarise, tag, and extract information from Russian texts. You respond in English and transliterate when necessary.",
+      format = schema
+    )
+    
+    results_df <- prompt_df |> 
+      ql_generate(only_cached = FALSE,
+                  error = "warn") 
+    
+    
+    results_df |> 
+      dplyr::rename(text = prompt) |> 
+      dplyr::left_join(y = non_military_df,
+                       by = "text")
+  }) |> 
+  purrr::list_rbind()
+
+
+contents_responses_df    
+
+```
+
+
+```{r extract_to_tibble, eval = TRUE, echo = FALSE, message=FALSE, include=FALSE}
+extract_to_tibble <- function(x, name, position = NULL) {
+  if (is.null(position)==FALSE) {
+    l <- x |> purrr::pluck(position)
+  } else {
+    l <- x |> purrr::pluck(name)
+  }
+  
+  
+  if (is.data.frame(l)) {
+    l <- l |> purrr::pluck("value")
+  }
+  
+  if (is.list(l)) {
+    l <- unlist(l)
+  }
+  
+  if (length(l)==0) {
+    v <- NA_character_
+  } else {
+    v <- as.character(l)
+  }
+  
+  list(
+    tibble::enframe(
+      v,
+      name = NULL,
+      value = name
+    )
+  )
+}  
+
+na_tibble <- tibble::tibble(
+  title = NA_character_,
+  summary = NA_character_,
+  tags = list(tibble::tibble(tags = NA_character_)),
+  `name of locations` = list(tibble::tibble(`name of locations` = NA_character_)),
+  `name of individuals` = list(tibble::tibble(`name of individuals` = NA_character_)),
+  `named entities` = list(tibble::tibble(`named entities` = NA_character_))
+)
+
+json_str <- contents_responses_df$response[[1566]]
+
+responses_df <-  purrr::pmap(
+  list(
+   contents_responses_df$response,
+  contents_responses_df$doc_id,
+  contents_responses_df$model,
+  contents_responses_df$text
+  ),
+
+  
+  .f = \(json_str, current_doc_id, current_model, current_text) {
+    if (is.na(json_str)) {
+      return(
+        dplyr::bind_cols(
+          tibble::tibble(doc_id = current_doc_id,
+                         model = current_model,
+                         text = current_text),
+          na_tibble
+        )
+      )
+    }
+    
+    x <- rlang::try_fetch(
+      expr = {
+        json_str |> 
+          yyjsonr::read_json_str()
+      },
+      error = function(cnd) {
+        l <- list(error = cnd)
+        list(error = l$error$message)
+      }
+    )
+    
+    if (is.null(x[["error"]])==FALSE) {
+      return(
+        dplyr::bind_cols(
+          tibble::tibble(doc_id = current_doc_id,
+                         model = current_model,
+                         text = current_text),
+          na_tibble
+        )
+      )
+    }
+    
+   
+   if ((sum(nchar(x[[4]]))>1000)) {
+           return(
+                dplyr::bind_cols(
+          tibble::tibble(doc_id = current_doc_id,
+                         model = current_model,
+                         text = current_text),
+          na_tibble
+        )
+      )
+   }
+    
+    # tibble::tibble(
+    #   title = x |> purrr::pluck("title (in English)"),
+    #   summary = x |> purrr::pluck("summary (in English)"),
+    #   tags = extract_to_tibble(x, "tags (in English)"),
+    #   `name of locations` = extract_to_tibble(x, "name of locations"),
+    #   `name of individuals` = extract_to_tibble(x, "name of individuals"),
+    #   `named entities` = extract_to_tibble(x, "named entities")
+    # )
+    
+    tibble::tibble(
+      doc_id = current_doc_id,
+      model = current_model,
+      text = current_text,
+      title = x[[1]],
+      summary = x[[2]],
+      tags = extract_to_tibble(x, "tags", 3),
+      `name of locations` = extract_to_tibble(x, "name of locations", 4),
+      `name of individuals` = extract_to_tibble(x, "name of individuals", 5),
+      `named entities` = extract_to_tibble(x, "named entities", 6)
+    )
+  }
+) |> 
+  purrr::list_rbind()
+
+
+```
+
+
+
+```{r all extracted, echo=FALSE}
+
+# combo_df <- contents_responses_df |> 
+#   dplyr::select(text, model) |> 
+#   dplyr::bind_cols(responses_df) |> 
+#   dplyr::group_by(model) |> 
+#   dplyr::mutate(id = dplyr::row_number()) |> 
+#   dplyr::ungroup()
+# 
+# 
+# 
+# combo_df <- contents_responses_df |> 
+#   dplyr::left_join(y = responses_df,
+#                    by = c("doc_id", "model"))
+
+combo_df <- responses_df
+
+
+combo_listed_df <- combo_df |> 
+  dplyr::select(doc_id, model, text, `name of locations`) |> 
+  tidyr::unnest("name of locations") |> 
+  tidyr::pivot_wider(names_from = model, values_from = `name of locations`, values_fn = list)
+  
+
+locations_df <- combo_df |> 
+  dplyr::select(doc_id, model, text, `name of locations`) |> 
+  tidyr::unnest("name of locations") |> 
+  tidyr::pivot_wider(names_from = model, values_from = `name of locations`, values_fn = list) |> 
+  dplyr::mutate(
+    dplyr::across(
+      3:sum(2, length(models_v)),
+      .fns = \(x) purrr::map_chr(
+        .x = x,
+        .f = \(x) stringr::str_flatten(x, collapse = "; ")))
+  )
+
+
+individuals_df <- combo_df |> 
+  dplyr::select(doc_id, model, text, `name of individuals`) |> 
+  tidyr::unnest("name of individuals") |> 
+  tidyr::pivot_wider(
+    names_from = model,
+    values_from = `name of individuals`,
+    values_fn = list) |> 
+  dplyr::mutate(
+    dplyr::across(
+      3:sum(2, length(models_v)),
+      .fns = \(x) purrr::map_chr(
+        .x = x,
+        .f = \(x) stringr::str_flatten(x, collapse = "; ")))
+  )
+
+
+entities_df <- combo_df |> 
+  dplyr::select(doc_id, model, text, `named entities`) |> 
+  tidyr::unnest("named entities") |> 
+  tidyr::pivot_wider(
+    names_from = model,
+    values_from = `named entities`,
+    values_fn = list) |> 
+  dplyr::mutate(
+    dplyr::across(
+      3:sum(2, length(models_v)),
+      .fns = \(x) purrr::map_chr(
+        .x = x,
+        .f = \(x) stringr::str_flatten(x, collapse = "; ")))
+  )
+
+tags_df <- combo_df |> 
+  dplyr::select(doc_id, model, text, `tags`) |> 
+  tidyr::unnest("tags") |> 
+  tidyr::pivot_wider(
+    names_from = model,
+    values_from = `tags`,
+    values_fn = list) |> 
+  dplyr::mutate(
+    dplyr::across(
+      3:sum(2, length(models_v)),
+      .fns = \(x) purrr::map_chr(
+        .x = x,
+        .f = \(x) stringr::str_flatten(x, collapse = "; "))
+      )
+  )
+
+
+title_df <- combo_df |> 
+  dplyr::select(doc_id, model, text, `title`) |> 
+  tidyr::unnest("title") |> 
+  tidyr::pivot_wider(
+    names_from = model,
+    values_from = `title`,
+    values_fn = list) |> 
+  dplyr::mutate(
+    dplyr::across(
+      3:sum(2, length(models_v)),
+      .fns = \(x) purrr::map_chr(
+        .x = x,
+        .f = \(x) stringr::str_flatten(x, collapse = "; "))
+      )
+  )
+
+summary_df <- combo_df |> 
+  dplyr::select(doc_id, model, text, `summary`) |> 
+  tidyr::unnest("summary") |> 
+  tidyr::pivot_wider(
+    names_from = model,
+    values_from = `summary`,
+    values_fn = list) |> 
+  dplyr::mutate(
+    dplyr::across(
+      3:sum(2, length(models_v)),
+      .fns = \(x) purrr::map_chr(
+        .x = x,
+        .f = \(x) stringr::str_flatten(x, collapse = "; "))
+      )
+  )
+
+fs::dir_create("data")
+saveRDS(object = responses_df, file = fs::path("data", "responses.rds"))
+readr::write_csv(x = title_df, file = fs::path("data", "title.csv"))
+readr::write_csv(x = summary_df, file = fs::path("data", "summary.csv"))
+readr::write_csv(x = tags_df, file = fs::path("data", "tags.csv"))
+readr::write_csv(x = individuals_df, file = fs::path("data", "individuals.csv"))
+readr::write_csv(x = locations_df, file = fs::path("data", "locations.csv"))
+readr::write_csv(x = entities_df, file = fs::path("data", "entities.csv"))
+
+```
+
+
+```{r gt tagging function, echo = FALSE} 
+
+gt_tag <- function(df) {
+  df |> 
+    dplyr::left_join(y = kherson_df |> 
+                       dplyr::select(doc_id, datetime),
+                     by = "doc_id") |> 
+  dplyr::mutate(post = purrr::map2_chr(
+    .x = doc_id,
+    .y = datetime,
+    .f = \(x, y) {
+     htmltools::a(y, href = stringr::str_flatten(c("https://t.me/vestiru24/", stringr::str_extract(string = x, pattern = "[[:digit:]]+"),"/"), collapse = "")) |> as.character()
+  })) |> 
+#  dplyr::mutate(text = stringr::str_trunc(string = text, width = 160)) |> 
+    dplyr::select(-doc_id, -datetime) |> 
+    dplyr::relocate(post) |> 
+gt::gt() |> 
+   gt::fmt_markdown(columns = "post") |> 
+  gt::opt_interactive(use_search = TRUE, use_highlight = TRUE, page_size_default = 3, use_page_size_select = TRUE, use_resizers = TRUE, use_text_wrapping = FALSE)
+}
+
+```
+
+
+#### Title
+
+```{r echo=FALSE}
+#| column: screen-inset
+
+gt_tag(summary_df) |> 
+  gt::tab_caption(caption = "title")
+
+```
+
+
+#### Summary
+
+```{r echo=FALSE}
+#| column: screen-inset
+
+gt_tag(summary_df) |> 
+  gt::tab_caption(caption = "Summary")
+
+```
+
+#### Locations
+
+```{r echo=FALSE}
+#| column: screen-inset
+
+gt_tag(locations_df) |> 
+  gt::tab_caption(caption = "Locations")
+
+```
+
+
+#### Individuals
+
+```{r echo=FALSE}
+#| column: screen-inset
+
+gt_tag(individuals_df) |> 
+  gt::tab_caption(caption = "Individuals")
+
+```
+
+
+#### Named entities
+
+```{r echo=FALSE}
+#| column: screen-inset
+
+gt_tag(entities_df) |> 
+  gt::tab_caption(caption = "Named entities")
+
+```
+
+#### Tags
+
+```{r echo=FALSE}
+#| column: screen-inset
+
+gt_tag(tags_df) |> 
+  gt::tab_caption(caption = "Tags")
+
+```
+
+## Processing time
+
+LLMs are notoriously demanding in terms of resources: it is possible to filter millions of posts by pattern matching in a matter of seconds, while it may well take a few seconds to process a single post with a locally deployed LLM. Of course, much depends on the hardware (and/or resources) available, but some issues of scalability emerge quite soon. The size of the model also matters significantly. 
+
+The following graphs shows how much it took to process each Telegram post in this dataset: less than a second with the smallest models, but usually about five seconds (and not infrequently more than 10 seconds) per post with the largest of those included, `phi4`. 
+
+```{r all_responses_df facet wrap, echo=FALSE, warning=FALSE}
+all_responses_df |> 
+  dplyr::select(model, eval_duration) |> 
+  dplyr::mutate(evaluation_time = eval_duration/1E9) |> 
+  dplyr::mutate(evaluation_time = dplyr::if_else(condition = evaluation_time>10,
+                                                 true = 10,
+                                                 false = evaluation_time)) |> 
+  dplyr::group_by(model) |> 
+  ggplot2::ggplot(mapping = ggplot2::aes(x = evaluation_time)) +
+  ggplot2::geom_histogram(bins = 20) +
+  ggplot2::scale_x_continuous(name = "Evaluation time (in seconds)") +
+  ggplot2::scale_y_continuous(name = "Number of posts") +
+  ggplot2::facet_wrap(~model) +
+  ggplot2::labs(title = "Total evaluation time per post with different models")
+  
+```
+The following graphs shows average processing time *per token* (i.e. adjusting for the length of input), which is likely to inform the choice of model. If, for example, in terms of named entity recognition `gemma3` performs just as well as `phi4` but is almost 5 times faster, then there's good reason to prefer it. 
+
+```{r ggplot total duration count, echo = FALSE, warning=FALSE}
+all_responses_df |> 
+  dplyr::select(model, eval_duration, eval_count) |> 
+  dplyr::group_by(model) |> 
+  dplyr::summarise(eval_duration = sum(eval_duration, na.rm = TRUE), 
+                   eval_count = sum(eval_count, na.rm = TRUE),
+                   .groups = "drop") |> 
+  dplyr::mutate(`processing time` = eval_duration/eval_count/1E6) |> 
+  dplyr::arrange(`processing time`) |> 
+  dplyr::mutate(model  = forcats::fct_inorder(model)) |> 
+  ggplot2::ggplot(mapping = ggplot2::aes(x = `processing time`,
+                                         y = model,
+                                         label = round(`processing time`))) +
+  ggplot2::geom_col() +
+  ggplot2::geom_label() +
+  ggplot2::scale_y_discrete(name = NULL) +
+  ggplot2::scale_x_continuous(labels = scales::number) +
+  ggplot2::labs(
+    title = "Processing time with different models",
+    subtitle = "Smaller is faster (milliseconds per token)")
+```
+
+```{r eval = FALSE, echo = FALSE}
+all_responses_df |> 
+  dplyr::select(doc_id, text, model, `about military`) |> 
+  tidyr::pivot_wider(names_from = model, values_from = `about military`, values_fill = NA) |> 
+  View()
+```
+
+```{r eval = FALSE, echo = FALSE}
+    responses_df <- purrr::map(
+      .x = purrr::transpose(results_df),
+      .f = \(current_response) {
+        current_response[["response"]] |> 
+          yyjsonr::read_json_str() |> 
+          tibble::as_tibble()
+      }) |> 
+      purrr::list_rbind()
+
+
+all_df <- purrr::map(
+  .x = ql_generate(prompt_df, only_cached = TRUE) |>
+    dplyr::pull(response),
+  .f = \(x) {
+    x |>
+      yyjsonr::read_json_str() |> 
+      tibble::as_tibble()
+  }) |> 
+  purrr::list_rbind()
+```
+
+```{r eval = FALSE, echo = FALSE}
+
+schema_ru <- list(
+  type = "object",
+  properties = list(
+    `о военных действиях` = list(type = "boolean")
+  ),
+  required = c(
+    "о военных действиях"
+  )
+)
+
+
+prompt_df <- ql_prompt(prompt = kherson_df[["text"]],
+              #model = "llama3.2",
+              # model = "phi4",
+              #model = "akdengi/saiga-gemma2",
+              model = "owl/t-lite",
+              #model = "gemma2",
+              #model = "lakomoor/vikhr-llama-3.2-1b-instruct:1b",
+              system = "Ты — виртуальный ассистент. Твоя задача определить если данный текст о военных действиях или нет.",
+              format = schema_ru) 
+
+
+
+
+ql_generate(prompt_df)
+
+
+```
+
+```{r eval = FALSE, echo = FALSE}
+
+all_responses_df <- purrr::map(
+  .x = models_v,
+  .f = \(current_model) {
+    results_df <- prompt_df <- ql_prompt(prompt = kherson_df[["text"]],
+
+              model = "owl/t-lite",
+
+              system = "Ты — виртуальный ассистент. Твоя задача определить если данный текст о военных действиях или нет.",
+              format = schema_ru) |> 
+      ql_generate(only_cached = TRUE) 
+    
+    
+    responses_df <- results_df |> 
+      dplyr::mutate(
+        response_extracted = purrr::map(
+          .x = response,
+          .f = \(x) {
+            x |> 
+              yyjsonr::read_json_str() |>
+              tibble::as_tibble()
+          })
+      ) |> 
+      tidyr::unnest(cols = response_extracted,
+                    keep_empty = TRUE)
+    
+    
+    responses_df |> 
+      dplyr::rename(text = prompt) |> 
+      dplyr::left_join(y = telegram_df,
+                       by = "text")
+  }) |> 
+  purrr::list_rbind()
+
+
+all_responses_df    
+```
+
+## Conclusions
+
+This post tentatively introduces a workflow for processing and categorising on-line sources with open LLMs based on two packages for the R programming language developed (and still under development) by this author , [`telegramparser`](https://github.com/giocomai/telegramparser/) and [`quackingllama`](https://giocomai.github.io/quackingllama/). 
+
+The results presented are not inherently meaningful and have not been validated; further validation of data quality issues, including matters of inter-coder reliability, will be discussed in a dedicated post. 
+
+In terms of methods, this preliminary exploration suggests that systematic processing of contents with locally-deployed open LLMs is likely feasible, if the relevant tasks are clearly defined. Due to resource constraints, these methods will likely be used in combination with more traditional approaches for filtering contents or extracting structured information from them. Indeed, this emerges even from the approach chosen for this post: first filter contents based on simple pattern matching (i.e. if a post makes reference to "Kherson"), then refine further, then query again for details.
+
+Even if LLMs are vastly less efficient than other computing techniques, they enable a different type of transparency compared to other approaches: indeed, as the prompts are expressed in natural human language, even non technically inclined readers will be in a position to propose alternative approaches for querying the dataset or different categorisation. Unlike traditional human-based coding, it will mostly be possible to re-process data without disproportionate human efforts. This approach can realistically be applied to replicate studies based on human coders, exploring slight variations in categorisation criteria.
+
+Further adjustments to workflows, and considerable validation efforts, are still needed to include results in substantive research.
+
+
+::: {.callout-note}
+## Credits
+
+This project is realized with the support of the Unit for Analysis, Policy Planning, Statistics and Historical Documentation -  Directorate General for Public and Cultural Diplomacy of the Italian Ministry of Foreign Affairs and International Cooperation, in accordance with Article 23 ‒ bis of the Decree of the President of the Italian Republic 18/1967.
+
+The views expressed are solely those of the authors and do not necessarily reflect the views of the Ministry of Foreign Affairs and International Cooperation.
+
+See [project page](https://www.balcanicaucaso.org/eng/Projects2/Framings-of-Russia-s-invasion-of-Ukraine-in-Russia-s-pro-Kremlin-public-discourse).
+
+:::
