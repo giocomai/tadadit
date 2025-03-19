@@ -18,9 +18,9 @@ bibliography: references.bib
 
 __Starting point__: What if we used LLMs (commonly referred to as "[AI](https://giorgiocomai.eu/post/2025-03-beach_volley_ai/)") to categorise Russian Telegram channels and extract information from posts?
 
-If responses are consistent, this would be vastly more efficient than human coding; as categorisation choices are expressed in natural language, results would be easier to interpret for non-technical users, who who would be able to better appreciate results and provide feedback that could be immediately implemented. As the approach relies on open LLMs (rather than ChatGPT or the likes), this would be fully replicable.
+If responses are consistent, this would be vastly more efficient than human coding; as categorisation choices are expressed in natural language, results would be easier to interpret for non-technical users, who would be able to better appreciate results and provide feedback that could be immediately implemented. As the approach relies on open LLMs (rather than ChatGPT or the likes), this would be fully replicable.
 
-___Preliminary conclusions___: the whole thing is quite promising, as others have been noticing, and especially if combined with other established approaches for content analysis, can become part of reasonably efficient and effective workflows.
+__Preliminary conclusions__: the whole thing is quite promising, as others have been noticing, and especially if combined with other established approaches for content analysis, can become part of reasonably efficient and effective workflows.
 
 __For R users__: I've developed a package to streamline local operations with this specific use case in mind, see more on the [package's documentation website](https://giocomai.github.io/quackingllama/).
 
@@ -915,7 +915,7 @@ gt_tag(tags_df) |>
 
 LLMs are notoriously demanding in terms of resources: it is possible to filter millions of posts by pattern matching in a matter of seconds, while it may well take a few seconds to process a single post with a locally deployed LLM. Of course, much depends on the hardware (and/or resources) available, but some issues of scalability emerge quite soon. The size of the model also matters significantly. 
 
-The following graphs shows how much it took to process each Telegram post in this dataset: less than a second with the smallest models, but usually about five seconds (and not infrequently more than 10 seconds) per post with the largest of those included, `phi4`. 
+The following graphs shows how much it took to process each Telegram post in this dataset: less than a second with the smallest models, but usually about six seconds (and not infrequently more than 10 seconds) per post with the largest of those included, `phi4`. 
 
 ```{r all_responses_df facet wrap, echo=FALSE, warning=FALSE}
 all_responses_df |> 
