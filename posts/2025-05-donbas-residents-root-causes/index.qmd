@@ -1,0 +1,306 @@
+---
+title: "From 'residents of the Donbas' to 'root causes'"
+description: "How the concern with 'residents of the Donbas' and humanitarian issues disappeared from Russian media"
+author: Giorgio Comai
+date: 2025-05-05
+last-modified: 2025-05-05
+categories: [russia, text-mining, telegram]
+image: "telegram_tv_01.webp"
+execute: 
+  cache: false
+editor: source
+draft: false
+---
+
+## ![](telegram_tv_01.webp) Context {#top-left-img}
+
+In some instances, it is useful to conduct a quick check about the relative prominence of certain concepts in Russian media and official discourse. There are, of course, many ways to achieve this result. In this post, I will outline an approach that is exceedingly fast and simple, while offering results that may be reasonably valid under basic assumptions. 
+
+Telegram allows to export the entire archive of a channel in a matter of minutes in a format that is amenable to further data processing. Indeed, no further data cleaning steps are effectively needed.
+
+Rather than engange in time-consuming text-mining or checking across a wide variety of sources, in this post I outline a more minimalistic approach.
+
+In brief: 
+
+- I export the archive of two Telegram channels, an all-news TV broadcaster (*Vesti*) and a news agency (*TASS*). Channel selection is based on the fact that they both focus on news and their posts routinely include quotes from government officials; at the most basic, they are meaningful proxies of mainstream news diet offered to Russian residents
+- I conduct basic word-frequency analysis and check keywords in context
+
+Once relevant workflows have been defined, these steps can be conducted in a matter of minutes.
+
+The examples provided in this post serve as background for [this article](../2025-05-territorial-concessions/). 
+
+## Frequency of posts on selected channels
+
+```{r setup, echo = FALSE, message=FALSE, include=TRUE}
+#library("extrafont")
+knitr::opts_chunk$set(echo = FALSE,
+                      fig.width = 8,
+                      fig.height = 4.5)
+
+library("ggplot2")
+library("dplyr", warn.conflicts = FALSE)
+
+library("castarter")
+
+# pak::pak("giocomai/telegramparser")
+library("telegramparser")
+library("severance")
+
+ggplot2::theme_set(new = theme_minimal(base_family = "Roboto Condensed"))
+
+
+
+base_telegram_folder <- readr::read_lines(file = "base_telegram_folder.txt") 
+
+invisible(tp_set_options(path = base_telegram_folder))
+
+tp_rename(base_telegram_folder)
+
+telegram_files <- fs::dir_ls(path = base_telegram_folder) 
+#tp_set_all_usernames()
+
+selected_channels_v <- c("ТАСС", "ВЕСТИ")
+
+```
+
+```{r metadata, echo = FALSE, message=FALSE}
+
+invisible(tp_set_options(path = base_telegram_folder))
+
+metadata_df <- tp_get_metadata() |> 
+  dplyr::filter(channel_name %in% selected_channels_v) |> 
+  dplyr::group_by(channel_id) |> 
+  dplyr::slice_max(latest_id) |> 
+  dplyr::ungroup()
+
+metadata_df |> 
+  dplyr::select(channel_name, earliest_post, latest_post, total_posts) |> 
+  dplyr::transmute(`Channel name` = channel_name, 
+                   `Earliest post` = as.Date(earliest_post), 
+                    `Latest post` = as.Date(latest_post), 
+                   `Total posts` = scales::number(total_posts)) |> 
+  gt::gt()
+```
+
+```{r news_combo_df, message = FALSE}
+news_combo_df <- tp_import(channel_name = selected_channels_v) |> 
+  dplyr::mutate(year = lubridate::year(date),
+                quarter = lubridate::quarter(date, type = "year.quarter"), 
+                month = stringr::str_extract(string = date, pattern = "[[:digit:]]{4}-[[:digit:]]{2}")) |> 
+  dplyr::filter(date < as.Date("2025-05-01"),
+                date >= as.Date("2021-01-01")) |> 
+  dplyr::left_join(tp_get_username(channel_name = selected_channels_v) |> 
+                     dplyr::select(channel_id, channel_username),
+                   by = "channel_id")
+
+```
+
+
+
+
+
+Selected Telegram channels have published consistently on Telegram since at least 2021, and have shown a relatively regular publication volume for the last couple of years. 
+
+```{r news_combo monthly distribution}
+xlabels <- sort(unique(news_combo_df$month))
+xlabels[stringr::str_ends(xlabels, "-01|-07", negate = TRUE)] <- ""
+
+news_combo_df |> 
+  dplyr::group_by(channel_name, month) |> 
+  dplyr::count() |> 
+  dplyr::ungroup() |> 
+  ggplot2::ggplot() +
+  ggplot2::geom_col(mapping = ggplot2::aes(x = month, y = n, fill = channel_name),
+                    position = "dodge") +
+  ggplot2::scale_y_continuous(name = "Number of posts", labels = scales::number) +
+  ggplot2::scale_x_discrete(name = NULL, labels = xlabels) +
+  
+  ggplot2::scale_fill_manual(values = severance::severance_palette("Dinner")) +
+  ggplot2::theme(legend.position = "bottom",
+                 axis.text.x = ggplot2::element_text(angle = 45)) +
+  ggplot2::labs(title = "Monthly Telegram posts on selected channels",
+                fill = "Channel name")
+```
+
+Rather than the number of posts, the following graph shows the total number of words per monht posted by each channel. 
+
+```{r}
+news_combo_df |> 
+  cas_count_total_words(group_by = c(channel_name, month))  |> 
+  dplyr::ungroup() |> 
+  ggplot2::ggplot() +
+  ggplot2::geom_col(mapping = ggplot2::aes(x = month, y = n, fill = channel_name),
+                    position = "dodge") +
+  ggplot2::scale_y_continuous(name = "Number of words", labels = scales::number) +
+  ggplot2::scale_x_discrete(name = NULL, labels = xlabels) +
+  ggplot2::scale_fill_manual(values = severance::severance_palette("Dinner")) +
+  ggplot2::theme(legend.position = "bottom",
+                 axis.text.x = ggplot2::element_text(angle = 45)) +
+  ggplot2::labs(title = "Total number of words posted each month on selected Telegram channels", fill = "Channel name")
+```
+
+According to both measures, there is some change in the volume of publications, but nothing of a scale that by itself could explain the trends outlined in the following sections of this post.
+
+## Residents of the Donbas
+
+"Residents of the Donbas" ("жител* донбас") have been a major object of news coverage in Russia, in particular in the days immediately before the beginning of the large scale invasion in February 2024, pointing at their promincence in the context of explaining to the Russian public the need for military intervention.
+
+They have featured somewhat regularly in posts published by selected channels throughout the following year through February 2024, but references to them were scarcely to be found later.
+
+```{r donbas_residents_count_df}
+donbas_residents_count_df <- news_combo_df |> 
+  cas_count(pattern = "жител[а-я]+ донбас",
+            group_by = c("month", "channel_name"))
+
+donbas_residents_count_df |> 
+  #  tidyr::pivot_wider(names_from = channel_name,
+  #                    values_from = n) |> 
+  dplyr::ungroup() |> 
+  ggplot2::ggplot() +
+  ggplot2::geom_col(mapping = ggplot2::aes(x = month, y = n, fill = channel_name),
+                    position = "dodge") +
+  ggplot2::scale_y_continuous(name = "Number of posts", labels = scales::number) +
+  ggplot2::scale_x_discrete(name = NULL, labels = xlabels) +
+  
+  ggplot2::scale_fill_manual(values = severance::severance_palette("Dinner")) +
+  ggplot2::theme(legend.position = "bottom",
+                 axis.text.x = ggplot2::element_text(angle = 45)) +
+  ggplot2::labs(title = "Number of posts including reference to 'residents of the Donbas' per month",
+                fill = "Channel name")
+
+
+#tp_get_info(channel_name = selected_channels_v[[1]])
+```
+
+```{r gt_kwic}
+
+gt_kwic <- function(kwic_df) {
+  
+kwic_df |> 
+  dplyr::select(date, id, channel_name, before, pattern, after, channel_username) |> 
+  dplyr::arrange(date, id, channel_name) |> 
+    dplyr::mutate(
+      date = purrr::pmap_chr(
+        .l = list(date,
+                  channel_username,
+                  id),
+    .f = \(x, y, z) {
+      htmltools::a(x, href = stringr::str_flatten(c("https://t.me/", y, "/", z),
+                                                  collapse = "")) |> as.character()
+    })) |> 
+  dplyr::select(-id, -channel_username) |> 
+  gt::gt() |> 
+  gt::cols_width(date ~ gt::px(120), 
+                 channel_name ~ gt::px(140),
+                 pattern ~ gt::px(220)) |> 
+    gt::cols_align(
+    align = "right",
+    columns = before
+  ) |> 
+  gt::cols_align(
+    align = "center",
+    columns = pattern
+  ) |> 
+  gt::opt_interactive(use_pagination = TRUE, use_sorting = TRUE, use_filters = TRUE, use_resizers = TRUE, use_highlight = TRUE, page_size_default = 5, use_page_size_select = TRUE)
+}
+```
+
+
+
+```{r donbas_residents_kwic_df}
+#| column: screen-inset
+
+
+donbas_residents_kwic_df <- news_combo_df |> 
+  cas_kwic(pattern = "жител[а-я]+ донбас")
+
+
+gt_kwic(kwic_df = donbas_residents_kwic_df)
+
+```
+
+
+## "Root causes"
+
+How frequent are mentions of "root causes" ("первопричин")? Overall, there is a rather limited number of references to "root causes" across both channels, but while they were sporadic until mid-2024, they appear more routinely, especially starting with 2025.
+
+```{r root_causes_count_df}
+root_causes_count_df <- news_combo_df |> 
+  cas_count(pattern = "первопричин",
+            group_by = c("month", "channel_name"))
+
+root_causes_count_df |> 
+   # tidyr::pivot_wider(names_from = channel_name,
+   #                   values_from = n) |> 
+  dplyr::ungroup() |> 
+  ggplot2::ggplot() +
+  ggplot2::geom_col(mapping = ggplot2::aes(x = month, y = n, fill = channel_name),
+                    position = "dodge") +
+  ggplot2::scale_y_continuous(name = "Number of posts", labels = scales::number, breaks = scales::pretty_breaks(n = 6)) +
+  ggplot2::scale_x_discrete(name = NULL, labels = xlabels) +
+  
+  ggplot2::scale_fill_manual(values = severance::severance_palette("Dinner")) +
+  ggplot2::theme(legend.position = "bottom",
+                 axis.text.x = ggplot2::element_text(angle = 45)) +
+  ggplot2::labs(title = "Number of posts including reference to 'Root causes' per month")
+```
+
+In principle, the expression "root causes" can refer to any issue (e.g. "the root causes of the economic crisis"), looking at the source text it appears clearly that it is only starting in late 2024, and more clearly since November 2024, that the expression "root causes" appears more consistently in quotes attributed to Russian officials and is applied more consistently to the conflict in Ukraine.
+
+```{r root_causes_kwic_df}
+#| column: screen-inset
+
+
+root_causes_kwic_df <- news_combo_df |> 
+  cas_kwic(pattern = "первопричин")
+
+gt_kwic(kwic_df = root_causes_kwic_df)
+```
+
+
+## Humanitarian
+
+```{r}
+humanitarian_count_df <- news_combo_df |> 
+  cas_count(pattern = "гуманитарн",
+            group_by = c("month", "channel_name"))
+
+
+
+humanitarian_count_df |> 
+  #  tidyr::pivot_wider(names_from = channel_name,
+  #                    values_from = n) |> 
+  dplyr::ungroup() |> 
+  ggplot2::ggplot() +
+  ggplot2::geom_col(mapping = ggplot2::aes(x = month, y = n, fill = channel_name),
+                    position = "dodge") +
+  ggplot2::scale_y_continuous(name = "Number of posts", labels = scales::number) +
+  ggplot2::scale_x_discrete(name = NULL, labels = xlabels) +
+  
+  ggplot2::scale_fill_manual(values = severance::severance_palette("Dinner")) +
+  ggplot2::theme(legend.position = "bottom",
+                 axis.text.x = ggplot2::element_text(angle = 45)) +
+  ggplot2::labs(title = "Number of posts including reference to 'humanitarian' per month")
+```
+
+```{r humanitarian_kwic_df}
+#| column: screen-inset
+
+
+humanitarian_kwic_df <- news_combo_df |> 
+  cas_kwic(pattern = "гуманитарн")
+
+gt_kwic(humanitarian_kwic_df)
+```
+
+
+::: {.callout-note}
+## Credits and disclaimers
+
+This project is realized with the support of the Unit for Analysis, Policy Planning, Statistics and Historical Documentation -  Directorate General for Public and Cultural Diplomacy of the Italian Ministry of Foreign Affairs and International Cooperation, in accordance with Article 23 ‒ bis of the Decree of the President of the Italian Republic 18/1967.
+
+The views expressed are solely those of the authors and do not necessarily reflect the views of the Ministry of Foreign Affairs and International Cooperation.
+
+See [project page](https://www.balcanicaucaso.org/eng/Projects2/Framings-of-Russia-s-invasion-of-Ukraine-in-Russia-s-pro-Kremlin-public-discourse).
+
+:::

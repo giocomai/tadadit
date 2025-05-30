@@ -13,3 +13,4 @@ quackingllama_phi4.duckdb
 quackingllama_phi4_mini.duckdb
 all_df.rds
 all_df_phi4.rds
+index_cache

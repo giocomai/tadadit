@@ -3,7 +3,7 @@ title: "1tv.ru_ru"
 description: "All items published on the Pervy Kanal (1tv.ru)"
 author: Giorgio Comai
 date: 2023-03-13
-last-modified: 2023-04-24
+last-modified: 2025-05-29
 categories: [dataset, Russian media, Russian language]
 ---
 

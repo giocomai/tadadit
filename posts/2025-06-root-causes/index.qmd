@@ -1,0 +1,478 @@
+---
+title: 'Russia and the "root causes" of the conflict'
+description: ""
+author: Giorgio Comai
+date: 2025-05-30
+last-modified: 2025-05-30
+categories: [russia, ukraine, root causes]
+execute: 
+  cache: true
+editor: source
+draft: false
+image: "root_causes.webp"
+---
+
+```{r setup,echo=FALSE, cache = FALSE}
+knitr::opts_chunk$set(echo = FALSE,
+                      fig.width = 8,
+                      fig.height = 4.5)
+
+ggplot2::theme_set(
+  new = ggplot2::theme_minimal(
+    base_family = "Roboto Condensed")
+)
+```
+
+
+::: {.callout-tip}
+### What this research note is about, in brief
+
+#### Questions
+
+1. when did Russia's leadership and state media really start to talk about the "root causes of the conflict", in reference to Russia's ongoing invasion of Ukraine?
+2. does a structured analysis of mentions, in particular early mentions, offer hints about what these "root causes" really are?
+
+#### Answers
+
+1. there's basically no relevant mention of "root causes" in reference to the ongoing war before 2024; "root causes" in this context effectively enters the Kremlin's dictionary in November 2024, right after Donald Trump's victory in the U.S. presidential election
+2. the "root causes of the conflict" may well be a fuzzy expression that can be adapted to different contexts; however, in Kremlin-speech as of early 2025, it effectively refers to Russia's place in the international system and in Europe's security architecture, not to Ukraine itself. 
+
+This is best summarised by prominent Russian commentator [Mikhail Leontyev](https://en.wikipedia.org/wiki/Mikhail_Leontyev), as he was about to explain why there shouldn't be expectations about any breakthrough in the negotiations with Ukraine in Istanbul in his famous [*Odnako*](https://ru.wikipedia.org/wiki/%D0%9E%D0%B4%D0%BD%D0%B0%D0%BA%D0%BE_(%D1%82%D0%B5%D0%BB%D0%B5%D0%BF%D0%B5%D1%80%D0%B5%D0%B4%D0%B0%D1%87%D0%B0)) programme on Russia's *First Channel* . Leontyev first included a Putin quote about the "root causes of the conflict" and then spelled out clearly what they are about, as well as the fact that the "root causes" cannot possibly be object of negotiation with Ukraine.
+
+> __Putin__: “We are in favour of solving the problem by peaceful means, but while eliminating the root causes that led to this situation. It is necessary to ensure Russia's security in a long-term historical perspective."
+
+> __Leontyev__: "We are talking about a new global world order that guarantees our interests and our security. Discussing the global world order with Ukraine is idiotic. We don't do that."
+
+[See the broadcast on Pervy Kanal's website.](https://www.1tv.ru/news/2025-05-14/509749-analiticheskaya_programma_odnako_s_mihailom_leontievym_ot_14_05_2025)
+
+Here is the relevant segment with English subtitles (about 1 minute):
+
+{{< video odnako50.mp4 >}}
+
+:::
+
+## ![](root_causes.webp) Context {#top-left-img}
+
+In a [recent article](../2025-05-territorial-concessions/), I argued that no amount of unilateral Ukrainian concessions would put an end to the conflict, as they couldn't possibly address what Russia considers the "root causes" of the conflict.
+
+In this post, I will unpack some of the premises to that argument and conduct more robust checks of some of its premises after [a preliminary analysis of Telegram posts of Russian news media](../2025-05-donbas-residents-root-causes/) seemed to confirm observations that the Kremlin's insistence on the "root causes" of the conflict were a recent phenomenon. I will do so by trying to answer the following two questions:
+
+1. when did Russia's leadership and state media really start to talk about the "root causes of the conflict" in reference to Russia's ongoing invasion of Ukraine?
+2. does a structured analysis of mentions offer hints about what these "root causes" really are?
+
+
+We'll approach this question based on all the publications that have appeared on the website of Russia's *First Channel* (*Pervy Kanal*, 1tv.ru) and on Kremlin.ru, which includes all official presidential statements. 
+
+There are many possible reasons to talk about "root causes", as it is a generic expression that can be used in reference to all sorts of issues completely unrelated to Ukraine, but as it will emerge clearly, it is after all not so common to talk about "root causes" in either news reports or official occasions. 
+
+## Root causes on Russia's First Channel
+
+The following graph shows how many times references to "root causes" were made in news items that appeared on the website of Russia's *First Channel*. In spite of the fact that in recent years the length of transcripts offered on the website has decreased substantially (see [more information on the 1tv.ru corpus on the dedicated page](../../datasets/1tv.ru_ru/)), it appears very clearly that the frequency of mentions to "root causes" has boomed in 2025, with dozens of mentions in the first months of the year, compared to a grand total of zero mentions in 2020 and just a few references in most other years. 
+
+```{r pervy_df}
+library("castarter")
+
+cas_set_options(
+  base_folder = fs::path(fs::path_home_r(), "R", "castarter_tadadit"),
+  project = "Russian media",
+  website = "1tv.ru_ru"
+)
+
+pervy_df <- cas_read_db_contents_data()
+
+corpus_df <- pervy_df |> 
+  dplyr::collect()
+
+pervy_root_count_df <-  corpus_df |>
+  cas_count(pattern = "первопричин")
+
+pervy_root_count_df |> 
+  cas_summarise(period = "year", auto_convert = TRUE) %>% 
+  dplyr::mutate(alpha = dplyr::if_else(date==2025, 0.9, 1)) |> 
+  ggplot2::ggplot(mapping = ggplot2::aes(x = date, y = n, alpha = alpha)) +
+  ggplot2::geom_col() +
+  ggplot2::scale_x_continuous(name = NULL) +
+  ggplot2::scale_y_continuous(name = NULL) +
+  ggplot2::scale_alpha_continuous(range = c(0.6, 1), guide = NULL) +
+  ggplot2::labs(
+    title = glue::glue("Number of references per year to {sQuote('root causes')} on {cas_get_options()$website |> stringr::str_remove('_ru$')}"),
+    subtitle = stringr::str_c("Based on ",
+                              scales::number(nrow(corpus_df)),
+                              " items published in Russian between ",
+                              format.Date(x = min(corpus_df$date), "%d %B %Y"), 
+                              " and ",
+                              format.Date(x = max(corpus_df$date), "%d %B %Y"),
+                              "\nQuery: ",
+                              sQuote("первопричин")),
+caption = "Data processing: Giorgio Comai (OBCT/CCI) / tadadit.xyz") +
+  ggplot2::theme_minimal(base_family = "Roboto Condensed") +
+  ggplot2::theme(legend.position = "none")
+```
+
+Zooming in and looking at results by month, it appears quite clearly that references to "root causes" became routine starting with November 2024, and increased significantly in May 2025.
+
+```{r pervy_monthly}
+every_nth = function(n) {
+  return(function(x) {x[c(TRUE, rep(FALSE, n - 1))]})
+}
+
+n_items_post_2020 <- corpus_df |> 
+dplyr::filter(date>= as.Date("2020-01-01")) |> 
+  nrow()
+
+pervy_root_count_df |> 
+  dplyr::filter(date>= as.Date("2020-01-01")) |>
+  cas_summarise(period = "month", auto_convert = TRUE) %>% 
+  #dplyr::mutate(alpha = dplyr::if_else(date==2025, 0.9, 1)) |> 
+  ggplot2::ggplot(mapping = ggplot2::aes(x = date, y = n)) +
+  ggplot2::geom_col() +
+  ggplot2::scale_x_discrete(name = NULL, breaks = every_nth(n = 6)) +
+  ggplot2::scale_y_continuous(name = NULL) +
+  ggplot2::scale_alpha_continuous(range = c(0.6, 1), guide = NULL) +
+  ggplot2::labs(
+    title = glue::glue("Number of references per month to {sQuote('root causes')} on {cas_get_options()$website |> stringr::str_remove('_ru$')}"),
+    subtitle = stringr::str_c("Based on ",
+                              scales::number(n_items_post_2020),
+                              " items published in Russian between ",
+                              format.Date(x = as.Date("2020-01-01"), "%d %B %Y"), 
+                              " and ",
+                              format.Date(x = max(corpus_df$date), "%d %B %Y"),
+                              "\nQuery: ",
+                              sQuote("первопричин")),
+caption = "Data processing: Giorgio Comai (OBCT/CCI) / tadadit.xyz") +
+  ggplot2::theme_minimal(base_family = "Roboto Condensed") +
+  ggplot2::theme(legend.position = "none")
+```
+
+```{r pervy_pervo_kwic_df, eval = FALSE}
+#| column: screen-inset
+pervy_pervo_kwic_df <- corpus_df |> 
+  dplyr::filter(date>= as.Date("2020-01-01")) |> 
+  cas_kwic(pattern = "первопричин")
+
+pervy_pervo_kwic_df |> 
+    dplyr::mutate(title = stringr::str_c("<a href='", url, "'>", title, "</a>")) |> 
+  dplyr::select(date, title, before, pattern, after) |> 
+DT::datatable(
+    escape = FALSE,
+    rownames = FALSE,
+    list(
+      paging = TRUE,
+      pageLength =  5,
+      columnDefs = list(
+        list(width = "10%", targets = 0),
+        list(width = "30%", targets = 1),
+        list(width = "20%", targets = 2),
+        list(width = "10%", targets = 3),
+        list(width = "20%", targets = 4)),
+      dom = 'pti'
+    ),
+    filter = list(position = "top")
+ )
+```
+
+The following table shows all mentions since 2020 in context:
+
+```{r pervy_pervo_sentences_df}
+#| column: screen-inset
+pervy_pervo_sentences_df <- corpus_df |> 
+  dplyr::filter(date>= as.Date("2020-01-01")) |> 
+  dplyr::filter(stringr::str_detect(
+    string = text,
+    pattern = stringr::regex("первопричин", ignore_case = TRUE))
+    ) |> 
+  tidytext::unnest_sentences(
+    input = text,
+    output = text,
+    to_lower = FALSE,
+    strip_punct = FALSE) |> 
+    dplyr::filter(stringr::str_detect(
+    string = text,
+    pattern = stringr::regex("первопричин", ignore_case = TRUE))
+    ) |> 
+  dplyr::mutate(
+    text = purrr::map_chr(
+      .x = text,
+      .f = \(x) {
+        castarter::cass_highlight(string = x, 
+                                  pattern = "первопричи[[а-я]]+",
+                                  ignore_case = TRUE)
+      })) 
+
+pervy_pervo_sentences_df |>
+      dplyr::mutate(title = stringr::str_c("<a href='", url, "'>", title, "</a>")) |> 
+  dplyr::select(date, title, text) |> 
+  dplyr::arrange(date) |> 
+  gt::gt() |> 
+  gt::fmt_markdown(columns = c("title", "text")) |> 
+    gt::cols_width(
+    date ~ gt::px(130),
+    title ~ gt::px(320)
+  ) |> 
+    gt::opt_interactive(use_search = TRUE, use_highlight = TRUE, page_size_default = 3, use_page_size_select = TRUE, use_resizers = TRUE, use_text_wrapping = TRUE)
+```
+
+Early mentions are unrelated to conflict or to Russia's invasion of Ukraine. 
+
+The first mention related to the conflict is a quote by Russia's Foreign Minister Lavrov during a visit to Ethiopia on 27 July 2022:
+
+> "Our African colleagues are well aware of the root causes of what is happening. The root causes are the attempt of the collective West to slow down the objective historical process, the formation of a just, democratic order and to cling to the elusive prospect of a so-called unipolar world" - [Source](https://www.1tv.ru/news/2022-07-27/434385-sergey_lavrov_v_hode_vizita_v_efiopiyu_poyasnil_prichiny_konflikta_na_ukraine)
+
+The next relevant mention appears only in [January 2023](https://www.1tv.ru/news/2023-01-13/445238-za_poslednie_30_let_ssha_215_raz_ispolzovali_svoyu_armiyu_za_rubezhom), and it's again by a diplomat, Russia's ambassador to the UN, who again puts the blame on the "Collective West" for the ongoing conflict.
+
+There's only a handful of other mentions in 2023, and they all relate to official meetings with African countries, including Somalia ([26 May 2023](https://www.1tv.ru/news/2023-05-26/453862-razvitie_dvustoronnih_otnosheniy_rossii_i_somali_obsudili_sergey_lavrov_i_abshir_omar_dzhama)), Algeria ([15 June 2023](https://www.1tv.ru/news/2023-06-15/455192-prezidenty_rossii_i_alzhira_podpisali_deklaratsiyu_ob_uglublennom_strategicheskom_partnerstve)), and the Africa-Russia summit ([28 July 2023](https://www.1tv.ru/news/2023-07-28/458068-na_sammite_rossiya_afrika_v_sankt_peterburge_zavershaetsya_plenarnaya_sessiya)).
+
+Focusing on 2022-2023, it appears that references are infrequent and clearly used only instrumentally as a rhetorical device when interacting with African leaders in order to shift the blame for the ongoing war on Western imperialism, rather than Russia itself. References to "root causes" appear seldom and only in well-defined contexts, and are obviously not addressed to either domestic audiences, the West, or Ukraine. 
+
+In April 2024, there are a few references to the [2023 peace proposal advanced by China the previous year](https://en.wikipedia.org/wiki/China%27s_Position_on_the_Political_Settlement_of_the_Ukrainian_Crisis), pointing at how the proposal addresses the "root causes" of the conflict (in particular, [here](https://www.1tv.ru/news/2024-04-12/474729-sergey_lavrov_nazval_putem_v_nikuda_sammit_po_ukraine_kotoryy_zapad_sobiraetsya_provesti_v_shveytsarii) and [here](https://www.1tv.ru/news/2024-04-14/474848-ministr_inostrannyh_del_rf_sergey_lavrov_s_ofitsialnym_vizitom_posetil_kitay)). 
+
+There are no substantive mention until November 2024, when the frequency of references to the root causes starts to increase. A first mention attributed to the MFA on [1 November 2024](https://www.1tv.ru/news/2024-11-01/491219-u_lavrova_vyzvalo_nedoumenie_sotrudnichestvo_ukrainy_i_turtsii) is inconspicuous, even if the relevant news report spells out what these root causes supposedly are about:
+
+> "NATO eastward enlargement, threats to security interests of Russia, violation of the rights of Russian and Russian-speaking residents of Ukraine [Source](https://www.1tv.ru/news/2024-11-01/491219-u_lavrova_vyzvalo_nedoumenie_sotrudnichestvo_ukrainy_i_turtsii)
+
+In the following weeks, mentions become more frequent, and involve not only the MFA, but also the Kremlin, including quotes from both [Vladimir Putin himself](https://www.1tv.ru/news/2024-11-15/492670-sostoyalsya_pervyy_za_dva_goda_telefonnyy_razgovor_vladimira_putina_s_kantslerom_frg_olafom_sholtsem) and his speaker [Dmitri Peskov](https://www.1tv.ru/news/2024-11-29/494011-peskov_zayavil_chto_mirotvortsy_nato_na_ukraine_vozmozhny_tolko_s_soglasiya_storon). 
+
+The first reference to root causes found on Russia's *First Channel* quoting Putin refers to a [call with German Chancellor Scholz](https://www.1tv.ru/news/2024-11-15/492670-sostoyalsya_pervyy_za_dva_goda_telefonnyy_razgovor_vladimira_putina_s_kantslerom_frg_olafom_sholtsem) on 15 November 2024. 
+
+In the following weeks, references to "root causes" became more common. It is worth highlighting how the surge in references to "root causes" of the conflict effectively coincides with Donald Trump's victory in the U.S. presidential election held on 5 November 2024. Indeed, in clear contrast with earlier pre-2024 references to "root causes", at this stage the expression is clearly targeted at Western leaders, and specifically the United States.
+
+Reference to "root causes" has become routine, to the extent that it does not require an explanation of what it is about. Statements from Russia's MFA point at the three above-mentioned elements (NATO, Russia's security, right of Russian-speakers in Ukraine), but the Kremlin leaves this definition more open-ended (see also below). Territorial control of regions in Eastern Ukraine, however, never features among "root causes" of the conflict.
+
+As all of these references are found in news items broadcast on Russian TV, there is obviously also a message for the domestic audience, who is to be primed about what to expect of direct negotiations with Ukraine. If peace can be reached only when the "root causes" of the conflict are removed, and root causes mostly do not stem from Ukraine, then the effectiveness of direct negotiations with Kyiv seems logically doubtful. 
+
+
+This is best summarised by prominent Russian commentator [Mikhail Leontyev](https://en.wikipedia.org/wiki/Mikhail_Leontyev), as he was about to explain why there shouldn't be expectations about any breakthrough in the negotiations with Ukraine in Istanbul in his famous [*Odnako*](https://ru.wikipedia.org/wiki/%D0%9E%D0%B4%D0%BD%D0%B0%D0%BA%D0%BE_(%D1%82%D0%B5%D0%BB%D0%B5%D0%BF%D0%B5%D1%80%D0%B5%D0%B4%D0%B0%D1%87%D0%B0)) programme on Russia's *First Channel* . Leontyev first included a Putin quote about the "root causes of the conflict" and then spelled out clearly what they are about, as well as the fact that the "root causes" cannot possibly be object of negotiation with Ukraine.
+
+> __Putin__: “We are in favor of solving the problem by peaceful means, but while eliminating the root causes that led to this situation. It is necessary to ensure Russia's security in a long-term historical perspective."
+
+> __Leontyev__: "We are talking about a new global world order that guarantees our interests and our security. Discussing the global world order with Ukraine is idiotic. We don't do that."
+
+[See the broadcast on Pervy Kanal's website.](https://www.1tv.ru/news/2025-05-14/509749-analiticheskaya_programma_odnako_s_mihailom_leontievym_ot_14_05_2025)
+
+Here is the relevant segment with English subtitles:
+
+{{< video odnako50.mp4 >}}
+
+## Root causes on Kremlin.ru
+
+Analysing the Kremlin's official website shows broadly similar trends, although with fewer overall mentions.
+
+```{r kremlin_df}
+library("castarter")
+
+cas_set_options(
+  base_folder = fs::path(fs::path_home_r(), "R", "castarter_tadadit"),
+  project = "Russian institutions",
+  website = "kremlin.ru_ru"
+)
+
+kremlin_df <- cas_read_db_contents_data()
+
+corpus_df <- kremlin_df |> 
+  dplyr::collect() |> 
+  dplyr::mutate(internal_id = stringr::str_extract(url, "[[:digit:]]+$")) |> 
+  dplyr::distinct(internal_id, .keep_all = TRUE)
+
+kremlin_root_count_df <-  corpus_df |>
+  cas_count(pattern = "первопричин")
+
+kremlin_root_count_df |> 
+  cas_summarise(period = "year", auto_convert = TRUE) %>% 
+  dplyr::mutate(alpha = dplyr::if_else(date==2025, 0.9, 1)) |> 
+  ggplot2::ggplot(mapping = ggplot2::aes(x = date, y = n, alpha = alpha)) +
+  ggplot2::geom_col() +
+  ggplot2::scale_x_continuous(name = NULL) +
+  ggplot2::scale_y_continuous(name = NULL, breaks = scales::pretty_breaks(n = 10)) +
+  ggplot2::scale_alpha_continuous(range = c(0.6, 1), guide = NULL) +
+  ggplot2::labs(
+    title = glue::glue("Number of references per year to {sQuote('root causes')} on {cas_get_options()$website |> stringr::str_remove('_ru$')}"),
+    subtitle = stringr::str_c("Based on ",
+                              scales::number(nrow(corpus_df)),
+                              " items published in Russian between ",
+                              format.Date(x = min(corpus_df$date), "%d %B %Y"), 
+                              " and ",
+                              format.Date(x = max(corpus_df$date), "%d %B %Y"),
+                              "\nQuery: ",
+                              sQuote("первопричин")),
+    caption = "Data processing: Giorgio Comai (OBCT/CCI) / tadadit.xyz") +
+  ggplot2::theme_minimal(base_family = "Roboto Condensed") +
+  ggplot2::theme(legend.position = "none")
+```
+
+
+```{r kremlin_monthly, eval = FALSE}
+# See also monthly data:
+
+
+every_nth = function(n) {
+  return(function(x) {x[c(TRUE, rep(FALSE, n - 1))]})
+}
+
+n_items_post_2020 <- corpus_df |> 
+  dplyr::filter(date>= as.Date("2020-01-01")) |> 
+  nrow()
+
+kremlin_root_count_df |> 
+  dplyr::filter(date>= as.Date("2020-01-01")) |>
+  cas_summarise(period = "month", auto_convert = TRUE) %>% 
+  #dplyr::mutate(alpha = dplyr::if_else(date==2025, 0.9, 1)) |> 
+  ggplot2::ggplot(mapping = ggplot2::aes(x = date, y = n)) +
+  ggplot2::geom_col() +
+  ggplot2::scale_x_discrete(name = NULL, breaks = every_nth(n = 6)) +
+  ggplot2::scale_y_continuous(name = NULL, breaks = scales::breaks_pretty(n = 10)) +
+  ggplot2::scale_alpha_continuous(range = c(0.6, 1), guide = NULL) +
+  ggplot2::labs(
+    title = glue::glue("Number of references per month to {sQuote('root causes')} on {cas_get_options()$website |> stringr::str_remove('_ru$')}"),
+    subtitle = stringr::str_c("Based on ",
+                              scales::number(n_items_post_2020),
+                              " items published in Russian between ",
+                              format.Date(x = as.Date("2020-01-01"), "%d %B %Y"), 
+                              " and ",
+                              format.Date(x = max(corpus_df$date), "%d %B %Y"),
+                              "\nQuery: ",
+                              sQuote("первопричин")),
+    caption = "Data processing: Giorgio Comai (OBCT/CCI) / tadadit.xyz") +
+  ggplot2::theme_minimal(base_family = "Roboto Condensed") +
+  ggplot2::theme(legend.position = "none")
+```
+
+
+
+```{r kremlin_pervo_sentences_df}
+#| column: screen-inset
+kremlin_pervo_sentences_df <- corpus_df |> 
+  dplyr::filter(date>= as.Date("2020-01-01")) |> 
+  dplyr::filter(stringr::str_detect(
+    string = text,
+    pattern = stringr::regex("первопричин", ignore_case = TRUE))
+    ) |> 
+  tidytext::unnest_sentences(
+    input = text,
+    output = text,
+    to_lower = FALSE,
+    strip_punct = FALSE) |> 
+    dplyr::filter(stringr::str_detect(
+    string = text,
+    pattern = stringr::regex("первопричин", ignore_case = TRUE))
+    ) |> 
+  dplyr::mutate(
+    text = purrr::map_chr(
+      .x = text,
+      .f = \(x) {
+        castarter::cass_highlight(string = x, 
+                                  pattern = "первопричи[[а-я]]+",
+                                  ignore_case = TRUE)
+      })) 
+
+kremlin_pervo_sentences_df |>
+      dplyr::mutate(title = stringr::str_c("<a href='", url, "'>", title, "</a>")) |> 
+  dplyr::select(date, title, text) |>  
+  dplyr::arrange(date) |> 
+  gt::gt() |> 
+  gt::fmt_markdown(columns = c("title", "text")) |> 
+    gt::cols_width(
+    date ~ gt::px(130),
+    title ~ gt::px(320)
+  ) |> 
+    gt::opt_interactive(use_search = TRUE, use_highlight = TRUE, page_size_default = 3, use_page_size_select = TRUE, use_resizers = TRUE, use_text_wrapping = TRUE)
+```
+
+
+Here is a similar set of quotes from the Kremlin's English-language website (discrepancies in availability are due to translation issues).
+
+
+```{r kremlin_pervo_sentences_en_df}
+#| column: screen-inset
+
+library("castarter")
+
+cas_set_options(
+  base_folder = fs::path(fs::path_home_r(), "R", "castarter_tadadit"),
+  project = "Russian institutions",
+  website = "kremlin.ru_en"
+)
+
+corpus_en_df <- cas_read_db_contents_data() |> 
+  dplyr::collect() |> 
+  dplyr::mutate(internal_id = stringr::str_extract(url, "[[:digit:]]+$")) |> 
+  dplyr::distinct(internal_id, .keep_all = TRUE)
+
+
+
+kremlin_pervo_sentences_en_df <- corpus_en_df |> 
+  dplyr::filter(date>= as.Date("2020-01-01")) |> 
+  dplyr::filter(stringr::str_detect(
+    string = text,
+    pattern = stringr::regex("root caus", ignore_case = TRUE))
+    ) |> 
+  tidytext::unnest_sentences(
+    input = text,
+    output = text,
+    to_lower = FALSE,
+    strip_punct = FALSE) |> 
+    dplyr::filter(stringr::str_detect(
+    string = text,
+    pattern = stringr::regex("root caus", ignore_case = TRUE))
+    ) |> 
+  dplyr::mutate(
+    text = purrr::map_chr(
+      .x = text,
+      .f = \(x) {
+        castarter::cass_highlight(string = x, 
+                                  pattern = "root caus[[a-z]]+",
+                                  ignore_case = TRUE)
+      })) 
+
+kremlin_pervo_sentences_en_df |>
+      dplyr::mutate(title = stringr::str_c("<a href='", url, "'>", title, "</a>")) |> 
+  dplyr::select(date, title, text) |>  
+  dplyr::arrange(date) |> 
+  gt::gt() |> 
+  gt::fmt_markdown(columns = c("title", "text")) |> 
+    gt::cols_width(
+    date ~ gt::px(130),
+    title ~ gt::px(320)
+  ) |> 
+    gt::opt_interactive(use_search = TRUE, use_highlight = TRUE, page_size_default = 3, use_page_size_select = TRUE, use_resizers = TRUE, use_text_wrapping = TRUE)
+```
+
+Again, we find mention of "root causes" during the [July 2023 Africa - Russia summit](http://en.kremlin.ru/events/president/news/71826); "root causes" is however here used in reference to the hikes in food prices, and in order to point out that they are not due to the war in Ukraine, but rather to "fundamental mistakes of industrialised countries in financial and energy policy". 
+
+We also find a relevant mention in reference to China's peace plan, long after it was initially proposed; I will quote this excerpt from an interview to Xinhua News Agency at length, as it provides substantial context about the "root causes"/"underlying causes":
+
+> We commend China's approaches to resolving the crisis in Ukraine. Beijing is well aware of its root causes and global geopolitical significance, which is reflected in its 12‑point plan [...]. The steps build on the idea that we need to forego the "Cold War mentality" and ensure indivisible security and respect for international law and the UN Charter in their entirety and interrelation. They could therefore lay the groundwork for a political and diplomatic process that would take into account Russia's security concerns and contribute to achieving a long-term and sustainable peace.
+
+> Unfortunately, neither Ukraine nor its Western patrons support these initiatives. They are not ready to engage in an equal, honest and open dialogue based on mutual respect and consideration of each other's interests. They are reluctant to discuss the underlying causes, the very origins of the global crisis, which has manifested itself, inter alia, in the dramatic situation around Ukraine. Why? Because today's global shocks have been provoked precisely by their policies in the previous years and decades. 
+
+> [Source](http://en.kremlin.ru/events/president/news/74027)
+
+From this quote, it appears that Ukraine is only a facet, an "*inter alia*", while the core issues of the conflict, the "root causes", are rather to be found among global geopolitical issues. 
+
+There are multiple references to "root causes" in the following months, perhaps most noticeably in the read-outs of phone calls between Putin and Trump held in [February 2025](http://en.kremlin.ru/events/president/news/76259), in [March 2025](http://en.kremlin.ru/events/president/news/76477), in [May 2025](http://en.kremlin.ru/events/president/news/76953), although in none of them they are presented or debated meaningfully. In a few instances they are associated with Russia's security.
+
+## Conclusions
+
+It is always important to the resist the temptation to engage in mind-reading Russia's president based on a few scattered quotes. Ultimately, references to "root causes" can be highly contextual; for example, it is understandable that when addressing a Chinese audience, Russia's invasion of Ukraine is explained in terms of geopolitical competition, and not in terms of Russia's imperialistic obsession with Ukraine.
+
+Given how much Russia's Ministry of Foreign Affairs has been left out of the loop in so many matters related to Russia's invasion of Ukraine, it would scarcely make sense to seek explanations for the war in quotes by Sergey Lavrov, who in many ways seems to be himself trying to make sense of the situation with little access to the Kremlin. 
+
+Still, this analysis shows that references to "root causes" used when engaging with Western leaders is a phenomenon that started in November 2024, effectively coinciding with Donald Trump's victory in the U.S. presidential election. 
+
+Throughout these quotes, "root causes" are not associated with Ukraine itself, if not as a last point among others in some of the quotes stemming from the MFA. On the contrary, the expression seems mostly to be used to differentiate it from the more concrete matters related to Ukraine: there may be territorial issues and security matters related specifically to Ukraine, and then there are "the root causes of the conflict". 
+
+My own understanding is that the expression gained prominence and relevance in the context of negotiations only after Trump's comeback to the White House, because Trump seemed to think that a deal based on Ukrainian territorial concessions would be enough to put an end to the conflict. As a deal involving some form of acknowledgement of Russia's territorial conquests in Ukraine was becoming more realistic both because of battlefield dynamics and Trump's own positions, Vladimir Putin started to insist on the "root causes" of the conflict that must be addressed for the conflict to end. In the Kremlin's view, territory won in battle cannot be object of negotiations: the negotiations must be be about "the root causes" of the conflict, i.e. Russia's place in the international system and in Europe's security architecture, not Ukraine itself. As I [recently argued](../2025-05-territorial-concessions/), "Ukraine, of course, remains central to Russia's interests. But [...] [in Moscow's vision] once Western geopolitical ambitions and weapons are removed from Ukraine, Ukraine would inevitably fall back within the Russian political and cultural space where it naturally belongs. Western quiescence to Russia's demands and Moscow's neo-imperial design to control Ukraine, and indeed subsume it in the Russian cultural and political space along with Belarus, are inextricably intertwined, as one set of objectives cannot be achieved without the other."
+
+I appreciate, however, that the expression "root causes" remains fuzzy and prone to different understandings. Brian Whitmore, for example, [argues](https://www.atlanticcouncil.org/blogs/new-atlanticist/welcome-to-the-long-war-why-a-ukraine-deal-was-never-realistic/) that "the root cause of the war is the very existence of Ukraine as a sovereign state". Lavrov's understanding of the "root causes" may only partly overlap with Putin's understandings. Ultimately, the fuzziness of the expression allows for it to take and adapt its meaning in context, and it may well be futile to try to pinpoint a specific, static meaning. 
+
+Analytically, perhaps what is most important at this stage is to appreciate its use in the context of the ongoing negotiations, and in setting expectations for domestic audiences. The fuzziness of the expression in the long-term may allow for adaptation and leeway in eventual negotiations. But in the short term, the quote by Leontyev presented earlier in this note seems to be most informative: by shifting the focus on matters well beyond Ukraine and in lowering expectations for domestic audiences, insistence on "root causes" does not bode well for direct Ukraine-Russia talks.
+
+::: {.callout-note}
+## Credits and disclaimers
+
+This project is realized with the support of the Unit for Analysis, Policy Planning, Statistics and Historical Documentation -  Directorate General for Public and Cultural Diplomacy of the Italian Ministry of Foreign Affairs and International Cooperation, in accordance with Article 23 ‒ bis of the Decree of the President of the Italian Republic 18/1967.
+
+The views expressed are solely those of the authors and do not necessarily reflect the views of the Ministry of Foreign Affairs and International Cooperation.
+
+See [project page](https://www.balcanicaucaso.org/eng/Projects2/Framings-of-Russia-s-invasion-of-Ukraine-in-Russia-s-pro-Kremlin-public-discourse).
+
+:::

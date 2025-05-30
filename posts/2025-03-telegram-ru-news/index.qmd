@@ -83,7 +83,7 @@ ggplot2::theme_set(new = theme_minimal(base_family = "Roboto Condensed"))
 
 base_telegram_folder <- readr::read_lines(file = "base_telegram_folder.txt") 
 
-tp_set_options(path = base_telegram_folder)
+invisible(tp_set_options(path = base_telegram_folder))
 
 tp_rename(base_telegram_folder)
 
@@ -126,7 +126,7 @@ tg_categories_df <-  tibble::tribble(
   "НЕЗЫГАРЬ", "Z-blogger, etc.",
   "Два майора", "Z-blogger, etc.", 
   
-
+  
   
   "Дмитрий Медведев", "Russian state official",
   "Мария Захарова", "Russian state official",
@@ -142,7 +142,7 @@ tg_categories_df <-  tibble::tribble(
   
   "Медуза — LIVE", "Russian independent media",
   "Телеканал Дождь", "Russian independent media"
-  )
+)
 ```
 
 ```{r metadata_df, echo = FALSE}
@@ -169,12 +169,12 @@ tg_categories_df |>
     .x = channel_name,
     .y = channel_username,
     .f = \(x, y) {
-     htmltools::a(x, href = stringr::str_flatten("https://t.me/", y, collapse = "")) |> as.character()
-  })) |> 
+      htmltools::a(x, href = stringr::str_flatten("https://t.me/", y, collapse = "")) |> as.character()
+    })) |> 
   dplyr::select(-channel_id, -channel_username, -latest_post) |> 
   dplyr::group_by(type) |> 
   gt::gt(caption = "Selected Telegram channels and number of posts published until mid-January 2025") |> 
-   gt::fmt_markdown(columns = "channel_name") |> 
+  gt::fmt_markdown(columns = "channel_name") |> 
   gt::fmt_number(columns = "total_posts", decimals = 0, sep_mark = " ") |> 
   gt::tab_options(row_group.as_column = TRUE)
 
@@ -229,21 +229,21 @@ Here are some summary statistics about Vesti's Telegram channel at the time of w
 ```{r basic_vesti_l, echo = FALSE}
 
 basic_vesti_l <- list(
-     `Earliest post` = vesti_df |> 
-  dplyr::slice_min(date,with_ties = FALSE) |> 
-  dplyr::pull(date) |> 
-  format("%d %B %Y"),
+  `Earliest post` = vesti_df |> 
+    dplyr::slice_min(date,with_ties = FALSE) |> 
+    dplyr::pull(date) |> 
+    format("%d %B %Y"),
   `Latest post` = vesti_df |> 
-  dplyr::slice_max(date,with_ties = FALSE) |> 
-  dplyr::pull(date) |> 
-  format("%d %B %Y"),
+    dplyr::slice_max(date,with_ties = FALSE) |> 
+    dplyr::pull(date) |> 
+    format("%d %B %Y"),
   `Total posts` = vesti_df |> 
     nrow() |> 
     scales::number(),
-   `Total posts with reference to Kherson` = kherson_df |> 
+  `Total posts with reference to Kherson` = kherson_df |> 
     nrow() |> 
     scales::number()
-
+  
 ) 
 
 basic_vesti_l |> 
@@ -276,7 +276,7 @@ While all of these models have generic capabilities, different models excel at d
 
 models_df <- tibble::tribble(
   ~model, ~author, ~parameter, ~link,
-"llama3.2", "Meta", "3b", "https://ollama.com/library/llama3.2",
+  "llama3.2", "Meta", "3b", "https://ollama.com/library/llama3.2",
   "phi4", "Microsoft", "14b", "https://ollama.com/library/phi4",
   "phi4-mini", "Microsoft", "3.8b", "https://ollama.com/library/phi4-mini",
   "gemma2", "Google", "9b", "https://ollama.com/library/gemma2",
@@ -293,12 +293,12 @@ models_v <- models_df |>
   dplyr::pull(model)
 
 models_df |> 
-    dplyr::mutate(model = purrr::map2_chr(
+  dplyr::mutate(model = purrr::map2_chr(
     .x = model,
     .y = link,
     .f = \(x, y) {
-     htmltools::a(x, href = y) |> as.character()
-  })) |> 
+      htmltools::a(x, href = y) |> as.character()
+    })) |> 
   dplyr::select(-link) |> 
   gt::gt(caption = "LLMs included in this test") |> 
   gt::fmt_markdown(columns = "model")
@@ -341,7 +341,7 @@ all_responses_df <- purrr::map(
     
     
     responses_df <- results_df |> 
-     # head() |> 
+      # head() |> 
       dplyr::mutate(
         response_extracted = purrr::map(
           .x = response,
@@ -349,9 +349,9 @@ all_responses_df <- purrr::map(
             if (is.na(x)) {
               return(NA)
             } else {
-            x |> 
-              yyjsonr::read_json_str() |>
-              tibble::as_tibble()  
+              x |> 
+                yyjsonr::read_json_str() |>
+                tibble::as_tibble()  
             }
           })
       ) |> 
@@ -396,17 +396,17 @@ Indeed, unsurprisingly, different models do not reply very consistently, althoug
 ```{r ka_about_military, echo=FALSE}
 ka_military_df <- tidycomm::test_icr(data = all_responses_df |> 
                                        dplyr::filter(model %in% c("phi4", "mistral")) |> 
-  dplyr::select(doc_id, `about military`, model) , 
-                   unit_var = doc_id,
-                   coder_var = model,
-                   levels = c(`about military` = "nominal"),
-                   holsti = FALSE,
-                   kripp_alpha = TRUE,
-                   cohens_kappa = FALSE,
-                   agreement = FALSE,
-                   na.omit = TRUE) |> 
+                                       dplyr::select(doc_id, `about military`, model) , 
+                                     unit_var = doc_id,
+                                     coder_var = model,
+                                     levels = c(`about military` = "nominal"),
+                                     holsti = FALSE,
+                                     kripp_alpha = TRUE,
+                                     cohens_kappa = FALSE,
+                                     agreement = FALSE,
+                                     na.omit = TRUE) |> 
   tibble::as_tibble()  
-  
+
 ka_military_df |>
   dplyr::select(n_Units, n_Coders, Krippendorffs_Alpha) |> 
   gt::gt(caption = "'Krippendorff Alpha' based on responses by `mistral` and `phi4` categorising a post as either 'about military' or not.")
@@ -437,21 +437,21 @@ Even with such a broad and rather unsatisfying definition, it appears that accor
 
 purrr::walk(.x = fs::dir_ls(glob = "*.duckdb"), .f = \(current_file) {
   
-con <- duckdb::dbConnect(duckdb::duckdb(),
-        dbdir = current_file,
-        read_only = FALSE)
-
-#duckdb::dbListTables(db)
-fixed_df <- quackingllama::ql_na_response_df |> 
-  dplyr::slice(0) |> 
-  dplyr::bind_rows(dplyr::tbl(src = con, "generate") |>
-          dplyr::collect())
-
-duckdb::dbRemoveTable(conn = con, name = "generate")
-
-duckdb::dbWriteTable(conn = con, name = "generate", value = fixed_df)
-}
+  con <- duckdb::dbConnect(duckdb::duckdb(),
+                           dbdir = current_file,
+                           read_only = FALSE)
   
+  #duckdb::dbListTables(db)
+  fixed_df <- quackingllama::ql_na_response_df |> 
+    dplyr::slice(0) |> 
+    dplyr::bind_rows(dplyr::tbl(src = con, "generate") |>
+                       dplyr::collect())
+  
+  duckdb::dbRemoveTable(conn = con, name = "generate")
+  
+  duckdb::dbWriteTable(conn = con, name = "generate", value = fixed_df)
+}
+
 )
 
 #current_file <- fs::dir_ls(glob = "*.duckdb")[[1]]
@@ -473,12 +473,15 @@ non_military_v <- all_responses_df |>
 non_military_df <- telegram_df |> 
   dplyr::filter(doc_id %in% non_military_v) |> 
   dplyr::select(doc_id, text)
-  
+
 
 schema <- list(
   type = "object",
   properties = list(
-    `title (in English)` = list(type = "string"),
+    `context of food security provision` = list(
+      type = "string", 
+      enum = c("trade restrictions", "food aid", "sustainable development")
+    ),
     `summary (in English)` = list(type = "string"),
     `tags (in English)` = list(type = "array"),
     `name of locations` = list(type = "array"),
@@ -494,7 +497,10 @@ schema <- list(
     "named entities"
   )
 )
+
+
 ```
+
 
 In conducting structured analysis, we'd review more carefully the source dataset (is Telegram's Vesti channel really relevant?), the definition of the categorisation criteria, as well as the consistency of results (including consistency with human coding for at least part of results). As this is just a preliminary test of the workflow, I'll proceed with processing further the dataset based on the results of the biggest among the models included (`phi4`).
 
@@ -613,12 +619,12 @@ json_str <- contents_responses_df$response[[1566]]
 
 responses_df <-  purrr::pmap(
   list(
-   contents_responses_df$response,
-  contents_responses_df$doc_id,
-  contents_responses_df$model,
-  contents_responses_df$text
+    contents_responses_df$response,
+    contents_responses_df$doc_id,
+    contents_responses_df$model,
+    contents_responses_df$text
   ),
-
+  
   
   .f = \(json_str, current_doc_id, current_model, current_text) {
     if (is.na(json_str)) {
@@ -654,17 +660,17 @@ responses_df <-  purrr::pmap(
       )
     }
     
-   
-   if ((sum(nchar(x[[4]]))>1000)) {
-           return(
-                dplyr::bind_cols(
+    
+    if ((sum(nchar(x[[4]]))>1000)) {
+      return(
+        dplyr::bind_cols(
           tibble::tibble(doc_id = current_doc_id,
                          model = current_model,
                          text = current_text),
           na_tibble
         )
       )
-   }
+    }
     
     # tibble::tibble(
     #   title = x |> purrr::pluck("title (in English)"),
@@ -717,7 +723,7 @@ combo_listed_df <- combo_df |>
   dplyr::select(doc_id, model, text, `name of locations`) |> 
   tidyr::unnest("name of locations") |> 
   tidyr::pivot_wider(names_from = model, values_from = `name of locations`, values_fn = list)
-  
+
 
 locations_df <- combo_df |> 
   dplyr::select(doc_id, model, text, `name of locations`) |> 
@@ -776,7 +782,7 @@ tags_df <- combo_df |>
       .fns = \(x) purrr::map_chr(
         .x = x,
         .f = \(x) stringr::str_flatten(x, collapse = "; "))
-      )
+    )
   )
 
 
@@ -793,7 +799,7 @@ title_df <- combo_df |>
       .fns = \(x) purrr::map_chr(
         .x = x,
         .f = \(x) stringr::str_flatten(x, collapse = "; "))
-      )
+    )
   )
 
 summary_df <- combo_df |> 
@@ -809,7 +815,7 @@ summary_df <- combo_df |>
       .fns = \(x) purrr::map_chr(
         .x = x,
         .f = \(x) stringr::str_flatten(x, collapse = "; "))
-      )
+    )
   )
 
 fs::dir_create("data")
@@ -831,18 +837,18 @@ gt_tag <- function(df) {
     dplyr::left_join(y = kherson_df |> 
                        dplyr::select(doc_id, datetime),
                      by = "doc_id") |> 
-  dplyr::mutate(post = purrr::map2_chr(
-    .x = doc_id,
-    .y = datetime,
-    .f = \(x, y) {
-     htmltools::a(y, href = stringr::str_flatten(c("https://t.me/vestiru24/", stringr::str_extract(string = x, pattern = "[[:digit:]]+"),"/"), collapse = "")) |> as.character()
-  })) |> 
-#  dplyr::mutate(text = stringr::str_trunc(string = text, width = 160)) |> 
+    dplyr::mutate(post = purrr::map2_chr(
+      .x = doc_id,
+      .y = datetime,
+      .f = \(x, y) {
+        htmltools::a(y, href = stringr::str_flatten(c("https://t.me/vestiru24/", stringr::str_extract(string = x, pattern = "[[:digit:]]+"),"/"), collapse = "")) |> as.character()
+      })) |> 
+    #  dplyr::mutate(text = stringr::str_trunc(string = text, width = 160)) |> 
     dplyr::select(-doc_id, -datetime) |> 
     dplyr::relocate(post) |> 
-gt::gt() |> 
-   gt::fmt_markdown(columns = "post") |> 
-  gt::opt_interactive(use_search = TRUE, use_highlight = TRUE, page_size_default = 3, use_page_size_select = TRUE, use_resizers = TRUE, use_text_wrapping = FALSE)
+    gt::gt() |> 
+    gt::fmt_markdown(columns = "post") |> 
+    gt::opt_interactive(use_search = TRUE, use_highlight = TRUE, page_size_default = 3, use_page_size_select = TRUE, use_resizers = TRUE, use_text_wrapping = FALSE)
 }
 
 ```
@@ -931,7 +937,7 @@ all_responses_df |>
   ggplot2::scale_y_continuous(name = "Number of posts") +
   ggplot2::facet_wrap(~model) +
   ggplot2::labs(title = "Total evaluation time per post with different models")
-  
+
 ```
 The following graphs shows average processing time *per token* (i.e. adjusting for the length of input), which is likely to inform the choice of model. If, for example, in terms of named entity recognition `gemma3` performs just as well as `phi4` but is almost 5 times faster, then there's good reason to prefer it. 
 
@@ -965,14 +971,14 @@ all_responses_df |>
 ```
 
 ```{r eval = FALSE, echo = FALSE}
-    responses_df <- purrr::map(
-      .x = purrr::transpose(results_df),
-      .f = \(current_response) {
-        current_response[["response"]] |> 
-          yyjsonr::read_json_str() |> 
-          tibble::as_tibble()
-      }) |> 
-      purrr::list_rbind()
+responses_df <- purrr::map(
+  .x = purrr::transpose(results_df),
+  .f = \(current_response) {
+    current_response[["response"]] |> 
+      yyjsonr::read_json_str() |> 
+      tibble::as_tibble()
+  }) |> 
+  purrr::list_rbind()
 
 
 all_df <- purrr::map(
@@ -1000,14 +1006,14 @@ schema_ru <- list(
 
 
 prompt_df <- ql_prompt(prompt = kherson_df[["text"]],
-              #model = "llama3.2",
-              # model = "phi4",
-              #model = "akdengi/saiga-gemma2",
-              model = "owl/t-lite",
-              #model = "gemma2",
-              #model = "lakomoor/vikhr-llama-3.2-1b-instruct:1b",
-              system = "Ты — виртуальный ассистент. Твоя задача определить если данный текст о военных действиях или нет.",
-              format = schema_ru) 
+                       #model = "llama3.2",
+                       # model = "phi4",
+                       #model = "akdengi/saiga-gemma2",
+                       model = "owl/t-lite",
+                       #model = "gemma2",
+                       #model = "lakomoor/vikhr-llama-3.2-1b-instruct:1b",
+                       system = "Ты — виртуальный ассистент. Твоя задача определить если данный текст о военных действиях или нет.",
+                       format = schema_ru) 
 
 
 
@@ -1023,11 +1029,11 @@ all_responses_df <- purrr::map(
   .x = models_v,
   .f = \(current_model) {
     results_df <- prompt_df <- ql_prompt(prompt = kherson_df[["text"]],
-
-              model = "owl/t-lite",
-
-              system = "Ты — виртуальный ассистент. Твоя задача определить если данный текст о военных действиях или нет.",
-              format = schema_ru) |> 
+                                         
+                                         model = "owl/t-lite",
+                                         
+                                         system = "Ты — виртуальный ассистент. Твоя задача определить если данный текст о военных действиях или нет.",
+                                         format = schema_ru) |> 
       ql_generate(only_cached = TRUE) 
     
     
