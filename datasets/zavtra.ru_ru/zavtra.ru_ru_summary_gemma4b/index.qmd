@@ -1,0 +1,112 @@
+---
+title: "Zavtra.ru - Summary of articles"
+description: "All items published on the website of the Russian weekly magazine 'Zavtra', summarised with a locally deployed LLM (gemma:4b)"
+author: Giorgio Comai
+date: 2025-07-29
+last-modified: 2025-07-29
+date-modified: last-modified
+categories: [dataset, Russian media, Russian language, llm, summary]
+editor: source
+---
+
+
+```{r batch generate, eval = TRUE, echo = FALSE, message=FALSE, warning=FALSE, include=FALSE}
+
+purrr::walk(
+  .x = 1996:2007,
+  .f = \(current_year) {
+    quarto::quarto_render(
+      input = "_template.qmd",
+      output_format = "md",
+      output_file = fs::path_ext_set(path = as.character(current_year), ext = "md"),
+      cache_refresh = TRUE,
+      execute_params = list(
+        year = current_year, 
+        sample_size = 100
+      )
+    )    
+  }
+)
+
+```
+
+
+```{r md_files, echo = FALSE}
+md_files <- fs::dir_ls(glob = "*.md")
+
+purrr::walk(
+  .x = md_files,
+  .f = \(current_file) {
+    md_pre <- readr::read_lines(file = current_file)
+    md_post <- c(
+      "---",
+      paste("title: Summary of a sample of Zavtra.ru articles published in", fs::path_ext_remove(current_file)),
+      "---",
+      "",
+      md_pre)
+    
+    readr::write_lines(x = md_post, file = current_file)
+  })
+
+```
+
+
+## Explore the summary of a sample of articles by year
+
+
+```{r index by year, echo = FALSE, results='asis'}
+purrr::walk(.x = md_files, .f = \(current_file) {
+  cat(stringr::str_flatten(c("- ", "<a href='", fs::path_ext_set(current_file, ext = "html"), "'>", fs::path_ext_remove(current_file), "</a>\n")))
+})
+```
+
+
+## Why LLM-generated summaries
+
+For readers unfamiliar with *Zavtra*, especially those who do not read Russian, it may be difficult to get a first impression of the thematic focus of the articles and the writing style. The fact that titles of publications are often not descriptive, makes it more difficult to skim through them and get a feeling of the thematic priorities of the editors, as well as the tone and style characteristic of the magazine. 
+
+An English-language collection of pre-compiled LLM-generated summaries of a random sample of articles makes it easy to skim through the contents and get a meaningful first impression. Even if the dull style of LLM-generated articles does not fully convey the stylistic verve, or the scathing or sarcastic criticism of public figures, it does outline both contents and style. It also allows to get a glimpse through the thematic priorities, including a long-term preoccupation with Russia (as a nation, in civilisational terms, more than short-term issues), the prevalence of opinion pieces, the attention to the arts, etc. 
+
+As is characteristic of LLMs, these summaries may include inaccuracies. 
+
+## About the process
+
+Summaries have been generated with the following tools:
+
+- a locally-deployed version of the LLM [`gemma3`](https://ollama.com/library/gemma3), in its 4b parameters version. `gemma3` is an open-weights model [released by Google Deepmind](https://deepmind.google/models/gemma/).
+- [`ollama`](https://ollama.com/), to run the model locally
+- [`quackingllama`](https://giocomai.github.io/quackingllama/) - an R package created by this author, which facilitates systematic processing of texts and local caching
+
+In brief, each of the articles included in the sample has been passed to the LLM, along with a prompt requesting a summary of the text and a translation of the title (see below for details on the prompts). The output is then systematically included in the set of pages divided by year listed above.
+
+The code used to generated them is [available on GitHub](https://github.com/giocomai/tadadit/tree/main/datasets/zavtra.ru_ru/zavtra.ru_ru_summary_gemma4b/
+). 
+
+The whole process has been conducted on the author's own device, without sending data to third parties. 
+
+## About the corpus
+
+These summaries are based on a corpus of all articles published by *Zavtra* on its official website. Find out more about the corpus and download it from [its official release on 
+*Discuss Data*](https://discuss-data.net/dataset/dae0b5b8-157f-471a-bb3c-ea24e0b2a7f7/), its [release page on this website](../../2025/zavtra.ru_ru_2025), or the [unstable version on this website](..) (may be more up to date, but not checked for consistency). 
+
+Finally, it should be possible to explore the dataset through [an interactive web interface](https://explore.tadadit.xyz/2025/zavtra.ru_ru_2025/).
+
+
+
+
+
+## Prompt used for summaries
+
+__System prompt__:
+
+> You are a helpful assistant. You summarise in English the text you receive. Your reply must always be in English and include only the summary of the received text, without additional comments or queries.
+
+__Message prompt__:
+
+> Without any additional comment or query, summarise in English the following text:  [Full text of the original article here]  "End of the text. Summarise in English."
+
+## Prompt used for translating titles
+
+Same system prompt as above. Message prompt:
+
+> Without any additional comment or request, translate in English the following text:

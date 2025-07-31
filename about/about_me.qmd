@@ -2,7 +2,7 @@
 title: "Giorgio Comai"
 #subtitle: "Researcher and data analyst at OBCT/CCI."
 description: "Giorgio Comai is lead researcher of the project."
-image: profile.jpg
+image: profile.webp
 date: 2022-10-22
 last-modified: 2023-03-14
 about:
@@ -10,7 +10,7 @@ about:
   template: solana
   image-shape: round
   image-width: 10rem
-  image: profile.jpg
+  image: profile.webp
   links:
     - icon: mastodon
       text: Fediverse

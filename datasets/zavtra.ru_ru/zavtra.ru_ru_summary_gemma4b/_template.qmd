@@ -1,0 +1,138 @@
+---
+params:
+  year: 1996 
+  sample_size: 10
+editor: source
+---
+
+```{r set metadata, echo = FALSE, eval = FALSE}
+#| output: asis
+
+quarto::write_yaml_metadata_block(
+  title = stringr::str_flatten(string = c("Summary of a sample of Zavtra.ru articles published in ", c(params$year)))
+)
+```
+
+```{r setup, echo = FALSE, message=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+
+
+```
+
+::: callout-warning
+## LLM-generated content, may include inaccuracies
+
+This page includes LLM-generated summaries of articles published on Russian weekly newspaper *Zavtra*. They may be useful for a first overview of the contents published by *Zavtra*, but they have not been reviewed and they almost certainly include inaccuracies.
+
+Clicking on the title of each article will bring you to the original publication on *Zavtra*'s official website. 
+
+:::
+
+
+```{r corpus_df}
+set.seed(1)
+
+library("castarter")
+
+# taking here from my local version to include 2025
+# but you can load the released version as `corpus_original_df`
+# and everything will work as expected.
+
+cas_set_options(
+  base_folder = fs::path(fs::path_home_r(), 
+                         "R",
+                         "castarter_tadadit"),
+  project = "Russian media",
+  website = "zavtra.ru_ru" 
+)
+
+corpus_original_df <- cas_read_db_contents_data() |> 
+  dplyr::mutate(publication_year = lubridate::year(date)) |> 
+  dplyr::filter(publication_year == params$year) |> 
+  dplyr::collect() 
+
+corpus_df <- corpus_original_df |> 
+  dplyr::slice_sample(n = params$sample_size)
+
+text <- corpus_df |> dplyr::pull("text")
+title <- corpus_df |> dplyr::pull("title")
+```
+
+
+*This page includes an LLM-generated summary of a random sample of `r scales::number(nrow(corpus_df))` articles out of a total of `r scales::number(nrow(corpus_original_df))` articles published in `r params$year` (coverage: `r scales::percent(nrow(corpus_df)/nrow(corpus_original_df), accuracy = 1)`)*. For more context, details on how this was implemented, and links to other years, see the [index page](index.html).
+
+
+```{r quackingllama setup}
+library("quackingllama")
+
+ql_set_db_options(
+  db_folder = fs::path(fs::path_home_r(), "R", "castarter_tadadit_ql")
+)
+
+```
+
+```{r summary_df}
+summary_df <- ql_prompt(
+  prompt = paste0(
+    "Without any additional comment or query, summarise in English the following text: ",
+    text, 
+    "End of the text. Summarise in English."
+  ),
+  system = "You are a helpful assistant. You summarise in English the text you receive. Your reply must always be in English and include only the summary of the received text, without additional comments or queries.", 
+  model = "gemma3-64k:4b"
+) |>
+  ql_generate(keep_alive = "20m", timeout = 1000) |> 
+  dplyr::bind_cols(corpus_df)
+
+
+
+```
+
+```{r title_df}
+title_df <- ql_prompt(
+  prompt = paste0(
+    "Without any additional comment or request, translate in English the following text: ",
+    title
+  ),
+  system = "You are a helpful assistant. You translate in English the text you receive. Your reply must always be in English and include only the translation of the received text, without additional comments or queries.",
+  model = "gemma3:4b"
+) |>
+  ql_generate() |> 
+  dplyr::bind_cols(corpus_df)
+
+```
+
+```{r current_corpus_df}
+current_corpus_df <- dplyr::bind_cols(
+  corpus_df,
+  title_df |> dplyr::transmute(title_english = response) |> 
+    dplyr::mutate(title_english = title_english |> 
+                    stringr::str_remove(pattern = "[[:punct::]]$") |> 
+                    stringr::str_squish()),
+  summary_df |> dplyr::transmute(summary_english = response)
+  ) |> 
+  dplyr::mutate(author_latin = stringi::stri_trans_general(str = author,
+                                                           "ru-ru_Latn/BGN")) |> 
+  dplyr::arrange(date)
+
+```
+
+```{r print output, results='asis'}
+
+current_corpus_l <- purrr::transpose(current_corpus_df)
+
+purrr::walk(
+  .x = current_corpus_l, .f = function(x) {
+    cat(stringr::str_flatten(c("<a href='", x[["url"]], "'>", "<h3>", x[["title_english"]], "</h3>", "</a>")))
+    cat("<p>")
+    cat(x[["date"]])
+    cat(" - ")
+    cat("<b>", x[["author_latin"]], "</b>")
+    cat("</p>")
+    cat("<p>")
+    cat( x[["summary_english"]])
+    cat("</p>")
+    cat("<hr />")
+})
+
+```

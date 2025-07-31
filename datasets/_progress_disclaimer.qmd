@@ -1,0 +1,7 @@
+::: callout-warning
+## Work-in-progress
+
+This page presents a version of the corpus that is only updated occasionally. It may be more up-to-date compared to the stable release, but only limited quality checks have been conducted, so if you intend to use it, make sure it is fit for purpose. 
+
+A stable and fully documented release is available, find details below. 
+:::

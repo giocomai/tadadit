@@ -1,0 +1,342 @@
+---
+title: "zavtra.ru_ru_2025"
+description: "Corpus based on the website of Russian weekly newspaper 'Zavtra' (in Russian, 1996-2024)"
+author: Giorgio Comai
+date: 2025-07-28
+last-modified: 2025-07-28
+categories: ["corpus", "full corpus", "Russian media", "Russian language"]
+editor: source
+---
+
+
+```{r setup, echo = FALSE, message=FALSE, warning=FALSE, results='asis'}
+website_name <- "zavtra.ru_ru"
+description_string_01 <- "all items published on"
+description_string_02 <- "zavtra.ru"
+license_string <- "[Creative Commons Attribution 4.0 International](https://creativecommons.org/licenses/by/4.0/deed.ru)"
+
+source(fs::path("..", "russian_institutions_2025", "release_functions_2025.R"))
+source(fs::path("..", "russian_institutions_2025", "release_setup_2025.R"))
+
+download_callout()
+```
+
+<hr />
+
+
+
+::: {.callout-tip title="Official release"}
+
+Official release with DOI now available on *Discuss Data* (2025 version to be released soon):
+
+[doi:10.48320/DAE0B5B8-157F-471A-BB3C-EA24E0B2A7F7](https://doi.org/10.48320/DAE0B5B8-157F-471A-BB3C-EA24E0B2A7F7).
+
+Giorgio Comai (2024): *zavtra.ru_ru - Full text corpus based on the website of Russian weekly newspaper 'Zavtra' (in Russian, 1996-2023)*, v. 1.0, Discuss Data, [doi:10.48320/DAE0B5B8-157F-471A-BB3C-EA24E0B2A7F7](https://doi.org/10.48320/DAE0B5B8-157F-471A-BB3C-EA24E0B2A7F7).
+
+::: 
+
+## Scope of this corpus
+
+This corpus is based on the website of Russian weekly newspaper [zavtra.ru](http://zavtra.ru/).
+
+The structure of the website suggests a strict correspondence between the online and the printed version: the website includes an archive with a separate section dedicated to each issue of the printed version of the newspaper. Archive pages show also which contents supposedly appear on which page of the printed version. Exact correspondence, however, has not been checked. 
+
+The website also hosts additional contents, such as podcasts, which are not included in this corpus. Only contents linked from the archive page of an issue of the newspaper are included in this corpus.
+
+The earliest issue included in this corpus is issue 149, published on 14 October 1996. The most recent issue included in this corpus is issue 1563, published on 27 December 2023.
+
+
+## Summary statistics
+
+```{r summary_stats, results='asis'}
+summary_stats_text()
+```
+
+```{r items_per_year}
+items_per_year()
+```
+
+```{r words_per_year}
+words_per_year()
+```
+
+
+```{r missing_table}
+missing_table()
+```
+
+```{r missing_graph}
+missing_graph()
+```
+
+
+## Narrative explanation of how this textual corpus was built
+
+*Zavtra* keeps a full archive of its publications starting from 1996. This corpus was built through a script that retrieves archive pages for each year (e.g. [this for 1996](https://zavtra.ru/archive/1996)), then retrieves the link to the page dedicated to each issue, and from there, extracts links to individual articles. Hence only articles attached to an issue are effectively included in the corpus. 
+
+The number of the issue in which each article supposedly appears is obtained based on the archive page where link to the given page was found (see below for potential issues). 
+
+Metadata such as author, date, and tags have been retrieved from the article page itself, based on relevant html tags. In particular:
+
+- `title` is retrieved from `<div>` of class `header__title`
+- `date` and `datetime` have been parsed from the `<span>` of class `header__data`
+- `author` is retrieved from `<span>` of class `avtor-name`
+- `intro` is retrieved from `<div>` of class `header__anonse`
+- `tags` is retrieved from `<span>` of class `artags`
+- `text` is retrieved from `<div>` of class `article__content`
+
+## Data quality issues
+
+No major issues have emerged during extraction of text and metadata from the website.
+
+As appears from the above graphs, fields such as "tags" and "intro" have been used somewhat consistently on the website only in the last decade. 
+
+Some minor issues are listed below:
+
+- especially in articles related to earlier years, title, date of publication, and issue number may be repeated at the beginning of the article itself
+- the date of publication included in such cases may be off by a few days in respect to the date of publication reported above the title
+- the issue number may also be off by one, e.g. this inline text makes reference to issue 228, but is linked from the archive page of issue 227. 
+- a very small number of issues includes only one article
+
+Here is an example showing all of the above issues. 
+
+[Issue 227](https://zavtra.ru/archive/1998/4/227), available from the archive page related to [1998](https://zavtra.ru/archive/1998), includes only [one article](https://zavtra.ru/blogs/1998-04-1711anshl). This [article](https://zavtra.ru/blogs/1998-04-1711anshl), includes at the very beginning of its text the title, and then the following string: "15 (228) Date: 17–04–98". This would suggest that the article was originally published on 17 April 1998 and belonged to issue 228. Yet on the very same web page, 13 April 1998 is presented as date of publication, and the 
+article is linked from the archive page of issue 227.
+
+Metadata in this corpus consistently rely on website metadata, hence would keep these latter points of reference, and ignore metadata included within the text itself. 
+
+As the difference is only of a few days, these issues are likely of negligibile impact for analyses looking at long term trends, but should be kept in consideration by researchers for whom exact date of publication is of the essence. Time of publication (hour and minute) should probably be disregarded for earlier years: the 3.00am time of publication reported for many articles is probably just an artifact of importing contents from previous versions of the website, which may have assumed GMT as the default time. Again, as these are the metadata currently visible online, they have been dutifully included in the published corpus, but should be looked at with caution.
+
+The vast majority of newspaper issues includes between 15 and 30 articles (see histogram below). In a small number of cases, as mentioned above, only one article is included in each issue. This may or may not hint at missing articles (perhaps, these were actually published as double issues, and the lone remaining article has been mis-attributed to an effectively non-existent issue). No additional checks have been conducted on these outliers. 
+
+```{r distribution_per_issue}
+corpus_df |> 
+  dplyr::group_by(issue_number) |> 
+  dplyr::count() |> 
+  dplyr::ungroup() |> 
+  dplyr::arrange(n) |> 
+  ggplot2::ggplot() +
+  ggplot2::geom_histogram(mapping = ggplot2::aes(x = n), binwidth = 1) +
+  scale_y_continuous(name = "", labels = scales::number) +
+    scale_x_continuous(name = "", breaks = scales::pretty_breaks(n = 10)) +
+    labs(
+      title = paste("Distribution of number of articles per issue published on", description_string_02, collapse = " "),
+      subtitle = stringr::str_c(
+        "Based on ",
+        scales::number(nrow(corpus_df)),
+        " items published in ", 
+        scales::number(corpus_df |> dplyr::distinct(issue_number) |> nrow()),
+        " issues between ",
+        format.Date(x = min(corpus_df$date), "%e %B %Y"), 
+        " and ",
+        format.Date(x = max(corpus_df$date), "%e %B %Y")) |> 
+        stringr::str_squish(),
+     caption = stringr::str_c("Source: Giorgio Comai / tadadit.xyz / ", corpus_name)
+    )  
+```
+
+
+## License information
+
+At the time contents were retrieved, the footer of *zavtra.ru* made clear that all contents are available under a Creative Commons license:
+
+> Все материалы сайта доступны по лицензии: [Creative Commons Attribution 4.0 International](https://creativecommons.org/licenses/by/4.0/deed.ru)
+
+The contents of this dataset - `zavtra.ru_ru_2025` - are distributed in line with this license. To the extent that it is possible, the corpus itself is also distributed by its creator, Giorgio Comai, with the same CC-BY license, as well as under the Open Data Commons Attribution license (ODC-BY).
+
+
+```{r corpus_original_df}
+corpus_original_df <- cas_read_db_contents_data() |> 
+  dplyr::collect()
+
+corpus_df <- corpus_original_df
+```
+
+
+
+## Dataset cleaning and reordering
+
+The following columns have been added to the original dataset before exporting:
+
+- introduce an `id`, based on the row number after reordering for issue number; this is used for reference, and does not necessarily represent order of publication
+- introduce a `doc_id` column (composed of the website base url, the language of the dataset, and the `id`) and set this as the first column of the dataset
+
+
+```{r cleaning}
+corpus_df <- corpus_original_df
+
+corpus_pre_df <- corpus_df 
+
+## ensure dates always present
+corpus_df <- corpus_df |> 
+  dplyr::filter(is.na(date)==FALSE) 
+
+  
+check <- assertthat::assert_that(nrow(corpus_original_df)==nrow(corpus_df), 
+                        msg = "rows dropped due to missing dates")
+
+## close dataset at end date
+corpus_df <- corpus_df |> 
+  dplyr::filter(date<=end_date) 
+
+## add id 
+
+corpus_df <- corpus_df |> 
+  dplyr::arrange(as.numeric(issue_number)) |> 
+  dplyr::mutate(id = dplyr::row_number())
+
+
+corpus_df <- corpus_df |> 
+  dplyr::rowwise() |> 
+  dplyr::mutate(doc_id = stringr::str_c(website_name, "_", id)) |> 
+  dplyr::ungroup() |> 
+  dplyr::relocate(doc_id, text, title, date, datetime) |> 
+  dplyr::relocate(id, url, .after = dplyr::last_col())
+
+check <- assertthat::assert_that(nrow(corpus_df) == nrow(corpus_df |> dplyr::distinct(doc_id)),
+                                 msg = "duplicated doc_id")
+```
+
+
+## Consistency check with previous version of this corpus
+
+```{r corpus_2024}
+corpus_2024_file <- fs::path(base_folder, "zavtra.ru_ru_2024.csv.gz")
+
+if (!fs::file_exists(corpus_2024_file)) {
+  download.file(url = "https://discuss-data.net/dataset/dae0b5b8-157f-471a-bb3c-ea24e0b2a7f7/files/f2f748ea-bd11-4cd2-b4b6-f57a7ac1b5b0/",
+                destfile = corpus_2024_file)  
+}
+
+corpus_2024_df <- readr::read_csv(corpus_2024_file)
+
+corpus_2025_df <- corpus_df
+```
+
+
+
+
+```{r corpus_id_combo_df}
+corpus_id_combo_df <- corpus_2024_df |> 
+  dplyr::select(id, url) |> 
+  dplyr::rename(id_2024 = id) |> 
+  dplyr::left_join(corpus_2025_df |> 
+  dplyr::select(id, url) |> 
+    dplyr::rename(id_2025 = id),
+  by = "url") |> 
+  dplyr::mutate(id_check = id_2024==id_2025) 
+
+# corpus_id_combo_df |> dplyr::filter(!id_check)
+# 
+# corpus_id_combo_df |> dplyr::filter(is.na(id_2025))
+
+corpus_id_combo_back_df <- corpus_2025_df |> 
+  dplyr::filter(date < as.Date("2024-01-01")) |> 
+  dplyr::select(id, url) |> 
+    dplyr::rename(id_2025 = id) |> 
+  dplyr::left_join(corpus_2024_df |> 
+  dplyr::select(id, url) |> 
+  dplyr::rename(id_2024 = id),
+  by = "url") |> 
+  dplyr::mutate(id_check = id_2024 == id_2025)
+
+```
+
+
+There are some minor inconsistencies with the previously published dataset, due to the fact that a few items disappeared from the on-line version of the website. They are three in total: a poem, an article about an artist, and an advertisement related to investments that probably was not supposed to appear on-line in the first place. Supposing there's reason for them to be taken offline, and the reason does not seem to be research-relevant, they are dropped from the updated version of the corpus.
+
+The id of items remains however consistent across versions of this corpus.
+
+```{r corpus_version_combo_df, echo=FALSE}
+corpus_version_combo_df <- corpus_2025_df |> 
+  dplyr::rename(id_2025 = id, 
+                doc_id_2025 = doc_id) |> 
+  dplyr::left_join(y = corpus_2024_df |> 
+                     dplyr::select(doc_id, id, url),
+                   by = "url")
+
+max_previous_id <- max(corpus_2024_df[["id"]])
+n_na <- sum(is.na(corpus_version_combo_df[["id"]]))
+
+
+corpus_version_combo_df[["id"]][is.na(corpus_version_combo_df[["id"]])] <- sum(max_previous_id, 1):sum(max_previous_id, n_na)
+
+# check
+testthat::test_that(desc = "All items have an id",
+                    code = testthat::expect_equal(
+                      object = sum(is.na(corpus_version_combo_df[["id"]])),
+                      expected = 0)
+)
+
+corpus_version_combo_df <- corpus_version_combo_df |> 
+  dplyr::mutate(doc_id = paste0("zavtra.ru_ru_", id)) |> 
+  dplyr::relocate(doc_id, .before = doc_id_2025) |> 
+  dplyr::relocate(id, .before = id_2025) |> 
+  dplyr::select(-doc_id_2025, -id_2025) 
+
+
+  # dplyr::mutate(id = dplyr::if_else(condition = is.na(id), true = id_2025, false = id),
+  #               doc_id = dplyr::if_else(condition = is.na(doc_id), true = doc_id_2025, false = doc_id))
+
+corpus_df <- corpus_version_combo_df
+```
+
+
+
+
+
+
+
+```{r piggyback, eval = FALSE}
+
+corpus_path <- fs::path(fs::path_home_r(), 
+                      "R",
+                      "castarter_2025",
+                      "corpora")
+
+fs::dir_create(corpus_path)
+
+csv_release_file <- fs::path(corpus_path, 
+                         stringr::str_c(corpus_name, ".csv.gz"))
+
+corpus_df |> 
+  readr::write_csv(file = csv_release_file)
+
+
+piggyback::pb_new_release(repo = "giocomai/tadadit",
+               tag = corpus_name,
+               body = summary_stats_text())
+
+piggyback::pb_upload(file = csv_release_file,
+          repo = "giocomai/tadadit",
+          tag = corpus_name)
+
+ods_file <- fs::path(corpus_path, 
+                         stringr::str_c(path = corpus_name, ".ods"))
+                      
+readODS::write_ods(x = corpus_df, path = ods_file)
+
+piggyback::pb_upload(file = ods_file,
+          repo = "giocomai/tadadit",
+          tag = corpus_name)
+
+
+rds_file <- fs::path(corpus_path, 
+                         stringr::str_c(path = corpus_name, ".rds"))
+                 
+saveRDS(object = corpus_df, file = rds_file)
+
+piggyback::pb_upload(file = rds_file,
+          repo = "giocomai/tadadit",
+          tag = corpus_name)
+
+cas_write_corpus(corpus = corpus_df,
+                 partition = "year",
+                 tif_compliant = FALSE,
+                 path = fs::path(corpus_path, corpus_name))
+```
+
+
+## Outputs related to this corpus
+
+- Comai, Giorgio (2023), "Who said it first? ‘The collective West’ in Russia’s nationalist media and official statements", tadadit.xyz, 14 March 2023,  [https://tadadit.xyz/posts/2023-03-who-says-it-first-nationalist-media-kremlin/](https://tadadit.xyz/posts/2023-03-who-says-it-first-nationalist-media-kremlin/)

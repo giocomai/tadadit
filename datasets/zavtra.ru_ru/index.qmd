@@ -3,11 +3,25 @@ title: "zavtra.ru_ru"
 description: "All items published on the website of the Russian weekly magazine 'Zavtra'"
 author: Giorgio Comai
 date: 2023-03-14
-last-modified: 2023-05-28
+last-modified: 2025-07-29
+date-modified: last-modified
 categories: [dataset, Russian media, Russian language]
+editor: source
 ---
 
-{{< include ./../_early_disclaimer.qmd >}}
+{{< include ./../_progress_disclaimer.qmd >}}
+
+<hr />
+
+::: {.callout-tip title="Official release"}
+
+Official release with DOI now available on *Discuss Data*:
+
+[doi:10.48320/DAE0B5B8-157F-471A-BB3C-EA24E0B2A7F7](https://doi.org/10.48320/DAE0B5B8-157F-471A-BB3C-EA24E0B2A7F7).
+
+Giorgio Comai (2024): *zavtra.ru_ru - Full text corpus based on the website of Russian weekly newspaper 'Zavtra' (in Russian, 1996-2023)*, v. 1.0, Discuss Data, [doi:10.48320/DAE0B5B8-157F-471A-BB3C-EA24E0B2A7F7](https://doi.org/10.48320/DAE0B5B8-157F-471A-BB3C-EA24E0B2A7F7).
+
+::: 
 
 ```{r setup, echo = FALSE, message=FALSE}
 #library("extrafont")
@@ -31,7 +45,7 @@ cas_set_options(
                          "R",
                          "castarter_tadadit"),
   project = "Russian media",
-  website = "Zavtra.ru" 
+  website = "zavtra.ru_ru" 
 )
 
 corpus_df <- cas_read_db_contents_data() %>% 
@@ -89,11 +103,11 @@ corpus_df |>
   )
 ```
 
-```{r}
+```{r words_per_day_df}
 words_per_day_df <- corpus_df |> 
   cas_count_total_words() |> 
   mutate(date = lubridate::as_date(date),
-         string = "total words")
+         pattern = "total words")
 
 words_per_day_df |> 
   cas_summarise(period = "year", auto_convert = TRUE) |>
